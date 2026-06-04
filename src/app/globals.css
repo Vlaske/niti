@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+:root {
+  --niti-cream: #faf7f2;
+  --niti-sand: #e8dfd4;
+  --niti-blush: #f4e4e0;
+  --niti-sage: #b8cfc0;
+  --niti-sage-dark: #8faf9a;
+  --niti-lavender: #e8e4f0;
+  --niti-charcoal: #2a2826;
+  --niti-muted: #7a736c;
+  --niti-line: #e5ddd4;
+  --niti-footer: #5c5348;
+  --niti-footer-dark: #4a4339;
+  --niti-sale: #c97b7b;
+  --niti-marquee: #c4bdb4;
+}
+
+@theme inline {
+  --color-niti-cream: var(--niti-cream);
+  --color-niti-sand: var(--niti-sand);
+  --color-niti-blush: var(--niti-blush);
+  --color-niti-sage: var(--niti-sage);
+  --color-niti-sage-dark: var(--niti-sage-dark);
+  --color-niti-lavender: var(--niti-lavender);
+  --color-niti-charcoal: var(--niti-charcoal);
+  --color-niti-muted: var(--niti-muted);
+  --color-niti-line: var(--niti-line);
+  --color-niti-footer: var(--niti-footer);
+  --color-niti-footer-dark: var(--niti-footer-dark);
+  --color-niti-sale: var(--niti-sale);
+  --color-niti-marquee: var(--niti-marquee);
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-serif: var(--font-serif), Georgia, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--niti-cream);
+  color: var(--niti-charcoal);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.font-serif {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+}
+
+.font-sans {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Pointer on all interactive elements */
+a,
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+[role="button"],
+label[for],
+select,
+summary,
+.interactive,
+.cursor-pointer {
+  cursor: pointer;
+}
+
+a:disabled,
+button:disabled,
+.interactive:disabled {
+  cursor: not-allowed;
+}
+
+.interactive {
+  transition:
+    color 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.product-card {
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.product-card-frame {
+  cursor: default;
+}
+
+@keyframes cart-badge-pop {
+  0% {
+    transform: scale(0.6);
+  }
+  70% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-badge-pop {
+  animation: cart-badge-pop 0.35s ease-out;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
