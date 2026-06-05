@@ -46,7 +46,11 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
     >
       <div className="mx-auto max-w-[1440px] px-4 md:px-8 lg:px-12">
         <div data-section-reveal>
-          <SectionHeader title={t("home.newArrivals")} viewAllHref="/shop" />
+          <SectionHeader
+            title={t("home.newArrivals")}
+            viewAllHref="/shop"
+            viewAllLabel={t("home.viewAll")}
+          />
         </div>
 
         <div data-section-reveal className="mt-6 md:mt-8">

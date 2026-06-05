@@ -8,11 +8,15 @@ import { FeaturedHero } from "@/components/home/FeaturedHero";
 // import { MarqueeBanner } from "@/components/home/MarqueeBanner";
 import { FaqSection } from "@/components/home/FaqSection";
 import { getAllProducts } from "@/lib/catalog";
+import { getDesignShowcaseItems } from "@/lib/catalog/design-showcase";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const products = await getAllProducts();
+  const [products, designShowcase] = await Promise.all([
+    getAllProducts(),
+    getDesignShowcaseItems(),
+  ]);
   return (
     <>
       <Header variant="transparent" />
@@ -24,7 +28,7 @@ export default async function HomePage() {
           image="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=85"
           ctaHref="/product/cloud-linen-sheet-set"
         />
-        <DesignCarousel />
+        <DesignCarousel items={designShowcase} />
         {/* Pomerajuća traka — privremeno isključeno
         <MarqueeBanner />
         */}

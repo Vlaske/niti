@@ -176,6 +176,36 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setToast({ message, variant: "error", visible: true });
   }, []);
 
+  const applyOptimisticAdd = useCallback(
+    (
+      product: Product,
+      quantity: number,
+      selectedColor?: string
+    ): CartItem[] => {
+      let nextItems: CartItem[] = [];
+      setItems((prev) => {
+        const existing = prev.find(
+          (i) =>
+            i.product.id === product.id && i.selectedColor === selectedColor
+        );
+        nextItems = existing
+          ? prev.map((i) =>
+              i.product.id === product.id &&
+              i.selectedColor === selectedColor
+                ? { ...i, quantity: i.quantity + quantity }
+                : i
+            )
+          : [...prev, { product, quantity, selectedColor }];
+        return nextItems;
+      });
+      setSubtotal(
+        nextItems.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
+      );
+      return nextItems;
+    },
+    []
+  );
+
   const addItem = useCallback(
     (
       product: Product,
@@ -189,25 +219,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const selectedColor = extras?.selectedColor;
 
       if (!shopifyCart) {
+        applyOptimisticAdd(product, quantity, selectedColor);
         setToast({ product, variant: "success", visible: true });
-        setItems((prev) => {
-          const existing = prev.find(
-            (i) =>
-              i.product.id === product.id &&
-              i.selectedColor === selectedColor
-          );
-          if (existing) {
-            return prev.map((i) =>
-              i.product.id === product.id &&
-              i.selectedColor === selectedColor
-                ? { ...i, quantity: i.quantity + quantity }
-                : i
-            );
-          }
-          return [...prev, { product, quantity, selectedColor }];
-        });
         return;
       }
+
+      const previousItems = items;
+      const previousSubtotal = subtotal;
+      applyOptimisticAdd(product, quantity, selectedColor);
 
       (async () => {
         try {
@@ -235,13 +254,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
           applyRemoteCart(cart);
           setToast({ product, variant: "success", visible: true });
         } catch (e) {
+          setItems(previousItems);
+          setSubtotal(previousSubtotal);
           const message = e instanceof Error ? e.message : "Greška";
           setCartError(message);
           showErrorToast(message);
         }
       })();
     },
-    [shopifyCart, cartId, ensureCartId, applyRemoteCart, showErrorToast, locale]
+    [
+      shopifyCart,
+      cartId,
+      items,
+      subtotal,
+      ensureCartId,
+      applyRemoteCart,
+      applyOptimisticAdd,
+      showErrorToast,
+      locale,
+    ]
   );
 
   const removeItem = useCallback(

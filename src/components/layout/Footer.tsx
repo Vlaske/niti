@@ -36,10 +36,10 @@ const legalLinks = [
 ];
 
 const icons: Record<string, React.ReactNode> = {
-  shipping: <ShoppingBag className="h-6 w-6" strokeWidth={1.25} />,
-  service: <Headphones className="h-6 w-6" strokeWidth={1.25} />,
-  payment: <CreditCard className="h-6 w-6" strokeWidth={1.25} />,
-  contact: <Mail className="h-6 w-6" strokeWidth={1.25} />,
+  shipping: <ShoppingBag className="h-5 w-5" strokeWidth={1.25} />,
+  service: <Headphones className="h-5 w-5" strokeWidth={1.25} />,
+  payment: <CreditCard className="h-5 w-5" strokeWidth={1.25} />,
+  contact: <Mail className="h-5 w-5" strokeWidth={1.25} />,
 };
 
 export function Footer() {
@@ -55,15 +55,20 @@ export function Footer() {
 
   return (
     <footer className="mt-auto">
-      <section className="border-t border-niti-line bg-niti-cream py-14 md:py-20">
-        <div className="mx-auto grid max-w-[1440px] gap-10 px-4 sm:grid-cols-2 lg:grid-cols-4 md:px-8 lg:px-12">
+      <section className="border-t border-niti-line bg-niti-cream py-8 md:py-14">
+        <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-x-4 gap-y-5 px-4 sm:gap-6 md:grid-cols-4 md:gap-8 md:px-8 lg:px-12">
           {valueProps.map((item) => (
-            <div key={item.title} className="flex flex-col gap-3">
-              <div className="text-niti-charcoal">{icons[item.icon]}</div>
-              <h3 className="text-sm font-semibold uppercase tracking-wide">
+            <div
+              key={item.title}
+              className="flex flex-col items-center text-center sm:items-start sm:text-left"
+            >
+              <div className="mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-white text-niti-charcoal shadow-sm sm:mb-3 sm:h-10 sm:w-10">
+                {icons[item.icon]}
+              </div>
+              <h3 className="text-xs font-semibold uppercase tracking-wide sm:text-sm">
                 {item.title}
               </h3>
-              <p className="text-sm leading-relaxed text-niti-muted">
+              <p className="mt-1 text-[11px] leading-snug text-niti-muted sm:mt-1.5 sm:text-sm sm:leading-relaxed">
                 {item.description}
               </p>
             </div>
@@ -71,7 +76,7 @@ export function Footer() {
         </div>
       </section>
 
-      <section className="relative min-h-[320px] overflow-hidden md:min-h-[380px]">
+      <section className="relative min-h-[240px] overflow-hidden md:min-h-[360px]">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
@@ -80,11 +85,11 @@ export function Footer() {
           }}
         />
         <div className="absolute inset-0 bg-niti-charcoal/55" />
-        <div className="relative mx-auto flex max-w-xl flex-col items-center justify-center px-4 py-20 text-center text-white md:py-28">
-          <h2 className="mb-3 text-2xl font-semibold md:text-4xl">
+        <div className="relative mx-auto flex max-w-xl flex-col items-center justify-center px-4 py-14 text-center text-white md:py-24">
+          <h2 className="mb-2 text-xl font-semibold md:mb-3 md:text-4xl">
             {t("footer.newsletter")}
           </h2>
-          <p className="mb-8 text-sm text-white/85 md:text-base">
+          <p className="mb-6 text-xs text-white/85 md:mb-8 md:text-base">
             {t("footer.newsletterSub")}
           </p>
           <NewsletterForm />
@@ -92,12 +97,12 @@ export function Footer() {
       </section>
 
       <div className="bg-niti-footer text-white">
-        <div className="mx-auto grid max-w-[1440px] gap-12 px-4 py-14 md:grid-cols-2 lg:grid-cols-4 md:px-8 lg:px-12 lg:py-16">
-          <div>
-            <p className="font-serif text-3xl font-bold tracking-[0.15em] md:text-4xl">
+        <div className="mx-auto grid max-w-[1440px] grid-cols-2 gap-x-6 gap-y-8 px-4 py-10 sm:gap-8 md:grid-cols-2 md:py-12 lg:grid-cols-4 lg:gap-12 lg:px-12 lg:py-14">
+          <div className="col-span-2 sm:col-span-1">
+            <p className="font-serif text-2xl font-bold tracking-[0.15em] md:text-3xl lg:text-4xl">
               NITI.
             </p>
-            <div className="mt-6 space-y-3 text-sm text-white/75">
+            <div className="mt-4 space-y-2 text-xs text-white/75 md:mt-5 md:space-y-3 md:text-sm">
               <p className="flex items-start gap-2">
                 <Home className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} />
                 Beograd, Srbija
@@ -110,10 +115,10 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider">
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider md:mb-4 md:text-sm">
               {t("footer.company")}
             </h4>
-            <ul className="space-y-2.5 text-sm text-white/75">
+            <ul className="space-y-2 text-xs text-white/75 md:space-y-2.5 md:text-sm">
               <li>
                 <Link href="/#faq" className="interactive hover:text-white">
                   Naša priča
@@ -130,10 +135,10 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider">
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider md:mb-4 md:text-sm">
               {t("footer.shop")}
             </h4>
-            <ul className="space-y-2.5 text-sm text-white/75">
+            <ul className="space-y-2 text-xs text-white/75 md:space-y-2.5 md:text-sm">
               {shopLinks.map((l) => (
                 <li key={l.label}>
                   <Link href={l.href} className="interactive hover:text-white">
@@ -144,11 +149,11 @@ export function Footer() {
             </ul>
           </div>
 
-          <div>
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider">
+          <div className="col-span-2 sm:col-span-1">
+            <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider md:mb-4 md:text-sm">
               {t("footer.care")}
             </h4>
-            <ul className="space-y-2.5 text-sm text-white/75">
+            <ul className="space-y-2 text-xs text-white/75 md:space-y-2.5 md:text-sm">
               {careLinks.map((l) => (
                 <li key={l.label}>
                   <Link href={l.href} className="interactive hover:text-white">
@@ -161,8 +166,8 @@ export function Footer() {
         </div>
 
         <div className="border-t border-white/10 bg-niti-footer-dark">
-          <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-4 py-6 md:flex-row md:items-center md:justify-between md:px-8 lg:px-12">
-            <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/60">
+          <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-4 py-5 md:flex-row md:items-center md:justify-between md:gap-6 md:px-8 md:py-6 lg:px-12">
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[11px] text-white/60 md:justify-start md:text-xs">
               {legalLinks.map((label) => (
                 <Link
                   key={label}
@@ -173,7 +178,7 @@ export function Footer() {
                 </Link>
               ))}
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center gap-4 md:justify-end">
               <select
                 className="interactive rounded border border-white/20 bg-transparent px-2 py-1.5 text-xs text-white/80"
                 defaultValue="rs"

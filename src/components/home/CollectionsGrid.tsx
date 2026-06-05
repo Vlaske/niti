@@ -22,6 +22,7 @@ export function CollectionsGrid() {
         <SectionHeader
           title={t("home.exploreCollections")}
           viewAllHref="/shop"
+          viewAllLabel={t("home.viewAll")}
         />
 
         {/* Mobile: horizontal snap scroll — compact cards */}

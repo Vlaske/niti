@@ -141,6 +141,7 @@ export function ProductPageView({
           <SectionHeader
             title={t("product.categories")}
             viewAllHref="/shop"
+            viewAllLabel={t("home.viewAll")}
             className="mb-10"
           />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

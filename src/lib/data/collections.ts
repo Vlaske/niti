@@ -33,59 +33,6 @@ export const collections: Collection[] = [
 
 export { heroSlides } from "@/config/hero-slides";
 
-export const designCarouselItems = [
-  {
-    id: "1",
-    title: "Cloud Linen Sheet Set",
-    description:
-      "Crafted with soft curves and natural materials — a calm layer for bedrooms that breathe.",
-    image:
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=700&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=200&q=80",
-    price: 20900,
-    compareAtPrice: 25900,
-    href: "/product/cloud-linen-sheet-set",
-  },
-  {
-    id: "2",
-    title: "Pastel Duvet Cover",
-    description:
-      "Silky percale in muted pastels — designed to slow down your evening routine.",
-    image:
-      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=700&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=200&q=80",
-    price: 17900,
-    href: "/product/pastel-duvet-cover",
-  },
-  {
-    id: "3",
-    title: "Quilted Bedspread",
-    description:
-      "Channel-stitched texture adds depth without weight — perfect for layered beds.",
-    image:
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=700&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&q=80",
-    price: 21900,
-    compareAtPrice: 27900,
-    href: "/product/quilted-bedspread",
-  },
-  {
-    id: "4",
-    title: "Woven Throw Blanket",
-    description:
-      "Textured weave for sofas and reading corners — a finishing touch in cream and sand.",
-    image:
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=700&q=80",
-    thumb:
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&q=80",
-    price: 8900,
-    href: "/product/woven-throw-blanket",
-  },
-];
-
 export const faqItems: FaqItem[] = [
   {
     id: "1",
