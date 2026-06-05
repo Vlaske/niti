@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function CartPage() {
   return (
-    <PageShell mainClassName="pt-24 md:pt-28">
+    <PageShell mainClassName="pt-[var(--header-offset)]">
       <div className="mx-auto max-w-[1440px] px-4 pb-20 md:px-8 lg:px-12">
         <CartPageTitle />
         <CartContent />

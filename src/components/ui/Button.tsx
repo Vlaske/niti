@@ -17,7 +17,7 @@ const variants: Record<ButtonVariant, string> = {
   primary:
     "bg-white text-niti-charcoal hover:bg-niti-cream shadow-sm",
   secondary:
-    "bg-niti-sage text-white hover:bg-niti-sage-dark",
+    "bg-niti-sage-dark text-white shadow-sm hover:bg-niti-sage active:scale-[0.98] active:bg-niti-sage-deep",
   ghost:
     "border border-white/80 text-white bg-transparent hover:bg-white/10",
   outline:

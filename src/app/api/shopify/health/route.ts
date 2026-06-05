@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getStorefrontAuthStrategies } from "@/lib/shopify/auth";
+import {
+  getActiveAuthStrategyId,
+  shopifyFetch,
+} from "@/lib/shopify/client";
 import {
   getShopifyTokenMode,
   shopifyServerConfigured,
   shopifyStoreDomain,
 } from "@/lib/shopify/config";
-import { shopifyFetch } from "@/lib/shopify/client";
 import { SHOP_NAME_QUERY } from "@/lib/shopify/queries";
 
 export async function GET(request: NextRequest) {
@@ -48,6 +52,8 @@ export async function GET(request: NextRequest) {
       shopName: data.shop.name,
       domain: shopifyStoreDomain,
       tokenMode: getShopifyTokenMode(),
+      authStrategies: getStorefrontAuthStrategies().map((s) => s.id),
+      activeAuth: getActiveAuthStrategyId(),
       primaryDomain: data.shop.primaryDomain?.url ?? null,
       ...(request.nextUrl.searchParams.has("testCart")
         ? { cartOk, cartHint }
@@ -62,11 +68,10 @@ export async function GET(request: NextRequest) {
         configured: true,
         domain: shopifyStoreDomain,
         tokenMode: getShopifyTokenMode(),
+        authStrategies: getStorefrontAuthStrategies().map((s) => s.id),
         message,
         hint:
-          getShopifyTokenMode() === "legacy"
-            ? "Ako koristiš Headless kanal, prebaci token u SHOPIFY_STOREFRONT_PRIVATE_TOKEN."
-            : "Proveri dozvole (scopes) u Headless kanalu ili Custom App.",
+          "Za Headless: SHOPIFY_STOREFRONT_PUBLIC_TOKEN = javni (hex), SHOPIFY_STOREFRONT_PRIVATE_TOKEN = shpss_ privatni. shpat_ u private polju često daje 401.",
       },
       { status: 502 }
     );

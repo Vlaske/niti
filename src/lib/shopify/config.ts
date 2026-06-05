@@ -63,11 +63,4 @@ export const shopifyClientEnabled =
 /** @deprecated Use shopifyServerConfigured or shopifyClientEnabled */
 export const shopifyConfigured = shopifyServerConfigured;
 
-/** Collection handles in Shopify should match these slugs (or override in Admin). */
-export const CATEGORY_COLLECTION_HANDLES: Record<string, string> = {
-  bedsheets: "bedsheets",
-  towels: "towels",
-  throws: "throws",
-  accessories: "accessories",
-  linen: "linen",
-};
+export { CATEGORY_COLLECTION_HANDLES } from "@/config/store-categories";

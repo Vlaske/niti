@@ -8,7 +8,23 @@ import {
   updateCartLine,
 } from "@/lib/shopify/cart";
 import { getVariantIdForColor } from "@/lib/shopify/mappers";
+import type { CheckoutLocale } from "@/lib/shopify/checkout";
 import type { Product } from "@/types";
+
+function cartOptions(request: NextRequest): { locale: CheckoutLocale } {
+  const locale = request.nextUrl.searchParams.get("locale");
+  return { locale: locale === "en" ? "en" : "sr" };
+}
+
+function cartOptionsFromBody(
+  body: { locale?: string },
+  request: NextRequest
+): { locale: CheckoutLocale } {
+  if (body.locale === "en" || body.locale === "sr") {
+    return { locale: body.locale };
+  }
+  return cartOptions(request);
+}
 
 function buyerIp(request: NextRequest): string | undefined {
   return (
@@ -29,7 +45,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const cart = await getCart(cartId, buyerIp(request));
+    const cart = await getCart(cartId, buyerIp(request), cartOptions(request));
     if (!cart) {
       return NextResponse.json({ error: "Korpa nije pronađena" }, { status: 404 });
     }
@@ -48,6 +64,7 @@ type CartActionBody = {
   selectedColor?: string;
   quantity?: number;
   lineId?: string;
+  locale?: string;
 };
 
 export async function POST(request: NextRequest) {
@@ -63,11 +80,12 @@ export async function POST(request: NextRequest) {
   }
 
   const ip = buyerIp(request);
+  const options = cartOptionsFromBody(body, request);
 
   try {
     switch (body.action) {
       case "create": {
-        const cart = await createCart(ip);
+        const cart = await createCart(ip, options);
         return NextResponse.json(cart);
       }
       case "add": {
@@ -88,7 +106,8 @@ export async function POST(request: NextRequest) {
         const cart = await addLinesToCart(
           body.cartId,
           [{ merchandiseId: variantId, quantity: body.quantity ?? 1 }],
-          ip
+          ip,
+          options
         );
         return NextResponse.json(cart);
       }
@@ -103,7 +122,8 @@ export async function POST(request: NextRequest) {
           body.cartId,
           body.lineId,
           body.quantity ?? 1,
-          ip
+          ip,
+          options
         );
         return NextResponse.json(cart);
       }
@@ -114,7 +134,7 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
-        const cart = await removeCartLines(body.cartId, [body.lineId], ip);
+        const cart = await removeCartLines(body.cartId, [body.lineId], ip, options);
         return NextResponse.json(cart);
       }
       default:

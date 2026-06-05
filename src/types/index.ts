@@ -5,19 +5,45 @@ export type ProductColor = {
   variantId?: string;
 };
 
+export type ProductOptionValue = {
+  value: string;
+  hex?: string;
+  available: boolean;
+};
+
+export type ProductOption = {
+  name: string;
+  label: string;
+  type: "color" | "size" | "other";
+  values: ProductOptionValue[];
+};
+
+export type ProductVariantSnapshot = {
+  id: string;
+  availableForSale: boolean;
+  price: number;
+  compareAtPrice?: number;
+  selectedOptions: { name: string; value: string }[];
+};
+
 export type Product = {
   id: string;
   handle: string;
   title: string;
   brand: string;
   description: string;
+  /** Shopify HTML opis */
+  descriptionHtml?: string;
   price: number;
   compareAtPrice?: number;
   category: string;
   collection?: string;
   image: string;
   images?: string[];
+  /** @deprecated Koristi options */
   colors?: ProductColor[];
+  options?: ProductOption[];
+  variants?: ProductVariantSnapshot[];
   tagline?: string;
   isNew?: boolean;
   isSale?: boolean;

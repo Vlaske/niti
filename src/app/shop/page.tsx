@@ -12,10 +12,11 @@ export const revalidate = 60;
 
 export default async function ShopPage() {
   const productList = await getAllProducts();
+
   return (
     <>
       <Header variant="solid" />
-      <main className="pt-[4.5rem] md:pt-24">
+      <main className="pt-[var(--header-offset)]">
         <section className="border-b border-niti-line bg-niti-sand/30 px-4 py-12 md:px-8 md:py-16 lg:px-12">
           <div className="mx-auto max-w-[1440px]">
             <h1 className="font-serif text-4xl font-semibold text-niti-charcoal md:text-5xl lg:text-6xl">

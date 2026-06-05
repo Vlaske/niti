@@ -31,11 +31,19 @@ export default async function ProductPage({ params }: Props) {
 
   const all = await getAllProducts();
   const related = all
-    .filter((p) => p.category === product.category && p.id !== product.id)
+    .filter((p) => {
+      if (p.id === product.id) return false;
+      if (product.category !== "all") {
+        return p.category === product.category;
+      }
+      return (
+        Boolean(product.collection) && p.collection === product.collection
+      );
+    })
     .slice(0, 4);
 
   return (
-    <PageShell mainClassName="pt-24 md:pt-28">
+    <PageShell mainClassName="pt-[var(--header-offset)]">
       <div className="mx-auto max-w-[1440px] px-4 pb-20 md:px-8 lg:px-12">
         <ProductPageView product={product} related={related} />
       </div>

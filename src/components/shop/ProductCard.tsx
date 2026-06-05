@@ -9,6 +9,7 @@ import { useRef } from "react";
 import { ColorSwatches } from "@/components/ui/ColorSwatches";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { productRequiresOptionSelection } from "@/lib/shopify/variants";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/types";
 
@@ -30,10 +31,21 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
       ? product.compareAtPrice - product.price
       : null;
 
+  const needsSelection = productRequiresOptionSelection(product);
+
+  const cardColors =
+    product.options?.find((o) => o.type === "color")?.values.map((v) => ({
+      name: v.value,
+      hex: v.hex ?? "#d4cfc8",
+    })) ??
+    product.colors ??
+    [];
+
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product, 1, product.colors?.[0]?.name);
+    if (needsSelection) return;
+    addItem(product, 1);
     if (frameRef.current) {
       gsap.fromTo(
         frameRef.current,
@@ -97,29 +109,64 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
             >
               <Eye className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.5} />
             </Link>
-            <button
-              type="button"
-              onClick={handleAdd}
-              className={`interactive pointer-events-auto rounded-md bg-white px-3 py-2 text-[11px] font-semibold text-niti-charcoal shadow-md transition-all duration-300 md:px-4 md:py-2.5 md:text-xs ${
-                hovered
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-2 opacity-0"
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <ShoppingBag className="h-3.5 w-3.5" />
-                {t("product.addToCart")}
-              </span>
-            </button>
+            {needsSelection ? (
+              <Link
+                href={`/product/${product.handle}`}
+                className={`interactive pointer-events-auto rounded-md bg-white px-3 py-2 text-[11px] font-semibold text-niti-charcoal shadow-md transition-all duration-300 md:px-4 md:py-2.5 md:text-xs ${
+                  hovered
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-2 opacity-0"
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <Eye className="h-3.5 w-3.5" />
+                  {t("product.chooseOptions")}
+                </span>
+              </Link>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAdd}
+                className={`interactive pointer-events-auto rounded-md bg-white px-3 py-2 text-[11px] font-semibold text-niti-charcoal shadow-md transition-all duration-300 md:px-4 md:py-2.5 md:text-xs ${
+                  hovered
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-2 opacity-0"
+                }`}
+              >
+                <span className="flex items-center gap-1.5">
+                  <ShoppingBag className="h-3.5 w-3.5" />
+                  {t("product.addToCart")}
+                </span>
+              </button>
+            )}
           </div>
         </div>
       </div>
 
-      {product.colors && product.colors.length > 0 && (
-        <div className="mb-2.5 px-0.5">
-          <ColorSwatches colors={product.colors} />
-        </div>
-      )}
+      <div className="mb-2 flex h-4 items-center px-0.5">
+        {cardColors.length > 0 ? <ColorSwatches colors={cardColors} /> : null}
+      </div>
+
+      <div className="mb-2 px-0.5 md:hidden">
+        {needsSelection ? (
+          <Link
+            href={`/product/${product.handle}`}
+            className="interactive flex w-full items-center justify-center gap-1.5 rounded-md border border-niti-line bg-white py-2 text-[11px] font-semibold text-niti-charcoal"
+          >
+            <Eye className="h-3.5 w-3.5" />
+            {t("product.chooseOptions")}
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="interactive flex w-full items-center justify-center gap-1.5 rounded-md bg-niti-sage-dark py-2 text-[11px] font-semibold text-white active:bg-niti-sage-deep"
+          >
+            <ShoppingBag className="h-3.5 w-3.5" />
+            {t("product.addToCart")}
+          </button>
+        )}
+      </div>
 
       <p className="mb-1 px-0.5 text-[10px] font-medium uppercase tracking-[0.18em] text-niti-muted md:text-xs">
         {product.brand} · Premium

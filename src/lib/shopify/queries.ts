@@ -4,7 +4,12 @@ export const PRODUCT_CARD_FRAGMENT = `
     handle
     title
     description
+    descriptionHtml
     vendor
+    options {
+      name
+      values
+    }
     tags
     availableForSale
     featuredImage {
@@ -103,7 +108,7 @@ export const COLLECTION_PRODUCTS_QUERY = `
       id
       title
       handle
-      products(first: $first, after: $after, sortKey: CREATED_AT, reverse: true) {
+      products(first: $first, after: $after, sortKey: COLLECTION_DEFAULT) {
         pageInfo {
           hasNextPage
           endCursor
@@ -170,8 +175,8 @@ export const CART_FRAGMENT = `
 
 export const CART_CREATE_MUTATION = `
   ${CART_FRAGMENT}
-  mutation CartCreate {
-    cartCreate(input: {}) {
+  mutation CartCreate($input: CartInput!) {
+    cartCreate(input: $input) {
       cart {
         ...CartFields
       }

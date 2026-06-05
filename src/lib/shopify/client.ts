@@ -1,57 +1,82 @@
 import {
+  buildAuthHeaders,
+  getStorefrontAuthStrategies,
+  type StorefrontAuthStrategy,
+} from "@/lib/shopify/auth";
+import {
   getShopifyTokenMode,
   SHOPIFY_API_VERSION,
   shopifyConfigured,
-  shopifyPrivateToken,
-  shopifyPublicToken,
   shopifyStoreDomain,
 } from "@/lib/shopify/config";
 
 export { shopifyConfigured, getShopifyTokenMode };
 
 type ShopifyFetchOptions = {
-  /** Buyer IP for rate limits / bot protection on buyer-driven requests */
   buyerIp?: string;
   revalidate?: number | false;
 };
+
+type ShopifyGraphqlResponse<T> = {
+  data?: T;
+  errors?: { message: string }[];
+};
+
+/** Zapamti strategiju koja je poslednja uspela (po procesu). */
+let cachedAuthStrategy: StorefrontAuthStrategy | null = null;
 
 function getEndpoint() {
   const domain = shopifyStoreDomain.replace(/^https?:\/\//, "").replace(/\/$/, "");
   return `https://${domain}/api/${SHOPIFY_API_VERSION}/graphql.json`;
 }
 
-function getActiveToken(): string {
-  return shopifyPrivateToken || shopifyPublicToken;
+function getStrategiesToTry(): StorefrontAuthStrategy[] {
+  const all = getStorefrontAuthStrategies();
+  if (!all.length) return [];
+
+  if (cachedAuthStrategy) {
+    const rest = all.filter((s) => s.id !== cachedAuthStrategy!.id);
+    return [cachedAuthStrategy, ...rest];
+  }
+  return all;
 }
 
-/**
- * Private header: Headless shpss_ tokens.
- * shpat_ Storefront tokens from Custom App use X-Shopify-Storefront-Access-Token.
- */
-function usePrivateTokenHeader(): boolean {
-  const token = getActiveToken();
-  if (token.startsWith("shpat_")) return false;
-  if (shopifyPrivateToken && shopifyPrivateToken.startsWith("shpss_")) return true;
-  return token.startsWith("shpss_");
-}
+async function requestWithStrategy<T>(
+  strategy: StorefrontAuthStrategy,
+  query: string,
+  variables: Record<string, unknown> | undefined,
+  options: ShopifyFetchOptions
+): Promise<{ ok: true; data: T } | { ok: false; status: number; message: string }> {
+  const { buyerIp, revalidate = 60 } = options;
 
-function buildHeaders(buyerIp?: string): HeadersInit {
-  const token = getActiveToken();
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  const res = await fetch(getEndpoint(), {
+    method: "POST",
+    headers: buildAuthHeaders(strategy, buyerIp),
+    body: JSON.stringify({ query, variables }),
+    ...(revalidate === false
+      ? { cache: "no-store" as const }
+      : { next: { revalidate } }),
+  });
 
-  if (usePrivateTokenHeader()) {
-    headers["Shopify-Storefront-Private-Token"] = token;
-  } else {
-    headers["X-Shopify-Storefront-Access-Token"] = token;
+  const json = (await res.json()) as ShopifyGraphqlResponse<T>;
+
+  if (!res.ok) {
+    return {
+      ok: false,
+      status: res.status,
+      message: json.errors?.[0]?.message ?? res.statusText ?? `HTTP ${res.status}`,
+    };
   }
 
-  if (buyerIp) {
-    headers["Shopify-Storefront-Buyer-IP"] = buyerIp;
+  if (json.errors?.length) {
+    return { ok: false, status: 200, message: json.errors[0].message };
   }
 
-  return headers;
+  if (!json.data) {
+    return { ok: false, status: 200, message: "Shopify API: prazan odgovor" };
+  }
+
+  return { ok: true, data: json.data };
 }
 
 export async function shopifyFetch<T>(
@@ -65,35 +90,45 @@ export async function shopifyFetch<T>(
     );
   }
 
-  const { buyerIp, revalidate = 60 } = options;
-
-  const res = await fetch(getEndpoint(), {
-    method: "POST",
-    headers: buildHeaders(buyerIp),
-    body: JSON.stringify({ query, variables }),
-    ...(revalidate === false
-      ? { cache: "no-store" as const }
-      : { next: { revalidate } }),
-  });
-
-  const json = (await res.json()) as {
-    data?: T;
-    errors?: { message: string }[];
-  };
-
-  if (!res.ok) {
+  const strategies = getStrategiesToTry();
+  if (!strategies.length) {
     throw new Error(
-      `Shopify HTTP ${res.status}: ${json.errors?.[0]?.message ?? res.statusText}`
+      "Nema Storefront tokena. Dodaj SHOPIFY_STOREFRONT_PUBLIC_TOKEN ili SHOPIFY_STOREFRONT_PRIVATE_TOKEN."
     );
   }
 
-  if (json.errors?.length) {
-    throw new Error(json.errors[0].message);
+  const errors: string[] = [];
+
+  for (const strategy of strategies) {
+    const result = await requestWithStrategy<T>(
+      strategy,
+      query,
+      variables,
+      options
+    );
+
+    if (result.ok) {
+      cachedAuthStrategy = strategy;
+      return result.data;
+    }
+
+    errors.push(`${strategy.id}: ${result.message}`);
+
+    if (result.status !== 401 && result.status !== 403) {
+      break;
+    }
   }
 
-  if (!json.data) {
-    throw new Error("Shopify API: prazan odgovor");
-  }
+  throw new Error(
+    `Shopify autentifikacija nije uspela. ${errors.join(" | ")}`
+  );
+}
 
-  return json.data;
+export function getActiveAuthStrategyId(): string | null {
+  return cachedAuthStrategy?.id ?? null;
+}
+
+/** Reset keša (npr. posle promene .env u dev-u). */
+export function resetShopifyAuthCache() {
+  cachedAuthStrategy = null;
 }

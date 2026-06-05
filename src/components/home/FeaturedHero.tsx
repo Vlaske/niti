@@ -20,11 +20,11 @@ export function FeaturedHero({ image, ctaHref }: FeaturedHeroProps) {
   return (
     <section
       ref={ref}
-      className="relative min-h-[70vh] overflow-hidden md:min-h-[85vh]"
+      className="relative min-h-[52vh] overflow-hidden sm:min-h-[60vh] md:min-h-[85vh]"
     >
       <Image src={image} alt="" fill className="object-cover" sizes="100vw" />
       <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/20 to-transparent" />
-      <div className="relative mx-auto flex min-h-[70vh] max-w-[1440px] flex-col justify-center px-4 py-24 md:min-h-[85vh] md:px-8 lg:px-12">
+      <div className="relative mx-auto flex min-h-[52vh] max-w-[1440px] flex-col justify-center px-4 py-16 sm:min-h-[60vh] sm:py-20 md:min-h-[85vh] md:px-8 md:py-24 lg:px-12">
         <p
           data-reveal
           className="mb-3 text-xs uppercase tracking-[0.25em] text-white/80"

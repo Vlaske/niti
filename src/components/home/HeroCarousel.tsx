@@ -10,7 +10,7 @@ import {
   runHeroMediaZoom,
   registerGsap,
 } from "@/lib/animations";
-import { heroSlides } from "@/lib/data/collections";
+import { heroSlides } from "@/config/hero-slides";
 import { heroConfig } from "@/config/hero";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";

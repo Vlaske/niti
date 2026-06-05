@@ -14,6 +14,7 @@ import {
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { NavMegaMenu } from "@/components/layout/NavMegaMenu";
+import { useNavCategories } from "@/context/CategoriesContext";
 import { formatPrice, cn } from "@/lib/utils";
 
 type HeaderProps = {
@@ -23,12 +24,14 @@ type HeaderProps = {
 export function Header({ variant = "solid" }: HeaderProps) {
   const { itemCount, subtotal } = useCart();
   const { t, locale, setLocale } = useLanguage();
+  const navCategories = useNavCategories();
   const [menuOpen, setMenuOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    const onScroll = () => setScrolled(window.scrollY > 48);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -46,17 +49,20 @@ export function Header({ variant = "solid" }: HeaderProps) {
   return (
     <>
       <header
-        className={cn(
-          "fixed inset-x-0 top-0 z-50 transition-all duration-500",
-          isTransparent
-            ? "bg-transparent text-white"
-            : "bg-niti-cream/95 text-niti-charcoal shadow-sm backdrop-blur-md",
-          megaOpen && "bg-niti-cream/98 text-niti-charcoal shadow-md"
-        )}
+        className="site-header fixed inset-x-0 top-0 z-50"
         onMouseLeave={() => setMegaOpen(false)}
       >
+        <div
+          className={cn(
+            "site-header__safe transition-[background-color,box-shadow,color] duration-300 ease-out",
+            isTransparent
+              ? "bg-transparent text-white"
+              : "bg-niti-cream text-niti-charcoal shadow-sm max-md:border-b max-md:border-niti-line/60 md:bg-niti-cream/95 md:backdrop-blur-md",
+            megaOpen && "bg-niti-cream text-niti-charcoal shadow-md md:bg-niti-cream/98"
+          )}
+        >
         <div className="relative mx-auto max-w-[1440px]">
-          <div className="flex items-center justify-between gap-4 px-4 py-3 md:px-8 lg:gap-8 lg:px-12 lg:py-4">
+          <div className="site-header__bar flex items-center justify-between gap-3 px-4 md:gap-8 md:px-8 lg:px-12">
             <div className="flex min-w-0 flex-1 items-center gap-3">
               <button
                 type="button"
@@ -101,10 +107,12 @@ export function Header({ variant = "solid" }: HeaderProps) {
             <Link
               href="/"
               className={cn(
-                "interactive shrink-0 font-serif font-semibold leading-none tracking-[0.18em] transition-transform hover:scale-[1.02]",
-                "text-[1.75rem] sm:text-[2rem] md:text-[2.5rem] lg:text-[2.85rem]",
+                "interactive shrink-0 font-serif font-bold leading-none tracking-[0.2em] transition-transform hover:scale-[1.02]",
+                "text-[2.25rem] sm:text-[2.5rem] md:text-[2.65rem] lg:text-[2.85rem]",
                 "px-1 md:px-3",
-                isTransparent && !megaOpen ? "text-white" : "text-niti-charcoal",
+                isTransparent && !megaOpen
+                  ? "text-white drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)]"
+                  : "text-niti-charcoal",
                 "lg:absolute lg:left-1/2 lg:-translate-x-1/2"
               )}
             >
@@ -166,10 +174,14 @@ export function Header({ variant = "solid" }: HeaderProps) {
             <NavMegaMenu open={megaOpen} onClose={() => setMegaOpen(false)} />
           </div>
         </div>
+        </div>
       </header>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-40 overflow-y-auto bg-niti-cream pt-[4.5rem] lg:hidden">
+        <div
+          className="fixed inset-0 z-40 overflow-y-auto bg-niti-cream lg:hidden"
+          style={{ paddingTop: "var(--header-offset)" }}
+        >
           <nav className="flex flex-col gap-1 px-5 pb-10">
             <p className="py-2 text-xs font-semibold uppercase tracking-widest text-niti-muted">
               {t("nav.shop")}
@@ -194,15 +206,20 @@ export function Header({ variant = "solid" }: HeaderProps) {
             <p className="pt-4 text-xs font-semibold uppercase tracking-widest text-niti-muted">
               {t("nav.browseCategories")}
             </p>
-            <div className="grid grid-cols-2 gap-2 py-2">
-              {["bedsheets", "towels", "throws", "accessories"].map((slug) => (
+            <div className="flex flex-col gap-1.5 py-2">
+              {navCategories.map((cat) => (
                 <Link
-                  key={slug}
-                  href={`/shop/${slug}`}
+                  key={cat.slug}
+                  href={`/shop/${cat.slug}`}
                   onClick={() => setMenuOpen(false)}
-                  className="interactive rounded-xl border border-niti-line bg-white px-3 py-4 text-center text-sm font-semibold"
+                  className="interactive rounded-xl border border-niti-line bg-white px-4 py-3.5 text-sm font-semibold"
                 >
-                  {t(`shop.filters.${slug}` as "shop.filters.all")}
+                  {cat.title}
+                  {cat.productCount > 0 && (
+                    <span className="ml-2 text-xs font-normal text-niti-muted">
+                      ({cat.productCount})
+                    </span>
+                  )}
                 </Link>
               ))}
             </div>

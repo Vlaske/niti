@@ -22,7 +22,7 @@ export function ColorSwatches({
     <div className="flex gap-2">
       {colors.map((c) => (
         <button
-          key={c.name}
+          key={c.variantId ?? c.name}
           type="button"
           title={c.name}
           onClick={() => onSelect?.(c.name)}

@@ -1,11 +1,15 @@
 @import "tailwindcss";
 
 :root {
+  --header-bar: 4rem;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --header-offset: calc(var(--header-bar) + var(--safe-top));
   --niti-cream: #faf7f2;
   --niti-sand: #e8dfd4;
   --niti-blush: #f4e4e0;
   --niti-sage: #b8cfc0;
   --niti-sage-dark: #8faf9a;
+  --niti-sage-deep: #6d9480;
   --niti-lavender: #e8e4f0;
   --niti-charcoal: #2a2826;
   --niti-muted: #7a736c;
@@ -22,6 +26,7 @@
   --color-niti-blush: var(--niti-blush);
   --color-niti-sage: var(--niti-sage);
   --color-niti-sage-dark: var(--niti-sage-dark);
+  --color-niti-sage-deep: var(--niti-sage-deep);
   --color-niti-lavender: var(--niti-lavender);
   --color-niti-charcoal: var(--niti-charcoal);
   --color-niti-muted: var(--niti-muted);
@@ -42,6 +47,20 @@ body {
   background: var(--niti-cream);
   color: var(--niti-charcoal);
   font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: clip;
+}
+
+/* Fiksni header — ista visina u transparent i solid stanju */
+.site-header {
+  isolation: isolate;
+}
+
+.site-header__safe {
+  padding-top: var(--safe-top);
+}
+
+.site-header__bar {
+  height: var(--header-bar);
 }
 
 .font-serif {
@@ -116,4 +135,45 @@ button:disabled,
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+.product-prose h1,
+.product-prose h2,
+.product-prose h3 {
+  margin-top: 1.25em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  color: var(--niti-charcoal);
+}
+
+.product-prose p {
+  margin-bottom: 0.85em;
+}
+
+.product-prose ul,
+.product-prose ol {
+  margin: 0.75em 0 1em;
+  padding-left: 1.35em;
+}
+
+.product-prose ul {
+  list-style: disc;
+}
+
+.product-prose ol {
+  list-style: decimal;
+}
+
+.product-prose li {
+  margin-bottom: 0.35em;
+}
+
+.product-prose strong {
+  font-weight: 600;
+  color: var(--niti-charcoal);
+}
+
+.product-prose a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

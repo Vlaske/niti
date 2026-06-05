@@ -10,58 +10,74 @@ import {
   fetchShopifyProducts,
   fetchShopifyProductsByCategory,
 } from "@/lib/shopify/catalog";
-import type { Product } from "@/types";
 
-export async function getAllProducts(): Promise<Product[]> {
+export type CatalogSource = "shopify" | "mock";
+
+let lastCatalogSource: CatalogSource = "mock";
+
+export function getCatalogSource(): CatalogSource {
+  return lastCatalogSource;
+}
+
+export function isShopifyCatalogActive(): boolean {
+  return lastCatalogSource === "shopify";
+}
+
+export { getEnrichedNavCategories } from "@/lib/catalog/categories";
+
+export async function getAllProducts() {
   if (shopifyServerConfigured) {
     try {
-      return await fetchShopifyProducts();
+      const products = await fetchShopifyProducts();
+      lastCatalogSource = "shopify";
+      return products;
     } catch (e) {
       console.error("[catalog] Shopify fetch failed, using mock:", e);
     }
   }
+  lastCatalogSource = "mock";
   return mockProducts;
 }
 
-export async function getProductByHandle(
-  handle: string
-): Promise<Product | null> {
+export async function getProductByHandle(handle: string) {
   if (shopifyServerConfigured) {
     try {
       const product = await fetchShopifyProductByHandle(handle);
+      lastCatalogSource = "shopify";
       if (product) return product;
+      return null;
     } catch (e) {
       console.error("[catalog] Shopify product fetch failed:", e);
     }
   }
+  lastCatalogSource = "mock";
   return getMockProductByHandle(handle) ?? null;
 }
 
-export async function getProductsByCategory(
-  categorySlug: string
-): Promise<Product[]> {
+export async function getProductsByCategory(categorySlug: string) {
   if (shopifyServerConfigured) {
     try {
       const list = await fetchShopifyProductsByCategory(categorySlug);
-      if (list.length > 0) return list;
+      lastCatalogSource = "shopify";
+      return list;
     } catch (e) {
       console.error("[catalog] Shopify collection fetch failed:", e);
     }
   }
+  lastCatalogSource = "mock";
   return getMockProductsByCategory(categorySlug);
 }
 
 export async function getProductHandles(): Promise<string[]> {
   if (shopifyServerConfigured) {
     try {
-      return await fetchShopifyProductHandles();
+      const handles = await fetchShopifyProductHandles();
+      lastCatalogSource = "shopify";
+      return handles;
     } catch (e) {
       console.error("[catalog] Shopify handles fetch failed:", e);
     }
   }
+  lastCatalogSource = "mock";
   return mockProducts.map((p) => p.handle);
-}
-
-export function isShopifyCatalogActive(): boolean {
-  return shopifyServerConfigured;
 }

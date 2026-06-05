@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Plus, Minus } from "lucide-react";
 import { useRef, useState } from "react";
 import { useScrollReveal } from "@/lib/animations";
+import { FAQ_SECTION_IMAGE } from "@/config/placeholders";
 import { faqItems } from "@/lib/data/collections";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -20,8 +21,8 @@ export function FaqSection() {
       <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
         <div className="relative min-h-[360px] lg:min-h-[640px]">
           <Image
-            src="https://images.unsplash.com/photo-1618221195710-e6f1a6a8b2e0?w=900&q=80"
-            alt="Premium enterijer"
+            src={FAQ_SECTION_IMAGE}
+            alt="Mekana posteljina i miran enterijer — NITI."
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 50vw"

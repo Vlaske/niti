@@ -18,7 +18,7 @@ export const products: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80",
       "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80",
-      "https://images.unsplash.com/photo-1616628188859-7a11abb6fcc8?w=1200&q=80",
+      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80",
     ],
     colors: [
       { name: "Blush", hex: "#f4e4e0" },
@@ -58,7 +58,7 @@ export const products: Product[] = [
     price: 17900,
     category: "bedsheets",
     image:
-      "https://images.unsplash.com/photo-1615874959470-d609969a20ed?w=800&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
     colors: [
       { name: "Lavender", hex: "#e8e4f0" },
       { name: "Peach", hex: "#f8e8dc" },
@@ -89,7 +89,7 @@ export const products: Product[] = [
     price: 7200,
     category: "towels",
     image:
-      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
     colors: [
       { name: "Stone", hex: "#d9d4cc" },
       { name: "Blush", hex: "#f4e4e0" },
@@ -105,7 +105,7 @@ export const products: Product[] = [
     price: 5400,
     category: "bedsheets",
     image:
-      "https://images.unsplash.com/photo-1631889993959-41b4e9c6dd3c?w=800&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
     colors: [
       { name: "White", hex: "#ffffff" },
       { name: "Sage", hex: "#d4e4dc" },
@@ -135,7 +135,7 @@ export const products: Product[] = [
     compareAtPrice: 27900,
     category: "bedsheets",
     image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&q=80",
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
     isSale: true,
     tagline:
       "Layered comfort with a sculptural quilt pattern — made for beds that feel intentionally styled.",

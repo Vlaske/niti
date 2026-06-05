@@ -1,21 +1,15 @@
-import { CATEGORY_COLLECTION_HANDLES } from "@/lib/shopify/config";
+import {
+  getStoreCategoryByCollectionHandle,
+  isNavCategoryCollection,
+} from "@/config/store-categories";
+import {
+  buildProductOptions,
+  getVariantIdFromSelections,
+  guessColorHex,
+  isColorOptionName,
+  mapVariantSnapshots,
+} from "@/lib/shopify/variants";
 import type { CartItem, Product, ProductColor } from "@/types";
-
-const COLOR_HEX: Record<string, string> = {
-  white: "#f5f3ef",
-  cream: "#ebe4d8",
-  sage: "#b8c4b0",
-  blush: "#e8d4d0",
-  sand: "#d4c4b0",
-  grey: "#9a9590",
-  gray: "#9a9590",
-  blue: "#a8b8c8",
-  green: "#b8c4b0",
-  pink: "#e8d4d0",
-  beige: "#d4c4b0",
-};
-
-const KNOWN_CATEGORIES = new Set(Object.keys(CATEGORY_COLLECTION_HANDLES));
 
 type ShopifyMoney = { amount: string; currencyCode: string };
 
@@ -33,9 +27,11 @@ export type ShopifyProductNode = {
   handle: string;
   title: string;
   description: string;
+  descriptionHtml?: string;
   vendor: string;
   tags: string[];
   availableForSale: boolean;
+  options: { name: string; values: string[] }[];
   featuredImage?: { url: string; altText?: string | null } | null;
   images: { nodes: { url: string; altText?: string | null }[] };
   priceRange: {
@@ -54,45 +50,55 @@ function parseMoneyAmount(money?: ShopifyMoney | null): number {
   return Math.round(parseFloat(money.amount));
 }
 
-function guessHex(optionValue: string): string {
-  const key = optionValue.toLowerCase().replace(/\s+/g, "");
-  for (const [name, hex] of Object.entries(COLOR_HEX)) {
-    if (key.includes(name)) return hex;
-  }
-  return "#d4cfc8";
+function getColorFromVariantNode(v: ShopifyVariant): string | null {
+  const colorOpt = v.selectedOptions.find((o) => isColorOptionName(o.name));
+  return colorOpt?.value ?? null;
 }
 
+/** Samo kolekcije definisane u store-categories.ts; ostale = "all" (samo /shop). */
 function resolveCategory(collections: { handle: string }[]): string {
   for (const col of collections) {
-    const mapped = Object.entries(CATEGORY_COLLECTION_HANDLES).find(
-      ([, handle]) => handle === col.handle
-    );
-    if (mapped) return mapped[0];
-    if (KNOWN_CATEGORIES.has(col.handle)) return col.handle;
+    const storeCat = getStoreCategoryByCollectionHandle(col.handle);
+    if (storeCat) return storeCat.slug;
   }
-  return collections[0]?.handle ?? "accessories";
+  return "all";
 }
 
+/**
+ * Jedna boja = jedan swatch (prva dostupna varijanta za tu boju).
+ * Više dimenzija iste boje ne duplira "Siva Kocka".
+ */
 function buildColors(variants: ShopifyVariant[]): ProductColor[] | undefined {
-  const colorVariants = variants.filter((v) =>
-    v.selectedOptions.some(
-      (o) => o.name.toLowerCase() === "color" || o.name.toLowerCase() === "boja"
-    )
-  );
-
-  if (colorVariants.length < 2) return undefined;
-
-  return colorVariants.map((v) => {
-    const colorOpt = v.selectedOptions.find(
-      (o) => o.name.toLowerCase() === "color" || o.name.toLowerCase() === "boja"
+  const withColor = variants
+    .map((v) => ({ v, colorName: getColorFromVariantNode(v) }))
+    .filter((x): x is { v: ShopifyVariant; colorName: string } =>
+      Boolean(x.colorName)
     );
-    const name = colorOpt?.value ?? v.title;
-    return {
-      name,
-      hex: guessHex(name),
-      variantId: v.id,
-    };
-  });
+
+  if (withColor.length < 2) return undefined;
+
+  const byColor = new Map<string, ProductColor>();
+
+  for (const { v, colorName } of withColor) {
+    const key = colorName.toLowerCase().trim();
+    const existing = byColor.get(key);
+    if (!existing) {
+      byColor.set(key, {
+        name: colorName,
+        hex: guessColorHex(colorName),
+        variantId: v.id,
+      });
+      continue;
+    }
+    if (v.availableForSale && existing.variantId) {
+      byColor.set(key, {
+        ...existing,
+        variantId: v.id,
+      });
+    }
+  }
+
+  return Array.from(byColor.values());
 }
 
 function pickDefaultVariant(variants: ShopifyVariant[]): ShopifyVariant {
@@ -110,9 +116,11 @@ export function mapShopifyProduct(node: ShopifyProductNode): Product {
     : parseMoneyAmount(defaultVariant.compareAtPrice);
 
   const category = resolveCategory(node.collections.nodes);
-  const collection = node.collections.nodes.find((c) => c.handle === "linen")
-    ? "linen"
-    : node.collections.nodes[0]?.handle;
+  const navCollection = node.collections.nodes.find((c) =>
+    isNavCategoryCollection(c.handle)
+  );
+  const collection =
+    navCollection?.handle ?? node.collections.nodes[0]?.handle;
 
   const images = node.images.nodes.map((i) => i.url);
   const image = node.featuredImage?.url ?? images[0] ?? "";
@@ -123,12 +131,20 @@ export function mapShopifyProduct(node: ShopifyProductNode): Product {
   const isSale =
     compareAt > 0 && compareAt > minPrice;
 
+  const options = buildProductOptions(node.options ?? [], variants);
+  const variantSnapshots = mapVariantSnapshots(variants);
+
+  const plainDescription = node.description?.trim()
+    ? node.description
+    : stripHtml(node.descriptionHtml ?? "");
+
   return {
     id: node.id,
     handle: node.handle,
     title: node.title,
     brand: node.vendor || "NITI.",
-    description: node.description,
+    description: plainDescription,
+    descriptionHtml: node.descriptionHtml || undefined,
     price: minPrice,
     compareAtPrice: isSale ? compareAt : undefined,
     category,
@@ -136,19 +152,33 @@ export function mapShopifyProduct(node: ShopifyProductNode): Product {
     image,
     images: images.length ? images : undefined,
     colors: buildColors(variants),
+    options: options.length ? options : undefined,
+    variants: variantSnapshots,
     variantId: defaultVariant.id,
     availableForSale: node.availableForSale && defaultVariant.availableForSale,
-    tagline: node.description.slice(0, 160),
+    tagline: plainDescription.slice(0, 160),
     isNew,
     isSale,
   };
 }
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+export { getVariantIdFromSelections } from "@/lib/shopify/variants";
 
 export function getVariantIdForColor(
   product: Product,
   colorName?: string
 ): string | undefined {
   if (!colorName) return product.variantId;
+  const colorOpt = product.options?.find((o) => o.type === "color");
+  if (colorOpt) {
+    return getVariantIdFromSelections(product, {
+      [colorOpt.name]: colorName,
+    });
+  }
   const match = product.colors?.find(
     (c) => c.name.toLowerCase() === colorName.toLowerCase()
   );

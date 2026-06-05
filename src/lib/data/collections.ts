@@ -1,18 +1,18 @@
-import type { Collection, HeroSlide, FaqItem } from "@/types";
+import type { Collection, FaqItem } from "@/types";
 
 export const collections: Collection[] = [
   {
     slug: "bedsheets",
     title: "Posteljina",
     image:
-      "https://images.unsplash.com/photo-1615874959470-d609969a20ed?w=900&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=900&q=80",
     productCount: 4,
   },
   {
     slug: "towels",
     title: "Peškiri",
     image:
-      "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=900&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=900&q=80",
     productCount: 3,
   },
   {
@@ -31,47 +31,7 @@ export const collections: Collection[] = [
   },
 ];
 
-export const heroSlides: HeroSlide[] = [
-  {
-    id: "1",
-    category: "Posteljina",
-    headline: "MEKA HARMONIJA U SVAKOJ NITI",
-    description:
-      "Premium pamuk i lan za miran san i bezvremenski skandinavski mir — tekstil koji voli vaš dom.",
-    image:
-      "https://images.unsplash.com/photo-1616628188859-7a11abb6fcc8?w=1920&q=85",
-    productTag: "Cloud Linen Set — od 20.900 RSD",
-    ctaPrimary: { label: "view", href: "/product/cloud-linen-sheet-set" },
-    ctaSecondary: { label: "shop", href: "/shop" },
-    // Video hero example (add your file to public/videos/):
-    // mediaType: "video",
-    // mediaSrc: "/videos/bedsheet-hero.mp4",
-    // poster: "https://images.unsplash.com/photo-1616628188859-7a11abb6fcc8?w=1920&q=85",
-  },
-  {
-    id: "2",
-    category: "Peškiri",
-    headline: "SVAKA NEŽNA LINIJA",
-    description:
-      "Spa težina frotira i profinjeni rubovi — kupatilski tekstil koji je lep koliko i prijatan.",
-    image:
-      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=1920&q=85",
-    productTag: "Sage Terry Bundle — od 10.900 RSD",
-    ctaPrimary: { label: "view", href: "/product/sage-terry-towel-bundle" },
-    ctaSecondary: { label: "buy", href: "/cart" },
-  },
-  {
-    id: "3",
-    category: "Istaknuto",
-    headline: "ORGANSKI KOMFOR U FOKUSU",
-    description:
-      "Svako tkanje i završna obrada osmišljeni su s namerom — spoj komfora, izdržljivosti i pastelnog mira.",
-    image:
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=85",
-    ctaPrimary: { label: "view", href: "/product/pastel-duvet-cover" },
-    ctaSecondary: { label: "explore", href: "/shop/bedsheets" },
-  },
-];
+export { heroSlides } from "@/config/hero-slides";
 
 export const designCarouselItems = [
   {
@@ -93,9 +53,9 @@ export const designCarouselItems = [
     description:
       "Silky percale in muted pastels — designed to slow down your evening routine.",
     image:
-      "https://images.unsplash.com/photo-1615874959470-d609969a20ed?w=700&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=700&q=80",
     thumb:
-      "https://images.unsplash.com/photo-1615874959470-d609969a20ed?w=200&q=80",
+      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=200&q=80",
     price: 17900,
     href: "/product/pastel-duvet-cover",
   },
@@ -105,9 +65,9 @@ export const designCarouselItems = [
     description:
       "Channel-stitched texture adds depth without weight — perfect for layered beds.",
     image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=700&q=80",
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=700&q=80",
     thumb:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=200&q=80",
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200&q=80",
     price: 21900,
     compareAtPrice: 27900,
     href: "/product/quilted-bedspread",
@@ -173,7 +133,7 @@ export const valueProps = [
   {
     icon: "payment",
     title: "Sigurno plaćanje",
-    description: "Šifrovano plaćanje preko Shopify platforme.",
+    description: "Sigurna i šifrovana naplata karticama i drugim metodama.",
   },
   {
     icon: "contact",

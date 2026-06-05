@@ -1,13 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { gsap } from "gsap";
 import { Button } from "@/components/ui/Button";
-import { ColorSwatches } from "@/components/ui/ColorSwatches";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  findVariantBySelections,
+  productRequiresOptionSelection,
+} from "@/lib/shopify/variants";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/types";
+import { ProductOptionPicker } from "./ProductOptionPicker";
 
 type ProductDetailsProps = {
   product: Product;
@@ -16,11 +20,80 @@ type ProductDetailsProps = {
 export function ProductDetails({ product }: ProductDetailsProps) {
   const { addItem } = useCart();
   const { t, locale } = useLanguage();
-  const [color, setColor] = useState(product.colors?.[0]?.name);
   const addBtnRef = useRef<HTMLSpanElement>(null);
+  const needsOptions = productRequiresOptionSelection(product);
+
+  const getDefaultSelections = useCallback((): Record<string, string> => {
+    if (!product.options?.length || !product.variants?.length) return {};
+    const variant =
+      product.variants.find((v) => v.availableForSale) ?? product.variants[0];
+    return Object.fromEntries(
+      variant.selectedOptions.map((o) => [o.name, o.value])
+    );
+  }, [product.options, product.variants]);
+
+  const [selections, setSelections] =
+    useState<Record<string, string>>(getDefaultSelections);
+  const [optionErrors, setOptionErrors] = useState<Record<string, boolean>>(
+    {}
+  );
+  const [showOptionHint, setShowOptionHint] = useState(false);
+
+  useEffect(() => {
+    setSelections(getDefaultSelections());
+    setOptionErrors({});
+    setShowOptionHint(false);
+  }, [product.handle, getDefaultSelections]);
+
+  const activeVariant = useMemo(
+    () => findVariantBySelections(product, selections),
+    [product, selections]
+  );
+
+  const displayPrice = activeVariant?.price ?? product.price;
+  const displayCompare = activeVariant?.compareAtPrice ?? product.compareAtPrice;
+  const canAdd =
+    !needsOptions ||
+    (product.options?.every((o) => Boolean(selections[o.name])) ?? false);
+
+  const allOptionsSelected = product.options?.every((o) =>
+    Boolean(selections[o.name])
+  );
+
+  const handleOptionChange = (name: string, value: string) => {
+    setSelections((prev) => {
+      const next = { ...prev, [name]: value };
+      if (product.options?.every((o) => Boolean(next[o.name]))) {
+        setOptionErrors({});
+        setShowOptionHint(false);
+      }
+      return next;
+    });
+  };
 
   const handleAdd = () => {
-    addItem(product, 1, color);
+    if (needsOptions && product.options) {
+      const missing: Record<string, boolean> = {};
+      for (const opt of product.options) {
+        if (!selections[opt.name]) missing[opt.name] = true;
+      }
+      if (Object.keys(missing).length > 0) {
+        setOptionErrors(missing);
+        setShowOptionHint(true);
+        return;
+      }
+    }
+
+    setShowOptionHint(false);
+
+    const variantId = activeVariant?.id ?? product.variantId;
+    const colorSelection = product.options?.find((o) => o.type === "color");
+    const selectedColor = colorSelection
+      ? selections[colorSelection.name]
+      : undefined;
+
+    addItem(product, 1, { variantId, selectedColor, selections });
+
     if (addBtnRef.current) {
       gsap.fromTo(
         addBtnRef.current,
@@ -40,50 +113,60 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       </h1>
 
       <div className="mt-4 flex items-baseline gap-3">
-        {product.compareAtPrice && (
+        {displayCompare && displayCompare > displayPrice && (
           <span className="text-lg text-niti-muted line-through">
-            {formatPrice(product.compareAtPrice, locale)}
+            {formatPrice(displayCompare, locale)}
           </span>
         )}
         <span
           className={
-            product.compareAtPrice
+            displayCompare && displayCompare > displayPrice
               ? "text-xl font-medium text-niti-sale"
               : "text-xl text-niti-charcoal"
           }
         >
-          {formatPrice(product.price, locale)}
+          {formatPrice(displayPrice, locale)}
         </span>
       </div>
 
-      {product.tagline && (
-        <p className="mt-6 text-sm leading-relaxed text-niti-muted md:text-base">
-          {product.tagline}
-        </p>
+      {allOptionsSelected && activeVariant && !activeVariant.availableForSale && (
+        <p className="mt-3 text-sm text-niti-sale">{t("product.outOfStock")}</p>
       )}
 
-      {product.colors && product.colors.length > 0 && (
+      {product.options && product.options.length > 0 ? (
         <div className="mt-8">
-          <p className="mb-3 text-sm font-medium">{t("product.color")}</p>
-          <ColorSwatches
-            colors={product.colors}
-            selected={color}
-            onSelect={setColor}
-            size="md"
+          <ProductOptionPicker
+            options={product.options}
+            selections={selections}
+            onChange={handleOptionChange}
+            errors={optionErrors}
           />
+          {showOptionHint && (
+            <p className="mt-3 text-sm text-niti-sale">
+              {t("product.selectAllOptions")}
+            </p>
+          )}
         </div>
-      )}
+      ) : null}
 
       <div className="mt-10 flex flex-col gap-3 sm:flex-row">
         <Button
           variant="secondary"
           className="w-full sm:flex-1"
           onClick={handleAdd}
+          disabled={
+            !canAdd ||
+            Boolean(
+              allOptionsSelected &&
+                activeVariant &&
+                !activeVariant.availableForSale
+            )
+          }
         >
           <span ref={addBtnRef}>{t("product.addToCart")}</span>
         </Button>
         <Button href="/cart" variant="outline" className="w-full sm:w-auto">
-          {t("product.buyNow")}
+          {t("product.viewCart")}
         </Button>
       </div>
     </div>

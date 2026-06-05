@@ -143,18 +143,23 @@ export function CartContent() {
         {isShopifyCart && checkoutUrl ? (
           <a
             href={checkoutUrl}
-            className="interactive mt-8 flex w-full items-center justify-center rounded-md bg-niti-charcoal px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-niti-charcoal/90"
+            className="interactive mt-8 flex w-full items-center justify-center rounded-md bg-niti-charcoal px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-niti-charcoal/90 hover:shadow-md"
           >
             {t("cart.checkout")}
           </a>
         ) : (
-          <Button variant="secondary" className="mt-8 w-full" disabled>
+          <Button variant="outline" className="mt-8 w-full" disabled>
             {t("cart.checkout")}
           </Button>
         )}
         <p className="mt-4 text-center text-xs text-niti-muted">
           {t("cart.secure")}
         </p>
+        {isShopifyCart && checkoutUrl && (
+          <p className="mt-2 text-center text-[11px] leading-relaxed text-niti-muted">
+            {t("cart.checkoutHint")}
+          </p>
+        )}
         <button
           type="button"
           onClick={clearCart}

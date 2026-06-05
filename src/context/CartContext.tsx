@@ -9,8 +9,10 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 import { shopifyClientEnabled } from "@/lib/shopify/config";
 import { getVariantIdForColor } from "@/lib/shopify/mappers";
+import { getVariantIdFromSelections } from "@/lib/shopify/variants";
 import type { CartItem, Product } from "@/types";
 
 const CART_ID_KEY = "niti-shopify-cart-id";
@@ -39,7 +41,15 @@ type CartContextValue = {
   cartLoading: boolean;
   cartError: string | null;
   toast: CartToast | null;
-  addItem: (product: Product, quantity?: number, color?: string) => void;
+  addItem: (
+    product: Product,
+    quantity?: number,
+    extras?: {
+      variantId?: string;
+      selectedColor?: string;
+      selections?: Record<string, string>;
+    }
+  ) => void;
   removeItem: (lineOrProductId: string) => void;
   updateQuantity: (lineOrProductId: string, quantity: number) => void;
   clearCart: () => void;
@@ -48,11 +58,14 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-async function postCart(body: Record<string, unknown>): Promise<CartApiState> {
+async function postCart(
+  body: Record<string, unknown>,
+  locale: string
+): Promise<CartApiState> {
   const res = await fetch("/api/shopify/cart", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ ...body, locale }),
   });
   const json = await res.json();
   if (!res.ok) {
@@ -61,8 +74,13 @@ async function postCart(body: Record<string, unknown>): Promise<CartApiState> {
   return json as CartApiState;
 }
 
-async function fetchCart(cartId: string): Promise<CartApiState | null> {
-  const res = await fetch(`/api/shopify/cart?cartId=${encodeURIComponent(cartId)}`);
+async function fetchCart(
+  cartId: string,
+  locale: string
+): Promise<CartApiState | null> {
+  const res = await fetch(
+    `/api/shopify/cart?cartId=${encodeURIComponent(cartId)}&locale=${locale}`
+  );
   if (res.status === 404) return null;
   const json = await res.json();
   if (!res.ok) {
@@ -72,6 +90,7 @@ async function fetchCart(cartId: string): Promise<CartApiState | null> {
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { locale } = useLanguage();
   const shopifyCart = shopifyClientEnabled;
   const [items, setItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<string | null>(null);
@@ -95,7 +114,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem(CART_ID_KEY);
     if (stored) {
       try {
-        const existing = await fetchCart(stored);
+        const existing = await fetchCart(stored, locale);
         if (existing) {
           applyRemoteCart(existing);
           return existing.cartId;
@@ -104,10 +123,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem(CART_ID_KEY);
       }
     }
-    const created = await postCart({ action: "create" });
+    const created = await postCart({ action: "create" }, locale);
     applyRemoteCart(created);
     return created.cartId;
-  }, [applyRemoteCart]);
+  }, [applyRemoteCart, locale]);
 
   useEffect(() => {
     if (!shopifyCart) {
@@ -121,7 +140,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       try {
         const stored = localStorage.getItem(CART_ID_KEY);
         if (stored) {
-          const cart = await fetchCart(stored);
+          const cart = await fetchCart(stored, locale);
           if (!cancelled && cart) {
             applyRemoteCart(cart);
             return;
@@ -142,7 +161,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [shopifyCart, applyRemoteCart]);
+  }, [shopifyCart, applyRemoteCart, locale]);
 
   const findItem = useCallback(
     (lineOrProductId: string) =>
@@ -158,7 +177,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const addItem = useCallback(
-    (product: Product, quantity = 1, selectedColor?: string) => {
+    (
+      product: Product,
+      quantity = 1,
+      extras?: {
+        variantId?: string;
+        selectedColor?: string;
+        selections?: Record<string, string>;
+      }
+    ) => {
+      const selectedColor = extras?.selectedColor;
+
       if (!shopifyCart) {
         setToast({ product, variant: "success", visible: true });
         setItems((prev) => {
@@ -183,19 +212,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
       (async () => {
         try {
           setCartError(null);
-          const variantId = getVariantIdForColor(product, selectedColor);
+          const variantId =
+            extras?.variantId ??
+            (extras?.selections
+              ? getVariantIdFromSelections(product, extras.selections)
+              : getVariantIdForColor(product, selectedColor));
           if (!variantId) {
             throw new Error(
               "Proizvod nema Shopify varijantu (dodaj iz /shop ili proveri mock podatke)."
             );
           }
           const id = cartId ?? (await ensureCartId());
-          const cart = await postCart({
-            action: "add",
-            cartId: id,
-            variantId,
-            quantity,
-          });
+          const cart = await postCart(
+            {
+              action: "add",
+              cartId: id,
+              variantId,
+              quantity,
+            },
+            locale
+          );
           applyRemoteCart(cart);
           setToast({ product, variant: "success", visible: true });
         } catch (e) {
@@ -205,7 +241,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
       })();
     },
-    [shopifyCart, cartId, ensureCartId, applyRemoteCart, showErrorToast]
+    [shopifyCart, cartId, ensureCartId, applyRemoteCart, showErrorToast, locale]
   );
 
   const removeItem = useCallback(
@@ -221,18 +257,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
       (async () => {
         try {
           setCartError(null);
-          const cart = await postCart({
-            action: "remove",
-            cartId,
-            lineId: item.lineId,
-          });
+          const cart = await postCart(
+            {
+              action: "remove",
+              cartId,
+              lineId: item.lineId,
+            },
+            locale
+          );
           applyRemoteCart(cart);
         } catch (e) {
           setCartError(e instanceof Error ? e.message : "Greška");
         }
       })();
     },
-    [shopifyCart, cartId, findItem, applyRemoteCart]
+    [shopifyCart, cartId, findItem, applyRemoteCart, locale]
   );
 
   const updateQuantity = useCallback(
@@ -258,19 +297,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
       (async () => {
         try {
           setCartError(null);
-          const cart = await postCart({
-            action: "update",
-            cartId,
-            lineId: item.lineId,
-            quantity,
-          });
+          const cart = await postCart(
+            {
+              action: "update",
+              cartId,
+              lineId: item.lineId,
+              quantity,
+            },
+            locale
+          );
           applyRemoteCart(cart);
         } catch (e) {
           setCartError(e instanceof Error ? e.message : "Greška");
         }
       })();
     },
-    [shopifyCart, cartId, findItem, applyRemoteCart]
+    [shopifyCart, cartId, findItem, applyRemoteCart, locale]
   );
 
   const clearCart = useCallback(() => {

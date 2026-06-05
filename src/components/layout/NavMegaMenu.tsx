@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { categories } from "@/lib/data/categories";
+import { useNavCategories } from "@/context/CategoriesContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +16,7 @@ type NavMegaMenuProps = {
 
 export function NavMegaMenu({ open, onClose }: NavMegaMenuProps) {
   const { t } = useLanguage();
+  const categories = useNavCategories();
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -105,7 +106,9 @@ export function NavMegaMenu({ open, onClose }: NavMegaMenuProps) {
                       {cat.title}
                     </span>
                     <span className="mt-0.5 block text-[11px] text-white/75 sm:text-xs">
-                      {cat.productCount} {t("common.products")}
+                      {cat.productCount > 0
+                        ? `${cat.productCount} ${t("common.products")}`
+                        : t("shop.browse")}
                     </span>
                   </div>
                 </Link>

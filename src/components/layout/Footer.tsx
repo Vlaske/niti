@@ -11,6 +11,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { NewsletterForm } from "@/components/layout/NewsletterForm";
+import { useNavCategories } from "@/context/CategoriesContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { valueProps } from "@/lib/data/collections";
 
@@ -18,13 +19,6 @@ const companyLinks = [
   { label: "Održivost", href: "/#faq" },
   { label: "Karijere", href: "#" },
   { label: "Press", href: "#" },
-];
-
-const shopLinks = [
-  { label: "Posteljina", href: "/shop/bedsheets" },
-  { label: "Peškiri", href: "/shop/towels" },
-  { label: "Ćebad", href: "/shop/throws" },
-  { label: "Svi proizvodi", href: "/shop" },
 ];
 
 const careLinks = [
@@ -50,6 +44,14 @@ const icons: Record<string, React.ReactNode> = {
 
 export function Footer() {
   const { t } = useLanguage();
+  const navCategories = useNavCategories();
+  const shopLinks = [
+    ...navCategories.map((c) => ({
+      label: c.title,
+      href: `/shop/${c.slug}`,
+    })),
+    { label: t("nav.allProducts"), href: "/shop" },
+  ];
 
   return (
     <footer className="mt-auto">

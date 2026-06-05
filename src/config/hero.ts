@@ -1,15 +1,14 @@
 /**
- * Hero carousel configuration
- *
- * VIDEO SETUP:
- * 1. Place your .mp4 file in `public/videos/` (e.g. `public/videos/bedsheet-hero.mp4`)
- * 2. Set `mediaType: "video"` and `videoSrc: "/videos/bedsheet-hero.mp4"` on a slide in heroSlides
- *
- * SINGLE VIDEO LOOP (no carousel):
- * Set `singleVideoLoop: true` — only the first slide plays, loops forever, controls hidden.
+ * Hero carousel — globalna podešavanja.
+ * Slajdovi (slike/video): `src/config/hero-slides.ts`
+ * Video fajlovi: `public/videos/`
  */
 export const heroConfig = {
-  /** When true, only first slide is shown and video/image loops — no carousel rotation */
-  singleVideoLoop: false,
+  /**
+   * true = samo prvi slajd, video/slika u petlji, bez kontrola karusela.
+   * Idealno za jedan product video na početnoj.
+   */
+  singleVideoLoop: true,
+  /** Interval rotacije slajdova (ms) — ignoriše se kad je singleVideoLoop */
   autoplayMs: 7000,
 };
