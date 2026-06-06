@@ -1,6 +1,8 @@
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
+import { HeroMediaPreload } from "@/components/home/HeroMediaPreload";
+import { HomeLoaderProvider } from "@/context/HomeLoaderContext";
 import { NewArrivals } from "@/components/home/NewArrivals";
 import { CollectionsGrid } from "@/components/home/CollectionsGrid";
 import { DesignCarousel } from "@/components/home/DesignCarousel";
@@ -18,7 +20,8 @@ export default async function HomePage() {
     getDesignShowcaseItems(),
   ]);
   return (
-    <>
+    <HomeLoaderProvider>
+      <HeroMediaPreload />
       <Header variant="transparent" />
       <main>
         <HeroCarousel />
@@ -35,6 +38,6 @@ export default async function HomePage() {
         <FaqSection />
       </main>
       <Footer />
-    </>
+    </HomeLoaderProvider>
   );
 }

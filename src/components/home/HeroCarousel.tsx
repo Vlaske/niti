@@ -12,6 +12,7 @@ import {
 } from "@/lib/animations";
 import { heroSlides } from "@/config/hero-slides";
 import { heroConfig } from "@/config/hero";
+import { useHomeLoader } from "@/context/HomeLoaderContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 import type { HeroSlide } from "@/types";
@@ -22,15 +23,43 @@ function getSlideMedia(slide: HeroSlide) {
   return { type, src, poster: slide.poster ?? slide.image };
 }
 
-function HeroMedia({ slide }: { slide: HeroSlide }) {
+function HeroMedia({
+  slide,
+  onReady,
+}: {
+  slide: HeroSlide;
+  onReady?: () => void;
+}) {
   const { type, src, poster } = getSlideMedia(slide);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const readySent = useRef(false);
+
+  const notifyReady = useCallback(() => {
+    if (readySent.current) return;
+    readySent.current = true;
+    onReady?.();
+  }, [onReady]);
+
+  useEffect(() => {
+    readySent.current = false;
+  }, [src, type]);
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v || type !== "video") return;
+
+    const handleReady = () => notifyReady();
+
+    if (v.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+      handleReady();
+    } else {
+      v.addEventListener("canplay", handleReady, { once: true });
+    }
+
     v.play().catch(() => {});
-  }, [src, type]);
+
+    return () => v.removeEventListener("canplay", handleReady);
+  }, [src, type, notifyReady]);
 
   if (type === "video") {
     return (
@@ -42,6 +71,7 @@ function HeroMedia({ slide }: { slide: HeroSlide }) {
         muted
         loop
         playsInline
+        preload="auto"
         poster={poster}
       >
         <source src={src} type="video/mp4" />
@@ -57,12 +87,14 @@ function HeroMedia({ slide }: { slide: HeroSlide }) {
       priority
       sizes="100vw"
       className="object-cover"
+      onLoad={notifyReady}
     />
   );
 }
 
 export function HeroCarousel() {
   const { t } = useLanguage();
+  const { markHeroReady } = useHomeLoader();
   const slides = heroConfig.singleVideoLoop
     ? heroSlides.slice(0, 1)
     : heroSlides;
@@ -111,7 +143,7 @@ export function HeroCarousel() {
       className="relative h-[100svh] min-h-[560px] w-full overflow-hidden"
     >
       <div className="absolute inset-0" data-hero-media>
-        <HeroMedia slide={slide} />
+        <HeroMedia slide={slide} onReady={markHeroReady} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-black/25" />
       </div>
 
