@@ -20,11 +20,18 @@ export function FeaturedHero({ image, ctaHref }: FeaturedHeroProps) {
   return (
     <section
       ref={ref}
-      className="relative min-h-[52vh] overflow-hidden sm:min-h-[60vh] md:min-h-[85vh]"
+      className="relative min-h-[42vh] overflow-hidden sm:min-h-[60vh] md:min-h-[85vh]"
     >
-      <Image src={image} alt="" fill className="object-cover" sizes="100vw" />
+      <Image
+        src={image}
+        alt=""
+        fill
+        className="pointer-events-none object-cover"
+        sizes="100vw"
+        draggable={false}
+      />
       <div className="absolute inset-0 bg-gradient-to-r from-black/45 via-black/20 to-transparent" />
-      <div className="relative mx-auto flex min-h-[52vh] max-w-[1440px] flex-col justify-center px-4 py-16 sm:min-h-[60vh] sm:py-20 md:min-h-[85vh] md:px-8 md:py-24 lg:px-12">
+      <div className="relative mx-auto flex min-h-[42vh] max-w-[1440px] flex-col justify-center px-4 py-12 sm:min-h-[60vh] sm:py-20 md:min-h-[85vh] md:px-8 md:py-24 lg:px-12">
         <p
           data-reveal
           className="mb-3 text-xs uppercase tracking-[0.25em] text-white/80"
@@ -33,7 +40,7 @@ export function FeaturedHero({ image, ctaHref }: FeaturedHeroProps) {
         </p>
         <h2
           data-reveal
-          className="max-w-xl font-serif text-3xl font-medium leading-tight text-white md:text-5xl lg:text-6xl"
+          className="max-w-xl font-serif text-2xl font-medium leading-tight text-white sm:text-3xl md:text-5xl lg:text-6xl"
         >
           {t("home.featuredTitle")}
         </h2>

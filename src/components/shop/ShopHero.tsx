@@ -29,7 +29,7 @@ export function ShopHero({
   return (
     <section
       className={cn(
-        "relative min-h-[32vh] overflow-hidden sm:min-h-[36vh] md:min-h-[42vh]",
+        "relative min-h-[28vh] overflow-hidden sm:min-h-[36vh] md:min-h-[42vh]",
         className
       )}
     >
@@ -39,14 +39,15 @@ export function ShopHero({
         fill
         priority
         sizes="100vw"
-        className="object-cover"
+        className="pointer-events-none object-cover"
+        draggable={false}
       />
       {/* Top: keep header readable; bottom: solid dark band for title */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/30 to-black/70" />
       <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-      <div className="relative mx-auto flex min-h-[32vh] max-w-[1440px] flex-col justify-end px-4 pb-10 pt-24 sm:min-h-[36vh] sm:pb-12 sm:pt-28 md:min-h-[42vh] md:px-8 md:pb-14 md:pt-32 lg:px-12">
-        <nav className="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-white/70 sm:text-sm">
+      <div className="relative mx-auto flex min-h-[28vh] max-w-[1440px] flex-col justify-end px-4 pb-8 pt-20 sm:min-h-[36vh] sm:pb-12 sm:pt-28 md:min-h-[42vh] md:px-8 md:pb-14 md:pt-32 lg:px-12">
+        <nav className="mb-2 flex flex-wrap items-center gap-1.5 text-xs text-white/70 sm:mb-3 sm:text-sm">
           {crumbs.map((crumb, i) => (
             <span key={`${crumb.label}-${i}`} className="flex items-center gap-1.5">
               {i > 0 && <span className="text-white/40">/</span>}
@@ -60,11 +61,11 @@ export function ShopHero({
             </span>
           ))}
         </nav>
-        <h1 className="font-serif text-3xl font-medium leading-[1.1] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[3.25rem]">
+        <h1 className="font-serif text-[1.65rem] font-medium leading-[1.12] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[3.25rem]">
           {title}
         </h1>
         {description && (
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/80 md:mt-4 md:text-base">
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80 line-clamp-3 md:mt-4 md:line-clamp-none md:text-base">
             {description}
           </p>
         )}

@@ -40,7 +40,7 @@ type ShopPageClientProps = {
 };
 
 const GRID_CLASS: Record<GridDensity, string> = {
-  large: "grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3",
+  large: "grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-3",
   medium:
     "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4",
   small:
@@ -236,12 +236,12 @@ export function ShopPageClient({
         </div>
       )}
 
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between">
         <SectionHeader
           title={`${filtered.length} ${t("shop.products")}`}
           className="flex-1"
         />
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
           <div
             className="flex items-center gap-0.5 rounded-md border border-niti-line bg-white p-1"
             role="group"
@@ -260,7 +260,7 @@ export function ShopPageClient({
                       : t("shop.gridSmall")
                 }
                 className={cn(
-                  "interactive flex h-8 w-8 items-center justify-center rounded transition-colors",
+                  "interactive flex h-9 w-9 items-center justify-center rounded transition-colors sm:h-8 sm:w-8",
                   density === size
                     ? "bg-niti-charcoal text-white"
                     : "text-niti-muted hover:text-niti-charcoal"
@@ -283,7 +283,8 @@ export function ShopPageClient({
             <select
               value={pageSize}
               onChange={(e) => setPageSize(Number(e.target.value))}
-              className="interactive rounded-md border border-niti-line bg-white px-3 py-2 text-sm"
+              className="interactive min-h-9 rounded-md border border-niti-line bg-white px-2.5 py-2 text-sm sm:px-3"
+              aria-label={t("shop.pageSize")}
             >
               {PAGE_SIZE_OPTIONS.map((n) => (
                 <option key={n} value={n}>
@@ -292,12 +293,12 @@ export function ShopPageClient({
               ))}
             </select>
           </label>
-          <label className="flex items-center gap-2 text-sm">
-            <span className="text-niti-muted">{t("shop.sort")}</span>
+          <label className="flex min-w-0 flex-1 items-center gap-2 text-sm sm:flex-none">
+            <span className="shrink-0 text-niti-muted">{t("shop.sort")}</span>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as SortKey)}
-              className="interactive rounded-md border border-niti-line bg-white px-3 py-2 text-sm"
+              className="interactive min-h-9 min-w-0 flex-1 rounded-md border border-niti-line bg-white px-2.5 py-2 text-sm sm:flex-none sm:px-3"
             >
               <option value="featured">{t("shop.sortFeatured")}</option>
               <option value="newest">{t("shop.sortNewest")}</option>

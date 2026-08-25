@@ -76,7 +76,8 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
               alt={product.title}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              className="pointer-events-none object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              draggable={false}
             />
           </Link>
 

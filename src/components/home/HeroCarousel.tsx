@@ -140,17 +140,17 @@ export function HeroCarousel() {
   return (
     <section
       ref={containerRef}
-      className="relative h-[100svh] min-h-[560px] w-full overflow-hidden"
+      className="relative h-[min(100svh,760px)] min-h-[480px] w-full overflow-hidden md:h-[100svh] md:min-h-[560px]"
     >
       <div className="absolute inset-0" data-hero-media>
         <HeroMedia slide={slide} onReady={markHeroReady} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-black/25" />
       </div>
 
-      <div className="relative mx-auto flex h-full max-w-[1440px] flex-col justify-end px-4 pb-28 pt-32 md:px-8 lg:px-12 lg:pb-36">
+      <div className="relative mx-auto flex h-full max-w-[1440px] flex-col justify-end px-4 pb-24 pt-28 md:px-8 md:pb-28 md:pt-32 lg:px-12 lg:pb-36">
         <p
           data-hero-tag
-          className="mb-4 w-fit border border-white/55 px-3 py-1.5 text-xs text-white/95 md:mb-5 md:text-sm"
+          className="mb-3 w-fit border border-white/55 px-3 py-1.5 text-xs text-white/95 md:mb-5 md:text-sm"
         >
           {slide.productTag ?? "Premium tekstil — NITI."}
         </p>
@@ -164,7 +164,7 @@ export function HeroCarousel() {
 
         <h1
           data-hero-headline
-          className="max-w-3xl text-3xl font-semibold uppercase leading-[1.08] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
+          className="max-w-3xl text-[1.65rem] font-semibold uppercase leading-[1.1] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
         >
           {slide.headline}
           {slide.brandMark && (

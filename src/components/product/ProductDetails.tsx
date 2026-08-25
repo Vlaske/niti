@@ -100,16 +100,16 @@ export function ProductDetails({
       <p className="text-xs uppercase tracking-[0.2em] text-niti-muted">
         {product.brand}
       </p>
-      <h1 className="mt-2 font-serif text-3xl font-semibold text-niti-charcoal md:text-4xl">
+      <h1 className="mt-2 font-serif text-[1.65rem] font-semibold leading-tight text-niti-charcoal sm:text-3xl md:text-4xl">
         {product.title}
       </h1>
 
-      <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
+      <div className="mt-4 flex flex-wrap items-end gap-x-3 gap-y-1 md:mt-5">
         <span
           className={
             savings
-              ? "text-2xl font-semibold tracking-tight text-niti-sale md:text-3xl"
-              : "text-2xl font-semibold tracking-tight text-niti-charcoal md:text-3xl"
+              ? "text-[1.35rem] font-semibold tracking-tight text-niti-sale sm:text-2xl md:text-3xl"
+              : "text-[1.35rem] font-semibold tracking-tight text-niti-charcoal sm:text-2xl md:text-3xl"
           }
         >
           {formatPrice(displayPrice, locale)}

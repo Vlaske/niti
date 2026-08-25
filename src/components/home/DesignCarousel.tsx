@@ -71,14 +71,14 @@ export function DesignCarousel({ items }: DesignCarouselProps) {
   const showArrows = items.length > 1;
 
   return (
-    <section ref={ref} className="overflow-hidden bg-niti-cream py-16 md:py-24">
+    <section ref={ref} className="overflow-hidden bg-niti-cream py-10 md:py-24">
       <div className="mx-auto max-w-[1440px] px-4 md:px-8 lg:px-12">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between md:gap-6">
           <div data-reveal className="flex-1">
             <SectionHeader title={t("home.designTitle")} />
           </div>
           {showArrows && (
-            <div data-reveal>
+            <div data-reveal className="hidden sm:block">
               <CarouselControls
                 onPrev={() => scrollByCard(-1)}
                 onNext={() => scrollByCard(1)}
@@ -87,9 +87,44 @@ export function DesignCarousel({ items }: DesignCarouselProps) {
           )}
         </div>
 
+        {/* Mobile: 2-up grid so cards aren’t one giant sideways scroll */}
+        <div className="mt-6 grid grid-cols-2 gap-3 md:hidden">
+          {items.slice(0, 4).map((item) => (
+            <article key={item.id} data-reveal>
+              <Link href={item.href} className="interactive group block">
+                <div className="relative aspect-[3/4] overflow-hidden bg-niti-sand">
+                  <ShowcaseMedia item={item} />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
+                </div>
+                <div className="mt-2">
+                  <p className="line-clamp-2 text-sm font-semibold text-niti-charcoal">
+                    {item.title}
+                  </p>
+                  <div className="mt-0.5 flex flex-wrap gap-x-2 text-sm">
+                    {item.compareAtPrice && (
+                      <span className="text-niti-muted line-through">
+                        {formatPrice(item.compareAtPrice, locale)}
+                      </span>
+                    )}
+                    <span
+                      className={
+                        item.compareAtPrice
+                          ? "font-medium text-niti-sale"
+                          : "text-niti-charcoal"
+                      }
+                    >
+                      {formatPrice(item.price, locale)}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            </article>
+          ))}
+        </div>
+
         <div
           ref={scrollRef}
-          className="mt-10 flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scroll-px-4 scrollbar-hide md:gap-6 lg:gap-6"
+          className="mt-10 hidden gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scroll-px-4 scrollbar-hide md:flex md:gap-6 lg:gap-6"
         >
           {items.map((item) => (
             <article

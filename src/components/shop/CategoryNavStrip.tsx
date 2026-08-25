@@ -25,38 +25,30 @@ export function CategoryNavStrip({
   const { t } = useLanguage();
   const firstLabel = allLabel ?? t("shop.filters.all");
 
+  const linkClass = (active: boolean) =>
+    cn(
+      "interactive shrink-0 border-b pb-1 text-[11px] font-medium uppercase tracking-[0.12em] transition-colors duration-300 sm:tracking-[0.16em] md:text-xs",
+      active
+        ? "border-niti-charcoal text-niti-charcoal"
+        : "border-transparent text-niti-muted hover:border-niti-charcoal/30 hover:text-niti-charcoal"
+    );
+
   return (
     <nav className="border-b border-niti-line bg-niti-cream">
       <div className="mx-auto max-w-[1440px] px-4 md:px-8 lg:px-12">
-        <div className="scrollbar-hide flex gap-6 overflow-x-auto py-4 md:gap-8 md:py-5">
-          <Link
-            href={allHref}
-              className={cn(
-                "interactive shrink-0 border-b pb-1 text-[11px] font-medium uppercase tracking-[0.16em] transition-colors duration-300 md:text-xs",
-                activeSlug === "all"
-                  ? "border-niti-charcoal text-niti-charcoal"
-                  : "border-transparent text-niti-muted hover:border-niti-charcoal/30 hover:text-niti-charcoal"
-              )}
-          >
+        <div className="flex flex-wrap gap-x-4 gap-y-2.5 py-3.5 md:gap-x-8 md:py-5">
+          <Link href={allHref} className={linkClass(activeSlug === "all")}>
             {firstLabel}
           </Link>
-          {categories.map((cat) => {
-            const active = activeSlug === cat.slug;
-            return (
-              <Link
-                key={cat.slug}
-                href={`/shop/${cat.slug}`}
-                  className={cn(
-                    "interactive shrink-0 border-b pb-1 text-[11px] font-medium uppercase tracking-[0.16em] transition-colors duration-300 md:text-xs",
-                    active
-                      ? "border-niti-charcoal text-niti-charcoal"
-                      : "border-transparent text-niti-muted hover:border-niti-charcoal/30 hover:text-niti-charcoal"
-                  )}
-              >
-                {cat.title}
-              </Link>
-            );
-          })}
+          {categories.map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/shop/${cat.slug}`}
+              className={linkClass(activeSlug === cat.slug)}
+            >
+              {cat.title}
+            </Link>
+          ))}
         </div>
       </div>
     </nav>

@@ -14,6 +14,8 @@ import {
 import { products as mockProducts } from "@/lib/data/products";
 import type { Product } from "@/types";
 
+const MOBILE_VISIBLE = 6;
+
 type NewArrivalsProps = {
   products?: Product[];
 };
@@ -38,6 +40,7 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
     return source.filter((p) => productMatchesCategory(p, filter));
   }, [filter, source]);
 
+  const mobileSlice = filtered.slice(0, MOBILE_VISIBLE);
   const visibleDesktop = 4;
   const maxOffset = Math.max(0, filtered.length - visibleDesktop);
 
@@ -50,7 +53,7 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
   return (
     <section
       ref={sectionRef}
-      className="bg-niti-cream py-12 md:py-24"
+      className="bg-niti-cream py-10 md:py-24"
       id="new-arrivals"
     >
       <div className="mx-auto max-w-[1440px] px-4 md:px-8 lg:px-12">
@@ -62,38 +65,16 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
           />
         </div>
 
-        <div data-section-reveal className="mt-6 md:mt-8">
-          <div className="relative -mx-4 md:mx-0">
-            <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-1 md:hidden">
-              {filters.map((f) => (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => {
-                    setFilter(f.id);
-                    setOffset(0);
-                  }}
-                  className={`interactive shrink-0 snap-start border-b pb-1 text-[11px] font-medium uppercase tracking-[0.14em] transition-colors ${
-                    filter === f.id
-                      ? "border-niti-charcoal text-niti-charcoal"
-                      : "border-transparent text-niti-muted"
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-            <div className="mt-3 hidden md:block">
-              <FilterPills
-                filters={filters}
-                active={filter}
-                onChange={(id) => {
-                  setFilter(id);
-                  setOffset(0);
-                }}
-              />
-            </div>
-          </div>
+        <div data-section-reveal className="mt-5 md:mt-8">
+          <FilterPills
+            filters={filters}
+            active={filter}
+            onChange={(id) => {
+              setFilter(id);
+              setOffset(0);
+            }}
+            className="gap-x-4 gap-y-2 md:gap-x-8"
+          />
         </div>
 
         {filtered.length === 0 ? (
@@ -102,17 +83,10 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
           </p>
         ) : (
           <>
-            <div className="relative mt-6 md:hidden">
-              <div className="scrollbar-hide -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-1">
-                {filtered.map((product) => (
-                  <div
-                    key={product.id}
-                    className="w-[46vw] max-w-[200px] shrink-0 snap-start"
-                  >
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
+            <div className="mt-6 grid grid-cols-2 gap-3 md:hidden">
+              {mobileSlice.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
             </div>
 
             <div className="relative mt-10 hidden overflow-hidden md:block">

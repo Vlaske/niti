@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ProductGalleryProps = {
@@ -24,7 +24,6 @@ export function ProductGallery({
 }: ProductGalleryProps) {
   const list = images.length > 0 ? images : [];
   const [index, setIndex] = useState(0);
-  const [lightbox, setLightbox] = useState(false);
   const thumbsRef = useRef<HTMLDivElement>(null);
   const mobileThumbsRef = useRef<HTMLDivElement>(null);
 
@@ -72,235 +71,130 @@ export function ProductGallery({
     scrollThumb(mobileThumbsRef.current, true);
   }, [index]);
 
-  useEffect(() => {
-    if (!lightbox) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setLightbox(false);
-      if (e.key === "ArrowLeft") goPrev();
-      if (e.key === "ArrowRight") goNext();
-    };
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [lightbox, goPrev, goNext]);
-
   if (list.length === 0) return null;
 
   const current = list[index]!;
   const compactThumbs = list.length > 6;
 
   return (
-    <>
-      <div
-        className={cn(
-          "flex flex-col gap-4",
-          hasMultiple && "sm:flex-row sm:items-start sm:gap-5"
-        )}
-      >
+    <div
+      className={cn(
+        "flex flex-col gap-3 sm:gap-4",
+        hasMultiple && "sm:flex-row sm:items-start sm:gap-5"
+      )}
+    >
+      {hasMultiple && (
+        <div
+          ref={thumbsRef}
+          onWheel={(e) => {
+            e.stopPropagation();
+          }}
+          className={cn(
+            "order-2 hidden max-h-[min(70vh,640px)] shrink-0 flex-col gap-2 overscroll-contain scroll-smooth sm:order-1 sm:flex [scrollbar-width:thin]",
+            compactThumbs
+              ? "grid w-[5.5rem] grid-cols-2 content-start gap-2 overflow-y-auto md:w-24"
+              : "w-[4.5rem] overflow-y-auto md:w-20"
+          )}
+        >
+          {list.map((src, i) => (
+            <button
+              key={`${src}-${i}`}
+              type="button"
+              data-thumb-index={i}
+              onClick={() => setIndex(i)}
+              aria-label={`Slika ${i + 1} od ${list.length}`}
+              aria-current={i === index}
+              className={cn(
+                "interactive relative aspect-square w-full shrink-0 overflow-hidden border bg-niti-sand/40 transition-all",
+                i === index
+                  ? "border-niti-charcoal opacity-100"
+                  : "border-transparent opacity-55 hover:opacity-100"
+              )}
+            >
+              <Image
+                src={src}
+                alt=""
+                fill
+                className="pointer-events-none object-cover"
+                sizes="80px"
+                draggable={false}
+              />
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="order-1 min-w-0 flex-1 sm:order-2">
+        {/* Shorter on mobile so product info isn’t dwarfed by a full-bleed square */}
+        <div className="group relative aspect-[4/5] overflow-hidden bg-niti-sand/60 sm:aspect-square">
+          <Image
+            key={current}
+            src={current}
+            alt={title}
+            fill
+            priority={index === 0}
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="pointer-events-none select-none object-cover"
+            draggable={false}
+          />
+
+          {hasMultiple && (
+            <>
+              <button
+                type="button"
+                onClick={goPrev}
+                aria-label="Prethodna slika"
+                className="interactive absolute left-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-white/90 text-niti-charcoal shadow-sm backdrop-blur-sm sm:left-3 md:h-11 md:w-11 md:opacity-0 md:group-hover:opacity-100"
+              >
+                <ChevronLeft className="h-5 w-5" strokeWidth={1.25} />
+              </button>
+              <button
+                type="button"
+                onClick={goNext}
+                aria-label="Sledeća slika"
+                className="interactive absolute right-2 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-white/90 text-niti-charcoal shadow-sm backdrop-blur-sm sm:right-3 md:h-11 md:w-11 md:opacity-0 md:group-hover:opacity-100"
+              >
+                <ChevronRight className="h-5 w-5" strokeWidth={1.25} />
+              </button>
+              <p className="pointer-events-none absolute bottom-3 right-3 z-10 bg-black/45 px-2 py-1 text-[10px] font-medium tracking-wider text-white backdrop-blur-sm">
+                {index + 1} / {list.length}
+              </p>
+            </>
+          )}
+        </div>
+
         {hasMultiple && (
           <div
-            ref={thumbsRef}
-            onWheel={(e) => {
-              e.stopPropagation();
-            }}
-            className={cn(
-              "order-2 hidden max-h-[min(70vh,640px)] shrink-0 flex-col gap-2 overscroll-contain scroll-smooth sm:order-1 sm:flex [scrollbar-width:thin]",
-              compactThumbs
-                ? "grid w-[5.5rem] grid-cols-2 content-start gap-2 overflow-y-auto md:w-24"
-                : "w-[4.5rem] overflow-y-auto md:w-20"
-            )}
+            ref={mobileThumbsRef}
+            className="mt-3 flex gap-2 overflow-x-auto overscroll-x-contain pb-1 scrollbar-hide sm:hidden"
           >
             {list.map((src, i) => (
               <button
-                key={`${src}-${i}`}
+                key={`mobile-${src}-${i}`}
                 type="button"
                 data-thumb-index={i}
                 onClick={() => setIndex(i)}
-                aria-label={`Slika ${i + 1} od ${list.length}`}
-                aria-current={i === index}
+                aria-label={`Slika ${i + 1}`}
                 className={cn(
-                  "interactive relative aspect-square w-full shrink-0 overflow-hidden border bg-niti-sand/40 transition-all",
+                  "interactive relative h-14 w-14 shrink-0 overflow-hidden border",
                   i === index
-                    ? "border-niti-charcoal opacity-100"
-                    : "border-transparent opacity-55 hover:opacity-100"
+                    ? "border-niti-charcoal"
+                    : "border-niti-line opacity-75"
                 )}
               >
                 <Image
                   src={src}
                   alt=""
                   fill
-                  className="object-cover"
-                  sizes="80px"
+                  className="pointer-events-none object-cover"
+                  sizes="56px"
+                  draggable={false}
                 />
               </button>
             ))}
           </div>
         )}
-
-        <div className="order-1 min-w-0 flex-1 sm:order-2">
-          <div className="group relative aspect-square overflow-hidden bg-niti-sand/60">
-            <button
-              type="button"
-              onClick={() => setLightbox(true)}
-              className="absolute inset-0 z-[1] cursor-zoom-in"
-              aria-label="Uvećaj sliku"
-            >
-              <Image
-                key={current}
-                src={current}
-                alt={title}
-                fill
-                priority={index === 0}
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
-              />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setLightbox(true)}
-              className="interactive absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center border border-white/25 bg-white/90 text-niti-charcoal opacity-100 shadow-sm backdrop-blur-sm md:opacity-0 md:group-hover:opacity-100"
-              aria-label="Uvećaj sliku"
-            >
-              <Expand className="h-4 w-4" strokeWidth={1.5} />
-            </button>
-
-            {hasMultiple && (
-              <>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goPrev();
-                  }}
-                  aria-label="Prethodna slika"
-                  className="interactive absolute left-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-white/90 text-niti-charcoal opacity-100 shadow-sm backdrop-blur-sm transition-opacity md:h-11 md:w-11 md:opacity-0 md:group-hover:opacity-100"
-                >
-                  <ChevronLeft className="h-5 w-5" strokeWidth={1.25} />
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    goNext();
-                  }}
-                  aria-label="Sledeća slika"
-                  className="interactive absolute right-3 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-white/90 text-niti-charcoal opacity-100 shadow-sm backdrop-blur-sm transition-opacity md:h-11 md:w-11 md:opacity-0 md:group-hover:opacity-100"
-                >
-                  <ChevronRight className="h-5 w-5" strokeWidth={1.25} />
-                </button>
-                <p className="pointer-events-none absolute bottom-3 right-3 z-10 bg-black/45 px-2 py-1 text-[10px] font-medium tracking-wider text-white backdrop-blur-sm">
-                  {index + 1} / {list.length}
-                </p>
-              </>
-            )}
-          </div>
-
-          {hasMultiple && (
-            <div
-              ref={mobileThumbsRef}
-              className="mt-3 flex gap-2 overflow-x-auto overscroll-x-contain pb-1 scrollbar-hide sm:hidden"
-            >
-              {list.map((src, i) => (
-                <button
-                  key={`mobile-${src}-${i}`}
-                  type="button"
-                  data-thumb-index={i}
-                  onClick={() => setIndex(i)}
-                  aria-label={`Slika ${i + 1}`}
-                  className={cn(
-                    "interactive relative h-16 w-16 shrink-0 overflow-hidden border",
-                    i === index
-                      ? "border-niti-charcoal"
-                      : "border-niti-line opacity-75"
-                  )}
-                >
-                  <Image
-                    src={src}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="64px"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
-
-      {/* Full-viewport lightbox — large image, dark stage, close / arrows */}
-      {lightbox && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={title}
-          className="fixed inset-0 z-[100] bg-black"
-          onClick={() => setLightbox(false)}
-        >
-          <button
-            type="button"
-            onClick={() => setLightbox(false)}
-            className="interactive absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center text-white/90 hover:text-white md:right-6 md:top-6"
-            aria-label="Zatvori"
-          >
-            <X className="h-7 w-7" strokeWidth={1.25} />
-          </button>
-
-          {hasMultiple && (
-            <>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goPrev();
-                }}
-                className="interactive absolute left-2 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center text-white/80 hover:text-white md:left-6"
-                aria-label="Prethodna"
-              >
-                <ChevronLeft className="h-8 w-8" strokeWidth={1.25} />
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goNext();
-                }}
-                className="interactive absolute right-2 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center text-white/80 hover:text-white md:right-6"
-                aria-label="Sledeća"
-              >
-                <ChevronRight className="h-8 w-8" strokeWidth={1.25} />
-              </button>
-            </>
-          )}
-
-          <div
-            className="absolute inset-0 flex items-center justify-center p-4 md:p-12"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="relative h-full w-full">
-              <Image
-                src={current}
-                alt={title}
-                fill
-                className="object-contain"
-                sizes="100vw"
-                priority
-              />
-            </div>
-          </div>
-
-          {hasMultiple && (
-            <p className="pointer-events-none absolute bottom-6 left-1/2 z-20 -translate-x-1/2 text-sm text-white/70">
-              {index + 1} / {list.length}
-            </p>
-          )}
-        </div>
-      )}
-    </>
+    </div>
   );
 }

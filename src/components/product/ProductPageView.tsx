@@ -86,7 +86,7 @@ export function ProductPageView({
     <div ref={mainRef}>
       <nav
         data-pdp-reveal
-        className="mb-8 mt-6 flex flex-wrap gap-1 pt-2 text-sm text-niti-muted md:mt-10 md:pt-4"
+        className="mb-5 mt-4 flex flex-wrap gap-1 pt-2 text-xs text-niti-muted sm:text-sm md:mb-8 md:mt-10 md:pt-4"
       >
         <Link href="/" className="interactive hover:text-niti-charcoal">
           {t("product.home")}
@@ -119,7 +119,7 @@ export function ProductPageView({
         )}
       </nav>
 
-      <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+      <div className="grid gap-6 md:gap-10 lg:grid-cols-2 lg:gap-16">
         <div data-pdp-reveal>
           <ProductGallery
             images={images}
@@ -138,7 +138,7 @@ export function ProductPageView({
 
       <section
         data-pdp-reveal
-        className="mt-12 grid gap-8 border-t border-niti-line py-10 sm:grid-cols-2"
+        className="mt-8 grid gap-6 border-t border-niti-line py-8 sm:grid-cols-2 sm:gap-8 md:mt-12 md:py-10"
       >
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-wider">
@@ -156,9 +156,9 @@ export function ProductPageView({
       </section>
 
       {related.length > 0 && (
-        <section className="mt-12 border-t border-niti-line pt-16">
-          <SectionHeader title={t("product.alsoLike")} className="mb-10" />
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+        <section className="mt-10 border-t border-niti-line pt-10 md:mt-12 md:pt-16">
+          <SectionHeader title={t("product.alsoLike")} className="mb-6 md:mb-10" />
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-6">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -167,12 +167,12 @@ export function ProductPageView({
       )}
 
       {recentExcluding.length > 0 && (
-        <section className="mt-20 border-t border-niti-line pt-16">
+        <section className="mt-12 border-t border-niti-line pt-10 md:mt-20 md:pt-16">
           <SectionHeader
             title={t("product.recentlyViewed")}
-            className="mb-10"
+            className="mb-6 md:mb-10"
           />
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-6">
             {recentExcluding.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -182,7 +182,7 @@ export function ProductPageView({
 
       <p
         data-pdp-reveal
-        className="mt-16 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-niti-line pt-8 text-[11px] font-medium uppercase tracking-[0.16em] text-niti-muted"
+        className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-niti-line pt-6 text-[11px] font-medium uppercase tracking-[0.16em] text-niti-muted md:mt-16 md:pt-8"
       >
         <span>{t("product.continue")}</span>
         {storeCat && (

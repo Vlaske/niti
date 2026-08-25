@@ -41,6 +41,8 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -48,6 +50,27 @@ body {
   color: var(--niti-charcoal);
   font-family: var(--font-sans), system-ui, sans-serif;
   overflow-x: clip;
+  overscroll-behavior-x: none;
+}
+
+/* Reduce accidental double-tap zoom / image callouts on mobile */
+img,
+video,
+picture {
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+a,
+button,
+[role="button"],
+.interactive,
+input,
+select,
+textarea,
+summary {
+  touch-action: manipulation;
 }
 
 /* Fiksni header — ista visina u transparent i solid stanju */
