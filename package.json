@@ -6,17 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "import:viktorija:discover": "tsx scripts/viktorija/discover.ts",
-    "import:viktorija:scrape": "tsx scripts/viktorija/scrape.ts",
-    "import:viktorija:map": "tsx scripts/viktorija/map.ts",
-    "import:viktorija:images": "tsx scripts/viktorija/download-images.ts",
-    "import:viktorija:export": "tsx scripts/viktorija/export-shopify.ts",
-    "import:viktorija:collections": "tsx scripts/viktorija/ensure-collections.ts",
-    "import:viktorija:push-products": "tsx scripts/viktorija/push-products.ts",
-    "import:viktorija:push-images": "tsx scripts/viktorija/push-images.ts",
-    "import:viktorija:publish": "tsx scripts/viktorija/publish.ts",
-    "import:viktorija": "npm run import:viktorija:discover && npm run import:viktorija:scrape && npm run import:viktorija:map && npm run import:viktorija:images && npm run import:viktorija:export"
+    "lint": "eslint"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -34,7 +24,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
-    "tsx": "^4.20.5",
     "typescript": "^5"
   }
 }

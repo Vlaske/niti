@@ -40,5 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local Viktorija import dumps (never deploy / never push)
+# Local Viktorija import tooling + dumps (never deploy / never push)
 /data/viktorija/
+/scripts/viktorija/
