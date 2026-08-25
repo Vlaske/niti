@@ -1,4 +1,5 @@
 import type { Product } from "@/types";
+import { productMatchesCategory } from "@/config/store-categories";
 
 /** All prices in Serbian dinar (RSD), whole numbers */
 export const products: Product[] = [
@@ -11,7 +12,7 @@ export const products: Product[] = [
       "Woven from long-staple European flax with a soft-washed finish. Breathable, durable, and designed for year-round comfort.",
     price: 20900,
     compareAtPrice: 25900,
-    category: "bedsheets",
+    category: "posteljine",
     collection: "linen",
     image:
       "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80",
@@ -38,7 +39,7 @@ export const products: Product[] = [
     description:
       "Plush 600 GSM cotton towels with a looped terry interior and quick-dry weave. Set includes bath, hand, and washcloth.",
     price: 10900,
-    category: "towels",
+    category: "peskiri",
     collection: "bath",
     image:
       "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
@@ -56,7 +57,7 @@ export const products: Product[] = [
     description:
       "Silky percale cotton with a subtle matte finish. Hidden button closure and interior corner ties keep your duvet in place.",
     price: 17900,
-    category: "bedsheets",
+    category: "posteljine",
     image:
       "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
     colors: [
@@ -74,7 +75,7 @@ export const products: Product[] = [
     description:
       "Lightweight cotton-blend throw with a textured basket weave. Perfect layered on a sofa or at the foot of the bed.",
     price: 8900,
-    category: "accessories",
+    category: "cebad",
     image:
       "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
     colors: [{ name: "Cream", hex: "#faf7f2" }],
@@ -87,7 +88,7 @@ export const products: Product[] = [
     description:
       "Absorbent low-pile mats with a non-slip backing. Machine washable and fade-resistant.",
     price: 7200,
-    category: "towels",
+    category: "prostirke",
     image:
       "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
     colors: [
@@ -103,7 +104,7 @@ export const products: Product[] = [
     description:
       "GOTS-certified organic cotton in a 400 thread count sateen weave. Envelope closure for a clean finish.",
     price: 5400,
-    category: "bedsheets",
+    category: "jastuci-i-jastucnice",
     image:
       "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=80",
     colors: [
@@ -120,7 +121,7 @@ export const products: Product[] = [
     description:
       "Compact guest towels with a refined border detail. Ideal for powder rooms and guest suites.",
     price: 4900,
-    category: "towels",
+    category: "peskiri",
     image:
       "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=800&q=80",
   },
@@ -133,7 +134,7 @@ export const products: Product[] = [
       "Lightweight quilted coverlet with a channel-stitched pattern. Adds texture without extra warmth.",
     price: 21900,
     compareAtPrice: 27900,
-    category: "bedsheets",
+    category: "jorgani-i-prekrivaci",
     image:
       "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
     isSale: true,
@@ -148,5 +149,5 @@ export function getProductByHandle(handle: string) {
 
 export function getProductsByCategory(category: string) {
   if (category === "all") return products;
-  return products.filter((p) => p.category === category);
+  return products.filter((p) => productMatchesCategory(p, category));
 }

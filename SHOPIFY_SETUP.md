@@ -117,11 +117,16 @@ Za legacy token **ne mora** `NEXT_PUBLIC_SHOPIFY_ENABLED` ako postoji javni toke
 
 ## Proizvodi u Shopify Admin-u
 
-1. **Products → Add product** — naslov, opis, slike, cena u **RSD**
-2. **Collections** — napravi kolekcije sa handle-ima (mora da se poklapa sa `src/config/store-categories.ts`):
-   - `posteljine`, `carsavi`, `jastuci`, `peskiri`
-3. Dodeli proizvod kolekciji
-4. Proizvod mora biti **Active** i objavljen na kanalu prodavnice (Online Store / Headless)
+Katalog se uvozi iz lokalnog CSV-a (vidi `PRODUCT_IMPORT.md`). Handle-i kolekcija **moraju** da se poklapaju sa `src/config/store-categories.ts`.
+
+Automatizovane kolekcije:
+
+- kategorija: tag `niti:peskiri` → handle `peskiri`
+- prostorija: tag `room:kupatilo` → handle `kupatilo`
+
+1. **Products → Import** — `data/viktorija/shopify-products.csv`, cene u **RSD**
+2. Objavi proizvode na **Headless** kanalu (ne samo Online Store)
+3. Slike kasnije: `npm run import:viktorija:push-images` (Admin token)
 
 Varijante boje: opcija **Color** ili **Boja** — front mapira na swatche i `variantId`.
 

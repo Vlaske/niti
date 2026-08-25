@@ -47,17 +47,17 @@ export function useScrollReveal<T extends HTMLElement>(
     const targets = root.querySelectorAll(selector);
     if (!targets.length) return;
 
-    gsap.set(targets, { opacity: 0, y: options?.y ?? 36 });
+    gsap.set(targets, { opacity: 0, y: options?.y ?? 18 });
 
     const tween = gsap.to(targets, {
       opacity: 1,
       y: 0,
-      duration: 0.85,
+      duration: 0.5,
       ease: "power3.out",
-      stagger: options?.stagger ?? 0.1,
+      stagger: options?.stagger ?? 0.04,
       scrollTrigger: {
         trigger: options?.trigger ?? root,
-        start: "top 88%",
+        start: "top 98%",
         toggleActions: "play none none none",
       },
     });

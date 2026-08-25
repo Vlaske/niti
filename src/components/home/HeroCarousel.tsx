@@ -148,36 +148,39 @@ export function HeroCarousel() {
       </div>
 
       <div className="relative mx-auto flex h-full max-w-[1440px] flex-col justify-end px-4 pb-28 pt-32 md:px-8 lg:px-12 lg:pb-36">
-        {slide.productTag && (
-          <p
-            data-hero-tag
-            className="mb-4 w-fit rounded-sm border border-white/50 px-3 py-1.5 text-xs text-white/95 md:text-sm"
-          >
-            {slide.productTag}
-          </p>
-        )}
+        <p
+          data-hero-tag
+          className="mb-4 w-fit border border-white/55 px-3 py-1.5 text-xs text-white/95 md:mb-5 md:text-sm"
+        >
+          {slide.productTag ?? "Premium tekstil — NITI."}
+        </p>
 
         <p
           data-hero-tag
-          className="mb-2 text-xs uppercase tracking-[0.2em] text-white/80"
+          className="mb-2 text-[11px] font-medium uppercase tracking-[0.22em] text-white/80 md:mb-3"
         >
           {slide.category}
         </p>
 
         <h1
           data-hero-headline
-          className="max-w-3xl text-3xl font-semibold uppercase leading-[1.1] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
+          className="max-w-3xl text-3xl font-semibold uppercase leading-[1.08] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
         >
           {slide.headline}
+          {slide.brandMark && (
+            <span className="ml-3 inline-block tracking-[0.14em] sm:ml-4 md:ml-5">
+              NITI.
+            </span>
+          )}
         </h1>
 
-        <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/85 md:text-base">
+        <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/85 md:mt-5 md:text-base">
           {slide.description}
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3" data-hero-cta>
           <Button href={slide.ctaPrimary.href} variant="primary">
-            {t("hero.viewProduct")}
+            {slide.ctaPrimary.label}
           </Button>
           {slide.ctaSecondary && (
             <Button href={slide.ctaSecondary.href} variant="ghost">

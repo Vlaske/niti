@@ -98,7 +98,7 @@ export function DesignCarousel({ items }: DesignCarouselProps) {
               className="w-[min(85vw,320px)] shrink-0 snap-center lg:w-[calc(25%-18px)]"
             >
               <Link href={item.href} className="interactive group block">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-niti-sand">
+                <div className="relative aspect-[3/4] overflow-hidden bg-niti-sand">
                   <ShowcaseMedia item={item} />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
                   <p className="pointer-events-none absolute bottom-0 left-0 right-0 p-4 text-sm leading-relaxed text-white">
@@ -106,36 +106,25 @@ export function DesignCarousel({ items }: DesignCarouselProps) {
                   </p>
                 </div>
 
-                <div className="mt-3 flex items-center gap-3 rounded-xl border border-niti-line bg-white p-3 transition-shadow group-hover:shadow-md">
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-md bg-niti-sand">
-                    <Image
-                      src={item.thumb}
-                      alt=""
-                      fill
-                      className="object-cover"
-                      sizes="56px"
-                    />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-niti-charcoal">
-                      {item.title}
-                    </p>
-                    <div className="mt-0.5 flex gap-2 text-sm">
-                      {item.compareAtPrice && (
-                        <span className="text-niti-muted line-through">
-                          {formatPrice(item.compareAtPrice, locale)}
-                        </span>
-                      )}
-                      <span
-                        className={
-                          item.compareAtPrice
-                            ? "font-medium text-niti-sale"
-                            : "text-niti-charcoal"
-                        }
-                      >
-                        {formatPrice(item.price, locale)}
+                <div className="mt-3">
+                  <p className="truncate text-sm font-semibold text-niti-charcoal">
+                    {item.title}
+                  </p>
+                  <div className="mt-0.5 flex gap-2 text-sm">
+                    {item.compareAtPrice && (
+                      <span className="text-niti-muted line-through">
+                        {formatPrice(item.compareAtPrice, locale)}
                       </span>
-                    </div>
+                    )}
+                    <span
+                      className={
+                        item.compareAtPrice
+                          ? "font-medium text-niti-sale"
+                          : "text-niti-charcoal"
+                      }
+                    >
+                      {formatPrice(item.price, locale)}
+                    </span>
                   </div>
                 </div>
               </Link>

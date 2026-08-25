@@ -36,55 +36,67 @@ export { heroSlides } from "@/config/hero-slides";
 export const faqItems: FaqItem[] = [
   {
     id: "1",
-    question: "Koje materijale koristite?",
+    question: "Šta prodaje NITI.?",
     answer:
-      "Koristimo dugog vlakna pamuk, evropski lan i GOTS sertifikovani organski pamuk. Na svakoj stranici proizvoda nalaze se sastav i uputstva za održavanje.",
+      "Kućni tekstil za ceo dom: posteljine, čaršavi, jastuci, peškiri, stolnjaci, dekorativni tekstil, dečiji i hotelski program. Biramo komade koji lepo izgledaju u enterijeru i traju u svakodnevnoj upotrebi.",
   },
   {
     id: "2",
-    question: "Gde se proizvodi NITI. tekstila?",
+    question: "Kako da izaberem veličinu?",
     answer:
-      "Naši partnerski tekstilni pogoni su u Portugalu i Turskoj, birani zbog zanatstva, etičkih standarda i konzistentnog kvaliteta.",
+      "Na stranici proizvoda birate veličinu (npr. 160×200, 200×220) i boju pre dodavanja u korpu. Ako niste sigurni, pišite nam — pomoći ćemo oko dimenzija kreveta i čaršava.",
   },
   {
     id: "3",
-    question: "Kako da negujem lan i perkal?",
+    question: "Kako da negujem tekstil?",
     answer:
-      "Perite na hladno sa blagim deterdžentom, sušite na niskoj temperaturi ili na vazduhu. Lan postaje mekši sa svakim pranjem; izbegavajte izbeljivač.",
+      "Uopšteno: blagi deterdžent, umerena temperatura, bez agresivnog izbeljivača. Tačna uputstva stoje uz proizvod; pamuk i frotir vole redovno pranje, a dekorativni komadi češće blago osvežavanje.",
   },
+  // {
+  //   id: "4",
+  //   question: "Da li nudite besplatnu dostavu?",
+  //   answer:
+  //     "Da — besplatna standardna dostava za porudžbine preko 13.000 RSD. Tačan iznos i rokovi potvrđuju se na Shopify checkout stranici pre plaćanja.",
+  // },
   {
     id: "4",
-    question: "Da li nudite besplatnu dostavu?",
+    question: "Kako funkcioniše dostava?",
     answer:
-      "Da — besplatna standardna dostava za porudžbine preko 13.000 RSD (podešava se u Shopify-u prema tržištu).",
+      "Trošak i rok dostave potvrđuju se na Shopify checkout stranici pre plaćanja, u zavisnosti od adrese i težine pošiljke. Šaljemo na teritoriji Srbije.",
   },
   {
     id: "5",
     question: "Koja je politika povrata?",
     answer:
-      "Neiskorišćeni proizvodi u originalnom pakovanju mogu se vratiti u roku od 30 dana. Posteljina otvorena radi provere veličine — kredit u prodavnici.",
+      "Neiskorišćene artikle u originalnom stanju možete vratiti u roku od 30 dana. Detalje (troškovi, izuzeci za otvorenu posteljinu) dogovaramo putem podrške — pišite na hello@niti.home.",
   },
 ];
 
 export const valueProps = [
+  // Free-shipping promo — re-enable when threshold is confirmed in Shopify
+  // {
+  //   icon: "shipping",
+  //   title: "Besplatna dostava",
+  //   description: "Besplatna dostava za porudžbine preko 13.000 RSD.",
+  // },
   {
     icon: "shipping",
-    title: "Besplatna dostava",
-    description: "Besplatna dostava za porudžbine preko 13.000 RSD.",
+    title: "Dostava",
+    description: "Šaljemo širom Srbije — trošak i rok vidiš pri plaćanju.",
   },
   {
     icon: "service",
     title: "Podrška kupcima",
-    description: "Posvećena podrška za porudžbine, negu i veličine.",
+    description: "Pomoć oko veličina, nege i porudžbina — odgovaramo radnim danom.",
   },
   {
     icon: "payment",
     title: "Sigurno plaćanje",
-    description: "Sigurna i šifrovana naplata karticama i drugim metodama.",
+    description: "Plaćanje preko Shopify checkout-a — kartice i dostupne metode.",
   },
   {
     icon: "contact",
     title: "Kontakt",
-    description: "hello@niti.home — odgovaramo u roku od jednog radnog dana.",
+    description: "hello@niti.home — tu smo za pitanja o tekstilu i porudžbinama.",
   },
 ];

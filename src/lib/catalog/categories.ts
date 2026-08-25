@@ -30,18 +30,18 @@ function mergeCategory(
 /** Kategorije sa slikom i brojem proizvoda iz Shopify kolekcija. */
 export async function getEnrichedNavCategories(): Promise<Category[]> {
   if (!shopifyServerConfigured) {
-    return STORE_CATEGORIES.map((c) =>
+    return STORE_CATEGORIES.filter((c) => !c.navHidden).map((c) =>
       mergeCategory(c, undefined)
     );
   }
 
   try {
     const metaMap = await fetchAllNavCollectionMeta();
-    return STORE_CATEGORIES.map((config) =>
+    return STORE_CATEGORIES.filter((c) => !c.navHidden).map((config) =>
       mergeCategory(config, metaMap.get(config.slug))
     );
   } catch (e) {
     console.error("[catalog] enriched categories failed:", e);
-    return STORE_CATEGORIES.map((c) => mergeCategory(c, undefined));
+    return STORE_CATEGORIES.filter((c) => !c.navHidden).map((c) => mergeCategory(c, undefined));
   }
 }

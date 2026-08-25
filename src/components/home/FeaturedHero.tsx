@@ -33,7 +33,7 @@ export function FeaturedHero({ image, ctaHref }: FeaturedHeroProps) {
         </p>
         <h2
           data-reveal
-          className="max-w-xl text-3xl font-semibold leading-tight text-white md:text-5xl lg:text-6xl"
+          className="max-w-xl font-serif text-3xl font-medium leading-tight text-white md:text-5xl lg:text-6xl"
         >
           {t("home.featuredTitle")}
         </h2>
@@ -45,7 +45,7 @@ export function FeaturedHero({ image, ctaHref }: FeaturedHeroProps) {
         </p>
         <div data-reveal className="mt-8">
           <Button href={ctaHref} variant="primary">
-            {t("hero.viewProduct")}
+            {t("nav.shopNow")}
           </Button>
         </div>
       </div>

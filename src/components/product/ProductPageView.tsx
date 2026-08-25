@@ -1,20 +1,27 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import Image from "next/image";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductDescription } from "@/components/product/ProductDescription";
-import { ProductDetails } from "@/components/product/ProductDetails";
+import {
+  ProductDetails,
+  getDefaultProductSelections,
+  getPreferredImageForSelections,
+} from "@/components/product/ProductDetails";
 import { ProductCard } from "@/components/shop/ProductCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { useNavCategories } from "@/context/CategoriesContext";
 import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { getStoreCategoryBySlug } from "@/config/store-categories";
-import { CATEGORY_IMAGE_FALLBACK } from "@/lib/catalog/categories";
+import {
+  getGroupById,
+  getGroupForCategorySlug,
+  getGroupHref,
+  getStoreCategoryBySlug,
+} from "@/config/store-categories";
 import type { Product } from "@/types";
+import { productImageSrc } from "@/lib/product-image";
 
 type ProductPageViewProps = {
   product: Product;
@@ -26,18 +33,36 @@ export function ProductPageView({
   related,
 }: ProductPageViewProps) {
   const { t } = useLanguage();
-  const navCategories = useNavCategories();
   const { addViewed, products: recent } = useRecentlyViewed();
   const mainRef = useRef<HTMLDivElement>(null);
+  const [selections, setSelections] = useState(() =>
+    getDefaultProductSelections(product)
+  );
 
-  const images = product.images ?? [product.image];
+  useEffect(() => {
+    setSelections(getDefaultProductSelections(product));
+  }, [product.handle]);
+
+  const images = useMemo(() => {
+    const list = (product.images ?? [product.image]).filter((src) =>
+      Boolean(src?.trim())
+    );
+    const preferred = getPreferredImageForSelections(product, selections);
+    if (preferred && !list.includes(preferred)) {
+      return [preferred, ...list];
+    }
+    return list.length ? list : [productImageSrc(product.image)];
+  }, [product, selections]);
+
+  const preferredSrc = getPreferredImageForSelections(product, selections);
+
   const recentExcluding = recent
     .filter((p) => p.handle !== product.handle)
     .slice(0, 4);
 
   const storeCat = getStoreCategoryBySlug(product.category);
-  const showCategoryCrumb =
-    product.category !== "all" && Boolean(storeCat);
+  const groupId = getGroupForCategorySlug(product.category);
+  const parentGroup = groupId ? getGroupById(groupId) : undefined;
 
   useEffect(() => {
     addViewed(product.handle);
@@ -61,7 +86,7 @@ export function ProductPageView({
     <div ref={mainRef}>
       <nav
         data-pdp-reveal
-        className="mb-8 flex flex-wrap gap-1 text-sm text-niti-muted"
+        className="mb-8 mt-6 flex flex-wrap gap-1 pt-2 text-sm text-niti-muted md:mt-10 md:pt-4"
       >
         <Link href="/" className="interactive hover:text-niti-charcoal">
           {t("product.home")}
@@ -70,7 +95,18 @@ export function ProductPageView({
         <Link href="/shop" className="interactive hover:text-niti-charcoal">
           {t("product.shop")}
         </Link>
-        {showCategoryCrumb && storeCat && (
+        {parentGroup && (
+          <>
+            <span className="mx-1">/</span>
+            <Link
+              href={getGroupHref(parentGroup.id)}
+              className="interactive hover:text-niti-charcoal"
+            >
+              {parentGroup.title}
+            </Link>
+          </>
+        )}
+        {storeCat && (
           <>
             <span className="mx-1">/</span>
             <Link
@@ -85,16 +121,24 @@ export function ProductPageView({
 
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
         <div data-pdp-reveal>
-          <ProductGallery images={images} title={product.title} />
+          <ProductGallery
+            images={images}
+            title={product.title}
+            preferredSrc={preferredSrc}
+          />
         </div>
         <div data-pdp-reveal>
-          <ProductDetails product={product} />
+          <ProductDetails
+            product={product}
+            selections={selections}
+            onSelectionsChange={setSelections}
+          />
         </div>
       </div>
 
       <section
         data-pdp-reveal
-        className="mt-12 grid gap-4 rounded-xl border border-niti-line bg-niti-sand/40 p-6 sm:grid-cols-2"
+        className="mt-12 grid gap-8 border-t border-niti-line py-10 sm:grid-cols-2"
       >
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-wider">
@@ -106,13 +150,13 @@ export function ProductPageView({
           />
         </div>
         <ul className="space-y-2 text-sm text-niti-muted">
-          <li>✓ {t("product.shipping")}</li>
-          <li>✓ {t("product.returns")}</li>
+          <li>{t("product.shipping")}</li>
+          <li>{t("product.returns")}</li>
         </ul>
       </section>
 
       {related.length > 0 && (
-        <section className="mt-20 border-t border-niti-line pt-16">
+        <section className="mt-12 border-t border-niti-line pt-16">
           <SectionHeader title={t("product.alsoLike")} className="mb-10" />
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
             {related.map((p) => (
@@ -136,37 +180,34 @@ export function ProductPageView({
         </section>
       )}
 
-      {navCategories.length > 0 && (
-        <section className="mt-20 border-t border-niti-line pt-16">
-          <SectionHeader
-            title={t("product.categories")}
-            viewAllHref="/shop"
-            viewAllLabel={t("home.viewAll")}
-            className="mb-10"
-          />
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {navCategories.map((col) => (
-              <Link
-                key={col.slug}
-                href={`/shop/${col.slug}`}
-                className="interactive group relative aspect-[4/3] overflow-hidden rounded-xl"
-              >
-                <Image
-                  src={col.image || CATEGORY_IMAGE_FALLBACK}
-                  alt={col.title}
-                  fill
-                  sizes="25vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/30 transition-colors group-hover:bg-black/40" />
-                <span className="absolute bottom-3 left-3 text-sm font-semibold text-white">
-                  {col.title}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
+      <p
+        data-pdp-reveal
+        className="mt-16 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-niti-line pt-8 text-[11px] font-medium uppercase tracking-[0.16em] text-niti-muted"
+      >
+        <span>{t("product.continue")}</span>
+        {storeCat && (
+          <Link
+            href={`/shop/${storeCat.slug}`}
+            className="interactive text-niti-charcoal hover:opacity-70"
+          >
+            {storeCat.title}
+          </Link>
+        )}
+        {parentGroup && (
+          <Link
+            href={getGroupHref(parentGroup.id)}
+            className="interactive text-niti-charcoal hover:opacity-70"
+          >
+            {parentGroup.title}
+          </Link>
+        )}
+        <Link
+          href="/shop"
+          className="interactive text-niti-charcoal hover:opacity-70"
+        >
+          {t("nav.allProducts")}
+        </Link>
+      </p>
     </div>
   );
 }

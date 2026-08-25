@@ -9,17 +9,51 @@ export const PRODUCT_CARD_FRAGMENT = `
     options {
       name
       values
+      optionValues {
+        name
+        swatch {
+          color
+          image {
+            ... on MediaImage {
+              image {
+                url
+                altText
+              }
+            }
+          }
+        }
+        firstSelectableVariant {
+          image {
+            id
+            url
+            altText
+          }
+        }
+      }
     }
     tags
     availableForSale
     featuredImage {
+      id
       url
       altText
     }
-    images(first: 12) {
+    images(first: 24) {
       nodes {
         url
         altText
+      }
+    }
+    media(first: 30) {
+      nodes {
+        alt
+        mediaContentType
+        ... on MediaImage {
+          image {
+            url
+            altText
+          }
+        }
       }
     }
     priceRange {
@@ -38,11 +72,16 @@ export const PRODUCT_CARD_FRAGMENT = `
         currencyCode
       }
     }
-    variants(first: 25) {
+    variants(first: 100) {
       nodes {
         id
         title
         availableForSale
+        image {
+          id
+          url
+          altText
+        }
         price {
           amount
           currencyCode
@@ -57,7 +96,7 @@ export const PRODUCT_CARD_FRAGMENT = `
         }
       }
     }
-    collections(first: 8) {
+    collections(first: 16) {
       nodes {
         handle
         title

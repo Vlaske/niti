@@ -11,6 +11,14 @@ export const PLACEHOLDER_IMAGES = {
     "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=1200&q=85",
   linen:
     "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=85",
+  kitchen:
+    "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1200&q=85",
+  living:
+    "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1200&q=85",
+  kids:
+    "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=85",
+  hotel:
+    "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=1200&q=85",
 } as const;
 
 /** FAQ sekcija — meka posteljina / miran enterijer */

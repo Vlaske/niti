@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
@@ -15,35 +15,23 @@ import { ProductOptionPicker } from "./ProductOptionPicker";
 
 type ProductDetailsProps = {
   product: Product;
+  selections: Record<string, string>;
+  onSelectionsChange: (next: Record<string, string>) => void;
 };
 
-export function ProductDetails({ product }: ProductDetailsProps) {
+export function ProductDetails({
+  product,
+  selections,
+  onSelectionsChange,
+}: ProductDetailsProps) {
   const { addItem } = useCart();
   const { t, locale } = useLanguage();
   const addBtnRef = useRef<HTMLSpanElement>(null);
   const needsOptions = productRequiresOptionSelection(product);
-
-  const getDefaultSelections = useCallback((): Record<string, string> => {
-    if (!product.options?.length || !product.variants?.length) return {};
-    const variant =
-      product.variants.find((v) => v.availableForSale) ?? product.variants[0];
-    return Object.fromEntries(
-      variant.selectedOptions.map((o) => [o.name, o.value])
-    );
-  }, [product.options, product.variants]);
-
-  const [selections, setSelections] =
-    useState<Record<string, string>>(getDefaultSelections);
   const [optionErrors, setOptionErrors] = useState<Record<string, boolean>>(
     {}
   );
   const [showOptionHint, setShowOptionHint] = useState(false);
-
-  useEffect(() => {
-    setSelections(getDefaultSelections());
-    setOptionErrors({});
-    setShowOptionHint(false);
-  }, [product.handle, getDefaultSelections]);
 
   const activeVariant = useMemo(
     () => findVariantBySelections(product, selections),
@@ -51,7 +39,8 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   );
 
   const displayPrice = activeVariant?.price ?? product.price;
-  const displayCompare = activeVariant?.compareAtPrice ?? product.compareAtPrice;
+  const displayCompare =
+    activeVariant?.compareAtPrice ?? product.compareAtPrice;
   const canAdd =
     !needsOptions ||
     (product.options?.every((o) => Boolean(selections[o.name])) ?? false);
@@ -61,14 +50,12 @@ export function ProductDetails({ product }: ProductDetailsProps) {
   );
 
   const handleOptionChange = (name: string, value: string) => {
-    setSelections((prev) => {
-      const next = { ...prev, [name]: value };
-      if (product.options?.every((o) => Boolean(next[o.name]))) {
-        setOptionErrors({});
-        setShowOptionHint(false);
-      }
-      return next;
-    });
+    const next = { ...selections, [name]: value };
+    onSelectionsChange(next);
+    if (product.options?.every((o) => Boolean(next[o.name]))) {
+      setOptionErrors({});
+      setShowOptionHint(false);
+    }
   };
 
   const handleAdd = () => {
@@ -103,30 +90,40 @@ export function ProductDetails({ product }: ProductDetailsProps) {
     }
   };
 
+  const savings =
+    displayCompare && displayCompare > displayPrice
+      ? displayCompare - displayPrice
+      : null;
+
   return (
     <div className="lg:sticky lg:top-28 lg:self-start">
       <p className="text-xs uppercase tracking-[0.2em] text-niti-muted">
         {product.brand}
       </p>
-      <h1 className="mt-2 text-2xl font-semibold text-niti-charcoal md:text-4xl">
+      <h1 className="mt-2 font-serif text-3xl font-semibold text-niti-charcoal md:text-4xl">
         {product.title}
       </h1>
 
-      <div className="mt-4 flex items-baseline gap-3">
-        {displayCompare && displayCompare > displayPrice && (
-          <span className="text-lg text-niti-muted line-through">
-            {formatPrice(displayCompare, locale)}
-          </span>
-        )}
+      <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
         <span
           className={
-            displayCompare && displayCompare > displayPrice
-              ? "text-xl font-medium text-niti-sale"
-              : "text-xl text-niti-charcoal"
+            savings
+              ? "text-2xl font-semibold tracking-tight text-niti-sale md:text-3xl"
+              : "text-2xl font-semibold tracking-tight text-niti-charcoal md:text-3xl"
           }
         >
           {formatPrice(displayPrice, locale)}
         </span>
+        {savings && (
+          <>
+            <span className="pb-0.5 text-base text-niti-muted line-through md:text-lg">
+              {formatPrice(displayCompare!, locale)}
+            </span>
+            <span className="pb-1 text-xs font-medium uppercase tracking-wider text-niti-sale">
+              −{formatPrice(savings, locale)}
+            </span>
+          </>
+        )}
       </div>
 
       {allOptionsSelected && activeVariant && !activeVariant.availableForSale && (
@@ -171,4 +168,32 @@ export function ProductDetails({ product }: ProductDetailsProps) {
       </div>
     </div>
   );
+}
+
+export function getDefaultProductSelections(
+  product: Product
+): Record<string, string> {
+  if (!product.options?.length || !product.variants?.length) return {};
+  const variant =
+    product.variants.find((v) => v.availableForSale) ?? product.variants[0];
+  return Object.fromEntries(
+    variant.selectedOptions.map((o) => [o.name, o.value])
+  );
+}
+
+/** Resolve gallery image for current color via precomputed colorImages map. */
+export function getPreferredImageForSelections(
+  product: Product,
+  selections: Record<string, string>
+): string | undefined {
+  const colorOpt = product.options?.find((o) => o.type === "color");
+  if (!colorOpt) return undefined;
+  const colorValue = selections[colorOpt.name];
+  if (!colorValue) return undefined;
+
+  if (product.colorImages?.[colorValue]) {
+    return product.colorImages[colorValue];
+  }
+
+  return colorOpt.values.find((v) => v.value === colorValue)?.image;
 }

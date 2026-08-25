@@ -19,16 +19,22 @@ const COLLECTION_META_QUERY = `
         url
         altText
       }
-      products(first: 250) {
-        nodes {
-          id
-        }
-      }
     }
   }
 `;
 
 export async function fetchCollectionMeta(
+  handle: string
+): Promise<ShopifyCollectionMeta | null> {
+  try {
+    return await fetchCollectionMetaUnsafe(handle);
+  } catch (e) {
+    console.error(`[collections] ${handle}:`, e);
+    return null;
+  }
+}
+
+async function fetchCollectionMetaUnsafe(
   handle: string
 ): Promise<ShopifyCollectionMeta | null> {
   const data = await shopifyFetch<{
@@ -37,7 +43,6 @@ export async function fetchCollectionMeta(
       title: string;
       description: string;
       image?: { url: string; altText?: string | null } | null;
-      products: { nodes: { id: string }[] };
     } | null;
   }>(COLLECTION_META_QUERY, { handle }, { revalidate: 120 });
 
@@ -48,7 +53,7 @@ export async function fetchCollectionMeta(
     title: data.collection.title,
     description: data.collection.description,
     imageUrl: data.collection.image?.url ?? null,
-    productCount: data.collection.products.nodes.length,
+    productCount: 0,
   };
 }
 

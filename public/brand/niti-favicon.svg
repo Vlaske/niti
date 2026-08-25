@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" role="img" aria-label="NITI.">
+  <title>NITI. favicon</title>
+  <rect width="32" height="32" rx="7" fill="#FAF7F2"/>
+  <g fill="#2A2826">
+    <path d="M8 8h3v10L18 8h3.5v16H18.5V14L11.5 24H8V8Z"/>
+    <circle cx="24.5" cy="21.5" r="2.2"/>
+  </g>
+</svg>

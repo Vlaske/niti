@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { guessColorSwatchStyle } from "@/lib/shopify/variants";
 import type { ProductColor } from "@/types";
 
 type ColorSwatchesProps = {
@@ -8,6 +9,8 @@ type ColorSwatchesProps = {
   selected?: string;
   onSelect?: (name: string) => void;
   size?: "sm" | "md";
+  /** Cap how many dots show (rest as +N) — avoids overlap on dense cards */
+  maxVisible?: number;
 };
 
 export function ColorSwatches({
@@ -15,28 +18,36 @@ export function ColorSwatches({
   selected,
   onSelect,
   size = "sm",
+  maxVisible = 6,
 }: ColorSwatchesProps) {
-  const dim = size === "sm" ? "h-4 w-4" : "h-6 w-6";
+  const dim = size === "sm" ? "h-3.5 w-3.5" : "h-5 w-5";
+  const visible = colors.slice(0, maxVisible);
+  const extra = Math.max(0, colors.length - visible.length);
 
   return (
-    <div className="flex gap-2">
-      {colors.map((c) => (
+    <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
+      {visible.map((c, i) => (
         <button
-          key={c.variantId ?? c.name}
+          key={`${c.name}-${c.variantId ?? i}`}
           type="button"
           title={c.name}
           onClick={() => onSelect?.(c.name)}
           className={cn(
             dim,
-            "interactive rounded-full border-2 transition-transform hover:scale-110",
+            "interactive shrink-0 rounded-full border border-niti-charcoal/15 transition-transform hover:scale-110",
             selected === c.name
-              ? "border-niti-charcoal"
-              : "border-transparent ring-1 ring-niti-line"
+              ? "ring-1 ring-niti-charcoal ring-offset-1"
+              : "ring-0"
           )}
-          style={{ backgroundColor: c.hex }}
+          style={guessColorSwatchStyle(c.name)}
           aria-label={`Color ${c.name}`}
         />
       ))}
+      {extra > 0 && (
+        <span className="shrink-0 text-[10px] font-medium tabular-nums text-niti-muted">
+          +{extra}
+        </span>
+      )}
     </div>
   );
 }

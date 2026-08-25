@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/layout/PageShell";
 import { ProductPageView } from "@/components/product/ProductPageView";
+import { productMatchesCategory } from "@/config/store-categories";
 import { getAllProducts, getProductByHandle, getProductHandles } from "@/lib/catalog";
 
 type Props = {
@@ -34,7 +35,7 @@ export default async function ProductPage({ params }: Props) {
     .filter((p) => {
       if (p.id === product.id) return false;
       if (product.category !== "all") {
-        return p.category === product.category;
+        return productMatchesCategory(p, product.category);
       }
       return (
         Boolean(product.collection) && p.collection === product.collection

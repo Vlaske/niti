@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 120" fill="none" role="img" aria-label="NITI.">
+  <title>NITI.</title>
+  <g fill="#8FAF9A">
+    <path d="M48 28h14.5v46.5L98 28h16v64H99.5V45.5L63.5 92H48V28Z"/>
+    <path d="M138 28h14.5v64H138V28Z"/>
+    <path d="M176 28h58v13.5h-21.75V92h-14.5V41.5H176V28Z"/>
+    <path d="M258 28h14.5v64H258V28Z"/>
+    <circle cx="302" cy="84" r="7.5"/>
+  </g>
+</svg>

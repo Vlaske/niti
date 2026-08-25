@@ -114,9 +114,13 @@ export async function shopifyFetch<T>(
 
     errors.push(`${strategy.id}: ${result.message}`);
 
-    if (result.status !== 401 && result.status !== 403) {
-      break;
+    if (result.status === 401 || result.status === 403) {
+      continue;
     }
+
+    throw new Error(
+      `Shopify API greška (${strategy.id}): ${result.message}`
+    );
   }
 
   throw new Error(

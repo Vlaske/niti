@@ -3,13 +3,20 @@ import {
   getProductsByCategory as getMockProductsByCategory,
   products as mockProducts,
 } from "@/lib/data/products";
+import {
+  productMatchesCategory,
+  type CategoryGroupId,
+} from "@/config/store-categories";
 import { shopifyServerConfigured } from "@/lib/shopify/config";
 import {
   fetchShopifyProductByHandle,
   fetchShopifyProductHandles,
   fetchShopifyProducts,
   fetchShopifyProductsByCategory,
+  fetchShopifyNewArrivalsCollection,
 } from "@/lib/shopify/catalog";
+import { selectNewArrivalsShowcase } from "@/lib/catalog/ranking";
+import type { Product } from "@/types";
 
 export type CatalogSource = "shopify" | "mock";
 
@@ -68,6 +75,21 @@ export async function getProductsByCategory(categorySlug: string) {
   return getMockProductsByCategory(categorySlug);
 }
 
+export async function getProductsByGroup(groupId: CategoryGroupId) {
+  if (shopifyServerConfigured) {
+    try {
+      const grouped = await fetchShopifyProductsByCategory(groupId);
+      lastCatalogSource = "shopify";
+      return grouped;
+    } catch (e) {
+      console.error("[catalog] Shopify group fetch failed:", e);
+    }
+  }
+
+  lastCatalogSource = "mock";
+  return mockProducts.filter((p) => productMatchesCategory(p, groupId));
+}
+
 export async function getProductHandles(): Promise<string[]> {
   if (shopifyServerConfigured) {
     try {
@@ -80,4 +102,24 @@ export async function getProductHandles(): Promise<string[]> {
   }
   lastCatalogSource = "mock";
   return mockProducts.map((p) => p.handle);
+}
+
+export async function getNewArrivalsProducts(all?: Product[]) {
+  const catalog = all ?? (await getAllProducts());
+
+  if (shopifyServerConfigured) {
+    try {
+      const fromCollection = await fetchShopifyNewArrivalsCollection();
+      if (fromCollection.length > 0) {
+        lastCatalogSource = "shopify";
+        return fromCollection.filter(
+          (p) => Boolean(p.image?.trim()) && p.availableForSale !== false
+        );
+      }
+    } catch (e) {
+      console.error("[catalog] New arrivals collection failed:", e);
+    }
+  }
+
+  return selectNewArrivalsShowcase(catalog);
 }

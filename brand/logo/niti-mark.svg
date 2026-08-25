@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-label="NITI.">
+  <title>NITI. mark</title>
+  <rect width="128" height="128" rx="28" fill="#FAF7F2"/>
+  <g fill="#2A2826">
+    <path d="M34 36h11v36L72 36h13v56H73V56L48 92H34V36Z"/>
+    <circle cx="96" cy="84" r="7"/>
+  </g>
+</svg>

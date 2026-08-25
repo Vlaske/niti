@@ -1,5 +1,5 @@
+import { productMatchesCategory } from "@/config/store-categories";
 import { shopifyFetch } from "@/lib/shopify/client";
-import { CATEGORY_COLLECTION_HANDLES } from "@/lib/shopify/config";
 import { mapShopifyProduct, type ShopifyProductNode } from "@/lib/shopify/mappers";
 import {
   COLLECTION_PRODUCTS_QUERY,
@@ -8,7 +8,8 @@ import {
 } from "@/lib/shopify/queries";
 import type { Product } from "@/types";
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE = 100;
+const MAX_PRODUCTS = 3000;
 
 type ProductsResponse = {
   products: {
@@ -19,15 +20,6 @@ type ProductsResponse = {
 
 type ProductResponse = {
   product: ShopifyProductNode | null;
-};
-
-type CollectionResponse = {
-  collection: {
-    products: {
-      pageInfo: { hasNextPage: boolean; endCursor: string | null };
-      nodes: ShopifyProductNode[];
-    };
-  } | null;
 };
 
 async function fetchAllProductNodes(): Promise<ShopifyProductNode[]> {
@@ -47,7 +39,7 @@ async function fetchAllProductNodes(): Promise<ShopifyProductNode[]> {
     nodes.push(...data.products.nodes);
     hasNext = data.products.pageInfo.hasNextPage;
     after = data.products.pageInfo.endCursor;
-    if (nodes.length > 250) break;
+    if (nodes.length >= MAX_PRODUCTS) break;
   }
 
   return nodes;
@@ -68,38 +60,67 @@ export async function fetchShopifyProductByHandle(
   return mapShopifyProduct(data.product);
 }
 
+/**
+ * Always filter from the full mapped catalog.
+ * Collection-handle fetches miss products that Shopify placed in the wrong
+ * collection, while our title/tag heuristics still classify them correctly.
+ */
 export async function fetchShopifyProductsByCategory(
   categorySlug: string
 ): Promise<Product[]> {
-  const collectionHandle =
-    CATEGORY_COLLECTION_HANDLES[categorySlug] ?? categorySlug;
-
-  const data = await shopifyFetch<CollectionResponse>(
-    COLLECTION_PRODUCTS_QUERY,
-    { handle: collectionHandle, first: PAGE_SIZE, after: null }
-  );
-
-  if (!data.collection) return [];
-
-  const nodes: ShopifyProductNode[] = [...data.collection.products.nodes];
-  let hasNext = data.collection.products.pageInfo.hasNextPage;
-  let after = data.collection.products.pageInfo.endCursor;
-
-  while (hasNext && nodes.length < 200) {
-    const next: CollectionResponse = await shopifyFetch<CollectionResponse>(
-      COLLECTION_PRODUCTS_QUERY,
-      { handle: collectionHandle, first: PAGE_SIZE, after }
-    );
-    if (!next.collection) break;
-    nodes.push(...next.collection.products.nodes);
-    hasNext = next.collection.products.pageInfo.hasNextPage;
-    after = next.collection.products.pageInfo.endCursor;
-  }
-
-  return nodes.map(mapShopifyProduct);
+  const all = await fetchShopifyProducts();
+  return all.filter((p) => productMatchesCategory(p, categorySlug));
 }
 
 export async function fetchShopifyProductHandles(): Promise<string[]> {
   const products = await fetchShopifyProducts();
   return products.map((p) => p.handle);
+}
+
+type CollectionProductsResponse = {
+  collection: {
+    products: {
+      pageInfo: { hasNextPage: boolean; endCursor: string | null };
+      nodes: ShopifyProductNode[];
+    };
+  } | null;
+};
+
+/** Only the dedicated homepage showcase collection — not Shopify’s default Home page. */
+export const NEW_ARRIVALS_COLLECTION_HANDLES = ["novo-u-ponudi"] as const;
+
+export async function fetchShopifyCollectionProducts(
+  handle: string,
+  max = 48
+): Promise<Product[]> {
+  const nodes: ShopifyProductNode[] = [];
+  let after: string | null = null;
+  let hasNext = true;
+
+  while (hasNext && nodes.length < max) {
+    const data: CollectionProductsResponse = await shopifyFetch(
+      COLLECTION_PRODUCTS_QUERY,
+      { handle, first: Math.min(50, max - nodes.length), after },
+      { revalidate: 60 }
+    );
+
+    if (!data.collection) return [];
+    nodes.push(...data.collection.products.nodes);
+    hasNext = data.collection.products.pageInfo.hasNextPage;
+    after = data.collection.products.pageInfo.endCursor;
+  }
+
+  return nodes.map(mapShopifyProduct);
+}
+
+export async function fetchShopifyNewArrivalsCollection(): Promise<Product[]> {
+  for (const handle of NEW_ARRIVALS_COLLECTION_HANDLES) {
+    try {
+      const list = await fetchShopifyCollectionProducts(handle, 24);
+      if (list.length > 0) return list;
+    } catch {
+      // try next handle
+    }
+  }
+  return [];
 }

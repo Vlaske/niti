@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { formatPrice } from "@/lib/utils";
+import { productImageSrc } from "@/lib/product-image";
 
 export function CartContent() {
   const {
@@ -62,7 +63,7 @@ export function CartContent() {
               className="interactive relative h-28 w-24 shrink-0 overflow-hidden rounded-lg bg-niti-sand md:h-32 md:w-28"
             >
               <Image
-                src={item.product.image}
+                src={productImageSrc(item.product.image)}
                 alt={item.product.title}
                 fill
                 className="object-cover"
@@ -124,7 +125,7 @@ export function CartContent() {
         ))}
       </ul>
 
-      <aside className="h-fit rounded-xl border border-niti-line bg-white p-6 lg:sticky lg:top-28">
+      <aside className="h-fit border border-niti-line bg-white p-6 lg:sticky lg:top-28">
         <h2 className="text-lg font-semibold">{t("cart.summary")}</h2>
         <div className="mt-6 space-y-3 text-sm">
           <div className="flex justify-between">

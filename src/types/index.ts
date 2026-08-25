@@ -3,12 +3,15 @@ export type ProductColor = {
   hex: string;
   /** Shopify ProductVariant GID when using Storefront API */
   variantId?: string;
+  /** Variant image when Shopify provides one for this color */
+  image?: string;
 };
 
 export type ProductOptionValue = {
   value: string;
   hex?: string;
   available: boolean;
+  image?: string;
 };
 
 export type ProductOption = {
@@ -24,6 +27,7 @@ export type ProductVariantSnapshot = {
   price: number;
   compareAtPrice?: number;
   selectedOptions: { name: string; value: string }[];
+  image?: string;
 };
 
 export type Product = {
@@ -36,10 +40,17 @@ export type Product = {
   descriptionHtml?: string;
   price: number;
   compareAtPrice?: number;
+  /** Primary leaf for breadcrumbs / card label */
   category: string;
+  /** All leaf categories this product belongs to (can overlap) */
+  categories?: string[];
   collection?: string;
   image: string;
   images?: string[];
+  /** Gallery with alt text — used to match color → image */
+  media?: { url: string; altText?: string }[];
+  /** Resolved color value → image URL (unique per color only) */
+  colorImages?: Record<string, string>;
   /** @deprecated Koristi options */
   colors?: ProductColor[];
   options?: ProductOption[];
@@ -50,6 +61,7 @@ export type Product = {
   /** Default variant GID for cart (Shopify) */
   variantId?: string;
   availableForSale?: boolean;
+  tags?: string[];
 };
 
 export type Category = {
@@ -58,6 +70,12 @@ export type Category = {
   description: string;
   image: string;
   productCount: number;
+};
+
+export type CategoryGroup = {
+  id: string;
+  title: string;
+  description: string;
 };
 
 export type Collection = {
@@ -74,6 +92,8 @@ export type HeroSlide = {
   id: string;
   category: string;
   headline: string;
+  /** Append logo wordmark “NITI.” in Playfair after the headline */
+  brandMark?: boolean;
   subheadline?: string;
   description: string;
   /** @deprecated use mediaSrc — kept for backwards compatibility */

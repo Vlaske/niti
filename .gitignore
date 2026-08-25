@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local Viktorija import dumps (never deploy / never push)
+/data/viktorija/

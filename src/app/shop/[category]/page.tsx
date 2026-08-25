@@ -1,11 +1,16 @@
 import { notFound } from "next/navigation";
 import { CategoryPageLayout } from "@/components/shop/CategoryPageLayout";
+import { GroupPageLayout } from "@/components/shop/GroupPageLayout";
 import {
-  getCategorySlugs,
+  getCategoriesByGroup,
+  getGroupById,
+  getGroupForCategorySlug,
+  getShopRouteSlugs,
   getStoreCategoryBySlug,
+  isCategoryGroupId,
   isNavCategorySlug,
 } from "@/config/store-categories";
-import { getProductsByCategory } from "@/lib/catalog";
+import { getProductsByCategory, getProductsByGroup } from "@/lib/catalog";
 import { fetchCollectionMeta } from "@/lib/shopify/collections";
 import type { Category } from "@/types";
 
@@ -19,17 +24,35 @@ const HERO_FALLBACK =
   "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=85";
 
 export async function generateStaticParams() {
-  return getCategorySlugs().map((category) => ({ category }));
+  return getShopRouteSlugs().map((category) => ({ category }));
 }
 
 export async function generateMetadata({ params }: Props) {
   const { category } = await params;
+  if (isCategoryGroupId(category)) {
+    const group = getGroupById(category);
+    return { title: group?.title ?? "Prostor" };
+  }
   const cat = getStoreCategoryBySlug(category);
   return { title: cat?.title ?? "Kategorija" };
 }
 
 export default async function CategoryPage({ params }: Props) {
   const { category } = await params;
+
+  if (isCategoryGroupId(category)) {
+    const group = getGroupById(category);
+    if (!group) notFound();
+    const productList = await getProductsByGroup(category);
+    const subcategorySlugs = getCategoriesByGroup(category).map((c) => c.slug);
+    return (
+      <GroupPageLayout
+        group={group}
+        productList={productList}
+        subcategorySlugs={subcategorySlugs}
+      />
+    );
+  }
 
   if (!isNavCategorySlug(category)) notFound();
 
@@ -46,8 +69,13 @@ export default async function CategoryPage({ params }: Props) {
     title: shopifyMeta?.title ?? catConfig.title,
     description: shopifyMeta?.description?.trim() || catConfig.description,
     image: shopifyMeta?.imageUrl || catConfig.image || HERO_FALLBACK,
-    productCount: shopifyMeta?.productCount ?? productList.length,
+    productCount: productList.length,
   };
+
+  const groupId = getGroupForCategorySlug(category);
+  const groupCategories = groupId
+    ? getCategoriesByGroup(groupId).map((c) => c.slug)
+    : [];
 
   return (
     <CategoryPageLayout
@@ -55,6 +83,7 @@ export default async function CategoryPage({ params }: Props) {
       activeSlug={category}
       productList={productList}
       initialFilter={category}
+      groupCategorySlugs={groupCategories}
     />
   );
 }

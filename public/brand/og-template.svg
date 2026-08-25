@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="NITI. Premium tekstil za dom">
+  <title>NITI. Open Graph</title>
+  <rect width="1200" height="630" fill="#FAF7F2"/>
+  <rect x="0" y="0" width="12" height="630" fill="#8FAF9A"/>
+  <g fill="#2A2826">
+    <path d="M420 230h22v70L492 230h24v96H494V256L450 326H420V230Z"/>
+    <path d="M548 230h22v96H548V230Z"/>
+    <path d="M602 230h88v20H660v76h-22v-76H602V230Z"/>
+    <path d="M722 230h22v96H722V230Z"/>
+    <circle cx="780" cy="314" r="11"/>
+  </g>
+  <text
+    x="600"
+    y="400"
+    text-anchor="middle"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="28"
+    letter-spacing="0.28em"
+    fill="#7A736C"
+  >PREMIUM TEKSTIL ZA DOM</text>
+</svg>

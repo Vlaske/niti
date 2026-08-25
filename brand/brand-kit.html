@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NITI. — Brand Kit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #faf7f2;
+      --sand: #e8dfd4;
+      --blush: #f4e4e0;
+      --sage: #b8cfc0;
+      --sage-dark: #8faf9a;
+      --sage-deep: #6d9480;
+      --lavender: #e8e4f0;
+      --charcoal: #2a2826;
+      --muted: #7a736c;
+      --line: #e5ddd4;
+      --footer: #5c5348;
+      --sale: #c97b7b;
+      --serif: "Playfair Display", Georgia, serif;
+      --sans: "Plus Jakarta Sans", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--charcoal);
+      font-family: var(--sans);
+      line-height: 1.5;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 80px; }
+    header { margin-bottom: 56px; }
+    .wordmark {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      letter-spacing: 0.22em;
+      margin: 0;
+    }
+    .tag {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    h2 {
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin: 48px 0 20px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+    }
+    h2:first-of-type { border-top: 0; margin-top: 0; }
+    p.lead { max-width: 40rem; color: var(--muted); }
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 16px;
+    }
+    .swatch {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .swatch .chip { height: 88px; }
+    .swatch .meta { padding: 12px; font-size: 0.8rem; }
+    .swatch .meta strong { display: block; margin-bottom: 4px; }
+    .swatch .meta span { color: var(--muted); font-variant-numeric: tabular-nums; }
+    .logo-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 700px) {
+      .logo-row { grid-template-columns: 1fr; }
+    }
+    .logo-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      min-height: 160px;
+    }
+    .logo-card img { width: min(280px, 100%); height: auto; }
+    .logo-card.dark { background: var(--charcoal); color: var(--cream); }
+    .logo-card.sage-bg { background: var(--sage-dark); }
+    .logo-card small { font-size: 0.75rem; color: var(--muted); }
+    .logo-card.dark small,
+    .logo-card.sage-bg small { color: rgba(250,247,242,0.7); }
+    .type-sample { margin: 12px 0 28px; }
+    .type-sample .label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .display-sample {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+    .body-sample { font-size: 1.05rem; max-width: 36rem; }
+    .caption-sample {
+      font-size: 0.75rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+    }
+    .btn-sage { background: var(--sage-dark); color: #fff; }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(42,40,38,0.2);
+      color: var(--charcoal);
+    }
+    .do-dont {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 700px) {
+      .do-dont { grid-template-columns: 1fr; }
+    }
+    .box {
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      padding: 20px;
+      background: #fff;
+    }
+    .box h3 { margin: 0 0 10px; font-size: 0.95rem; }
+    .box ul { margin: 0; padding-left: 1.1rem; color: var(--muted); font-size: 0.9rem; }
+    .mark-grid {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .mark-grid img { width: 72px; height: 72px; }
+    footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="wordmark">NITI.</p>
+      <p class="tag">Brand kit · v1.0</p>
+      <p class="lead" style="margin-top: 24px;">
+        Premium tekstil za dom. Pastelni tonovi, skandinavski mir, mekana svakodnevica.
+        Ovaj kit zakucava logo, boje, tipografiju i ton — za sajt, Instagram i saradnju sa dizajnerom.
+      </p>
+    </header>
+
+    <h2>Logo — wordmark</h2>
+    <p class="lead">Vektor (SVG) bez zavisnosti od font fajla. Koristiti charcoal na svetlom, cream na tamnom.</p>
+    <div class="logo-row">
+      <div class="logo-card">
+        <img src="logo/niti-wordmark-charcoal.svg" alt="NITI. charcoal" />
+        <small>charcoal · svetle pozadine</small>
+      </div>
+      <div class="logo-card dark">
+        <img src="logo/niti-wordmark-cream.svg" alt="NITI. cream" />
+        <small>cream · tamne / foto</small>
+      </div>
+      <div class="logo-card sage-bg">
+        <img src="logo/niti-wordmark-cream.svg" alt="NITI. on sage" />
+        <small>cream na sage</small>
+      </div>
+      <div class="logo-card">
+        <img src="logo/niti-wordmark-sage.svg" alt="NITI. sage" />
+        <small>sage · limited accent</small>
+      </div>
+    </div>
+
+    <h2>Mark / favicon</h2>
+    <div class="mark-grid">
+      <img src="logo/niti-mark.svg" alt="NITI. mark" />
+      <img src="logo/niti-favicon.svg" alt="favicon" width="32" height="32" style="width:32px;height:32px" />
+      <span style="color:var(--muted);font-size:0.85rem">Avatar · browser tab</span>
+    </div>
+
+    <h2>Web wordmark (Playfair)</h2>
+    <p class="lead">Na sajtu header i dalje koristi tipografski wordmark (Playfair Display) — isti osećaj, širi tracking. SVG iznad je za favicon, social i print.</p>
+    <p class="wordmark" style="font-size: 2.75rem;">NITI.</p>
+
+    <h2>Boje</h2>
+    <div class="swatches">
+      <div class="swatch"><div class="chip" style="background:#faf7f2;border-bottom:1px solid #e5ddd4"></div><div class="meta"><strong>Cream</strong><span>#FAF7F2</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#2a2826"></div><div class="meta"><strong>Charcoal</strong><span>#2A2826</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#8faf9a"></div><div class="meta"><strong>Sage</strong><span>#8FAF9A</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#6d9480"></div><div class="meta"><strong>Sage Deep</strong><span>#6D9480</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#e8dfd4"></div><div class="meta"><strong>Sand</strong><span>#E8DFD4</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#f4e4e0"></div><div class="meta"><strong>Blush</strong><span>#F4E4E0</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#e8e4f0"></div><div class="meta"><strong>Lavender</strong><span>#E8E4F0</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#c97b7b"></div><div class="meta"><strong>Sale</strong><span>#C97B7B</span></div></div>
+    </div>
+
+    <h2>Tipografija</h2>
+    <div class="type-sample">
+      <div class="label">Display — Playfair Display</div>
+      <div class="display-sample">Meka harmonija u svakoj niti</div>
+    </div>
+    <div class="type-sample">
+      <div class="label">Body — Plus Jakarta Sans</div>
+      <p class="body-sample">Premium pamuk i lan za miran san i bezvremenski skandinavski mir — tekstil koji voli vaš dom.</p>
+    </div>
+    <div class="type-sample">
+      <div class="label">Caption / label</div>
+      <div class="caption-sample">Premium tekstil — NITI.</div>
+    </div>
+
+    <h2>CTA / dugmad</h2>
+    <div class="btn-row">
+      <button class="btn btn-sage" type="button">Dodaj u korpu</button>
+      <button class="btn btn-ghost" type="button">Sva ponuda</button>
+    </div>
+
+    <h2>Do / Don’t</h2>
+    <div class="do-dont">
+      <div class="box">
+        <h3>Da</h3>
+        <ul>
+          <li>Pišite uvek <strong>NITI.</strong> sa tačkom</li>
+          <li>Cream pozadine, sage CTA</li>
+          <li>Širok tracking na logou</li>
+          <li>Meko svetlo, pastel foto stil</li>
+          <li>Srpski UI po defaultu</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>Ne</h3>
+        <ul>
+          <li>Ne skraćujte tačku / ne pišite „Niti“</li>
+          <li>Ne koristite ljubičaste gradijente / neon</li>
+          <li>Ne stavljajte slab kontrast (sage na cream za tekst)</li>
+          <li>Ne istežite logo</li>
+          <li>Ne mešajte previše pastela u jednom kadru</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Tone of voice</h2>
+    <p class="body-sample"><strong>Jedna rečenica:</strong> NITI. je premium tekstil za dom — pastelni tonovi, pažljivi materijali i miran skandinavski osećaj.</p>
+    <p class="body-sample" style="margin-top:12px"><strong>Tagline:</strong> Premium tekstil za dom.</p>
+
+    <footer>
+      Detaljan brief: <code>BRAND_BRIEF.md</code> · SVG: <code>logo/</code> · OG šablon: <code>og-template.svg</code><br />
+      Otvorite ovaj fajl lokalno u browseru (dupli klik). Za produkcijski logo od dizajnera — zamenite SVG pathove, zadržite imena fajlova.
+    </footer>
+  </div>
+</body>
+</html>

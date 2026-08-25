@@ -9,7 +9,7 @@ import { DesignCarousel } from "@/components/home/DesignCarousel";
 import { FeaturedHero } from "@/components/home/FeaturedHero";
 // import { MarqueeBanner } from "@/components/home/MarqueeBanner";
 import { FaqSection } from "@/components/home/FaqSection";
-import { getAllProducts } from "@/lib/catalog";
+import { getAllProducts, getNewArrivalsProducts } from "@/lib/catalog";
 import { getDesignShowcaseItems } from "@/lib/catalog/design-showcase";
 
 export const revalidate = 60;
@@ -19,17 +19,18 @@ export default async function HomePage() {
     getAllProducts(),
     getDesignShowcaseItems(),
   ]);
+  const newArrivals = await getNewArrivalsProducts(products);
   return (
     <HomeLoaderProvider>
       <HeroMediaPreload />
       <Header variant="transparent" />
       <main>
         <HeroCarousel />
-        <NewArrivals products={products} />
+        <NewArrivals products={newArrivals} />
         <CollectionsGrid />
         <FeaturedHero
           image="https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=85"
-          ctaHref="/product/cloud-linen-sheet-set"
+          ctaHref="/shop/spavaca-soba"
         />
         <DesignCarousel items={designShowcase} />
         {/* Pomerajuća traka — privremeno isključeno

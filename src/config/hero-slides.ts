@@ -1,32 +1,25 @@
 import type { HeroSlide } from "@/types";
 
 /**
- * Hero slajdovi — slike i/ili video.
- *
- * VIDEO:
- * 1. Stavi .mp4 u `public/videos/` (npr. `public/videos/posteljina-hero.mp4`)
- * 2. Na slajdu dodaj:
- *    mediaType: "video",
- *    mediaSrc: "/videos/posteljina-hero.mp4",
- *    poster: "...", // slika dok se video učitava
- *
- * JEDAN VIDEO U PETLJI (bez karusela):
- * U `src/config/hero.ts` postavi `singleVideoLoop: true`
- *
- * MEŠAVINA VIDEO + SLIKA:
- * Svaki slajd može biti image ili video — karusel ih rotira redom.
+ * Hero — room-focused (not a single SKU).
+ * Visual rhythm matches the clean badge + uppercase sans headline look;
+ * primary CTA still names the room (“Pogledaj Spavaću sobu”).
  */
 export const heroSlides: HeroSlide[] = [
   {
     id: "1",
-    category: "Posteljina",
-    headline: "MEKA HARMONIJA U SVAKOJ NITI",
+    category: "Spavaća soba",
+    headline: "Meka harmonija u svakoj",
+    brandMark: true,
+    productTag: "Premium tekstil — NITI.",
     description:
-      "Premium pamuk i lan za miran san i bezvremenski skandinavski mir — tekstil koji voli vaš dom.",
+      "Posteljina, čaršavi i slojevi za miran san — tekstil biran za komfor i nežne tonove.",
     image:
       "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=85",
-    productTag: "Premium tekstil — NITI.",
-    ctaPrimary: { label: "view", href: "/shop/posteljine" },
+    ctaPrimary: {
+      label: "Pogledaj Spavaću sobu",
+      href: "/shop/spavaca-soba",
+    },
     ctaSecondary: { label: "shop", href: "/shop" },
     mediaType: "video",
     mediaSrc: "/videos/bedding-video-hero.mp4",
@@ -35,25 +28,28 @@ export const heroSlides: HeroSlide[] = [
   },
   {
     id: "2",
-    category: "Peškiri",
-    headline: "SVAKA NEŽNA LINIJA",
+    category: "Kupatilo",
+    headline: "Svaka nežna linija",
+    brandMark: true,
+    productTag: "Premium tekstil — NITI.",
     description:
-      "Spa težina frotira i profinjeni rubovi — kupatilski tekstil koji je lep koliko i prijatan.",
+      "Peškiri, bade mantili i tekstil za kupatilo — mekan frotir za svakodnevni ritual.",
     image:
       "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=1920&q=85",
-    productTag: "Peškiri — NITI.",
-    ctaPrimary: { label: "view", href: "/shop/peskiri" },
+    ctaPrimary: { label: "Pogledaj Kupatilo", href: "/shop/kupatilo" },
     ctaSecondary: { label: "shop", href: "/shop" },
   },
   {
     id: "3",
-    category: "Istaknuto",
-    headline: "ORGANSKI KOMFOR U FOKUSU",
+    category: "Kuhinja",
+    headline: "Trpeza u dobrom tonu",
+    brandMark: true,
+    productTag: "Premium tekstil — NITI.",
     description:
-      "Svako tkanje i završna obrada osmišljeni su s namerom — spoj komfora, izdržljivosti i pastelnog mira.",
+      "Stolnjaci, kuhinjske krpe i kecelje — tekstil za trpezu i radni deo kuhinje.",
     image:
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=85",
-    ctaPrimary: { label: "view", href: "/shop" },
-    ctaSecondary: { label: "explore", href: "/shop/posteljine" },
+      "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=1920&q=85",
+    ctaPrimary: { label: "Pogledaj Kuhinju", href: "/shop/kuhinja" },
+    ctaSecondary: { label: "shop", href: "/shop" },
   },
 ];

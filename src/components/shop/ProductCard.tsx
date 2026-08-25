@@ -2,14 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, ShoppingBag } from "lucide-react";
-import { useState } from "react";
+import { ShoppingBag } from "lucide-react";
+import { useState, useRef } from "react";
 import { gsap } from "gsap";
-import { useRef } from "react";
 import { ColorSwatches } from "@/components/ui/ColorSwatches";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { getStoreCategoryBySlug } from "@/config/store-categories";
 import { productRequiresOptionSelection } from "@/lib/shopify/variants";
+import { productImageSrc } from "@/lib/product-image";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/types";
 
@@ -32,6 +33,7 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
       : null;
 
   const needsSelection = productRequiresOptionSelection(product);
+  const categoryTitle = getStoreCategoryBySlug(product.category)?.title;
 
   const cardColors =
     product.options?.find((o) => o.type === "color")?.values.map((v) => ({
@@ -50,7 +52,7 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
       gsap.fromTo(
         frameRef.current,
         { scale: 1 },
-        { scale: 1.02, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out" }
+        { scale: 1.015, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out" }
       );
     }
   };
@@ -58,14 +60,11 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
   return (
     <article
       ref={cardRef}
-      className="product-card group flex flex-col"
+      className="product-card group flex h-full flex-col"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div
-        ref={frameRef}
-        className="product-card-frame mb-4 bg-white p-2 shadow-[0_2px_20px_rgba(42,40,38,0.06)] transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-[0_16px_40px_rgba(42,40,38,0.1)] sm:p-2.5 md:p-3"
-      >
+      <div ref={frameRef} className="product-card-frame mb-3 shrink-0">
         <div className="relative aspect-[4/5] overflow-hidden bg-[#ebe8e2]">
           <Link
             href={`/product/${product.handle}`}
@@ -73,87 +72,84 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
             aria-label={product.title}
           >
             <Image
-              src={product.image}
+              src={productImageSrc(product.image)}
               alt={product.title}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
             />
           </Link>
 
           {product.isNew && (
-            <span className="pointer-events-none absolute left-2 top-2 z-20 rounded-full bg-niti-sage px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+            <span className="pointer-events-none absolute left-3 top-3 z-20 bg-niti-sage px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
               {t("nav.new")}
             </span>
           )}
 
           {savings && (
-            <span className="pointer-events-none absolute right-2 top-2 z-20 rounded-full border border-niti-sale/30 bg-white/95 px-2 py-0.5 text-[10px] font-medium text-niti-sale">
+            <span className="pointer-events-none absolute right-3 top-3 z-20 bg-white/95 px-2 py-0.5 text-[10px] font-medium text-niti-sale">
               −{formatPrice(savings, locale)}
             </span>
           )}
 
           <div
-            className={`pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-2.5 bg-black/15 transition-opacity duration-300 ${
-              hovered ? "opacity-100" : "opacity-0"
-            }`}
+            className={`absolute inset-x-0 bottom-0 z-20 hidden md:block ${
+              hovered ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
+            } transition-all duration-300`}
           >
-            <Link
-              href={`/product/${product.handle}`}
-              className={`interactive pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white text-niti-charcoal shadow-md transition-all duration-300 md:h-11 md:w-11 ${
-                hovered
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-2 opacity-0"
-              }`}
-              aria-label={t("product.quickView")}
-            >
-              <Eye className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.5} />
-            </Link>
             {needsSelection ? (
               <Link
                 href={`/product/${product.handle}`}
-                className={`interactive pointer-events-auto rounded-md bg-white px-3 py-2 text-[11px] font-semibold text-niti-charcoal shadow-md transition-all duration-300 md:px-4 md:py-2.5 md:text-xs ${
-                  hovered
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-2 opacity-0"
-                }`}
+                className="interactive flex w-full items-center justify-center bg-white/95 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-niti-charcoal"
               >
-                <span className="flex items-center gap-1.5">
-                  <Eye className="h-3.5 w-3.5" />
-                  {t("product.chooseOptions")}
-                </span>
+                {t("product.chooseOptions")}
               </Link>
             ) : (
               <button
                 type="button"
                 onClick={handleAdd}
-                className={`interactive pointer-events-auto rounded-md bg-white px-3 py-2 text-[11px] font-semibold text-niti-charcoal shadow-md transition-all duration-300 md:px-4 md:py-2.5 md:text-xs ${
-                  hovered
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-2 opacity-0"
-                }`}
+                className="interactive flex w-full items-center justify-center gap-1.5 bg-white/95 py-2.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-niti-charcoal"
               >
-                <span className="flex items-center gap-1.5">
-                  <ShoppingBag className="h-3.5 w-3.5" />
-                  {t("product.addToCart")}
-                </span>
+                <ShoppingBag className="h-3.5 w-3.5" />
+                {t("product.addToCart")}
               </button>
             )}
           </div>
         </div>
       </div>
 
-      <div className="mb-2 flex h-4 items-center px-0.5">
-        {cardColors.length > 0 ? <ColorSwatches colors={cardColors} /> : null}
+      <div className="mb-2 flex h-4 shrink-0 items-center">
+        {cardColors.length > 0 ? (
+          <ColorSwatches colors={cardColors} maxVisible={6} />
+        ) : null}
       </div>
 
-      <div className="mb-2 px-0.5 md:hidden">
+      {/* Price under media — same line on every card, no gap under short titles */}
+      <div className="mb-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+        {product.compareAtPrice && product.compareAtPrice > product.price ? (
+          <>
+            <span className="text-base font-semibold tracking-tight text-niti-sale md:text-[17px]">
+              {formatPrice(product.price, locale)}
+            </span>
+            <span className="text-xs text-niti-muted line-through md:text-sm">
+              {formatPrice(product.compareAtPrice, locale)}
+            </span>
+          </>
+        ) : (
+          <span className="text-base font-semibold tracking-tight text-niti-charcoal md:text-[17px]">
+            {product.price >= 10000
+              ? `${t("product.from")} ${formatPrice(product.price, locale)}`
+              : formatPrice(product.price, locale)}
+          </span>
+        )}
+      </div>
+
+      <div className="mb-2 shrink-0 md:hidden">
         {needsSelection ? (
           <Link
             href={`/product/${product.handle}`}
-            className="interactive flex w-full items-center justify-center gap-1.5 rounded-md border border-niti-line bg-white py-2 text-[11px] font-semibold text-niti-charcoal"
+            className="interactive flex w-full items-center justify-center rounded-md border border-niti-line bg-white py-2 text-[11px] font-semibold text-niti-charcoal"
           >
-            <Eye className="h-3.5 w-3.5" />
             {t("product.chooseOptions")}
           </Link>
         ) : (
@@ -168,42 +164,23 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
         )}
       </div>
 
-      <p className="mb-1 px-0.5 text-[10px] font-medium uppercase tracking-[0.18em] text-niti-muted md:text-xs">
-        {product.brand} · Premium
-      </p>
-      <Link
-        href={`/product/${product.handle}`}
-        className="interactive px-0.5"
-      >
+      {categoryTitle && (
+        <p className="mb-1 text-[10px] font-medium uppercase tracking-[0.18em] text-niti-muted md:text-xs">
+          {categoryTitle}
+        </p>
+      )}
+
+      <Link href={`/product/${product.handle}`} className="interactive">
         <h3
           className={
             variant === "compact"
-              ? "font-semibold text-niti-charcoal md:text-base"
-              : "text-sm font-semibold leading-snug text-niti-charcoal md:text-base"
+              ? "line-clamp-2 font-semibold leading-snug text-niti-charcoal md:text-base"
+              : "line-clamp-2 text-sm font-semibold leading-snug text-niti-charcoal md:text-base"
           }
         >
           {product.title}
         </h3>
       </Link>
-
-      <div className="mt-1.5 flex items-baseline gap-2 px-0.5">
-        {product.compareAtPrice ? (
-          <>
-            <span className="text-sm text-niti-muted line-through">
-              {formatPrice(product.compareAtPrice, locale)}
-            </span>
-            <span className="text-sm font-semibold text-niti-sale">
-              {formatPrice(product.price, locale)}
-            </span>
-          </>
-        ) : (
-          <span className="text-sm font-medium text-niti-charcoal">
-            {product.price >= 10000
-              ? `${t("product.from")} ${formatPrice(product.price, locale)}`
-              : formatPrice(product.price, locale)}
-          </span>
-        )}
-      </div>
     </article>
   );
 }

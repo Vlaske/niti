@@ -1,20 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ChevronDown,
   Globe,
   Menu,
   Search,
   ShoppingBag,
-  User,
+  Sparkles,
   X,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { NavMegaMenu } from "@/components/layout/NavMegaMenu";
+import { SearchOverlay } from "@/components/layout/SearchOverlay";
 import { useNavCategories } from "@/context/CategoriesContext";
+import { getGroupedNavCategories } from "@/config/store-categories";
 import { formatPrice, cn } from "@/lib/utils";
 
 type HeaderProps = {
@@ -27,7 +29,18 @@ export function Header({ variant = "solid" }: HeaderProps) {
   const navCategories = useNavCategories();
   const [menuOpen, setMenuOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(
+    "spavaca-soba"
+  );
+
+  const groupedMobile = getGroupedNavCategories().map(({ group, categories }) => ({
+    group,
+    categories: categories.map(
+      (c) => navCategories.find((e) => e.slug === c.slug) ?? c
+    ),
+  }));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 48);
@@ -43,8 +56,25 @@ export function Header({ variant = "solid" }: HeaderProps) {
     };
   }, [menuOpen]);
 
+  const openSearch = useCallback(() => {
+    setMegaOpen(false);
+    setMenuOpen(false);
+    setSearchOpen(true);
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        openSearch();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openSearch]);
+
   const isTransparent =
-    variant === "transparent" && !scrolled && !menuOpen && !megaOpen;
+    variant === "transparent" && !scrolled && !menuOpen && !megaOpen && !searchOpen;
 
   return (
     <>
@@ -80,7 +110,7 @@ export function Header({ variant = "solid" }: HeaderProps) {
               <nav className="hidden items-center gap-10 lg:flex">
                 <button
                   type="button"
-                  className="interactive flex items-center gap-1.5 text-base font-medium tracking-wide lg:text-lg"
+                  className="interactive flex items-center gap-1.5 text-sm font-medium uppercase tracking-[0.14em] lg:text-[0.95rem]"
                   aria-expanded={megaOpen}
                   aria-haspopup="true"
                   onMouseEnter={() => setMegaOpen(true)}
@@ -97,7 +127,7 @@ export function Header({ variant = "solid" }: HeaderProps) {
                 </button>
                 <Link
                   href="/#faq"
-                  className="interactive text-base font-medium tracking-wide lg:text-lg"
+                  className="interactive text-sm font-medium uppercase tracking-[0.14em] lg:text-[0.95rem]"
                 >
                   {t("nav.about")}
                 </Link>
@@ -129,20 +159,14 @@ export function Header({ variant = "solid" }: HeaderProps) {
                 <Globe className="h-3.5 w-3.5" strokeWidth={1.5} />
                 {locale.toUpperCase()}
               </button>
-              <Link
-                href="/search"
+              <button
+                type="button"
+                onClick={openSearch}
                 className="interactive hidden p-2 md:block"
                 aria-label={t("nav.search")}
               >
                 <Search className="h-5 w-5" strokeWidth={1.5} />
-              </Link>
-              <Link
-                href="/account"
-                className="interactive hidden p-2 md:block"
-                aria-label={t("nav.account")}
-              >
-                <User className="h-5 w-5" strokeWidth={1.5} />
-              </Link>
+              </button>
               <Link
                 href="/cart"
                 className="interactive flex items-center gap-2 p-2"
@@ -160,13 +184,14 @@ export function Header({ variant = "solid" }: HeaderProps) {
                   {t("nav.subtotal")} {formatPrice(subtotal, locale)}
                 </span>
               </Link>
-              <Link
-                href="/search"
+              <button
+                type="button"
+                onClick={openSearch}
                 className="interactive p-2 lg:hidden"
                 aria-label={t("nav.search")}
               >
                 <Search className="h-5 w-5" strokeWidth={1.5} />
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -189,39 +214,68 @@ export function Header({ variant = "solid" }: HeaderProps) {
             <Link
               href="/shop"
               onClick={() => setMenuOpen(false)}
-              className="interactive rounded-xl bg-white px-4 py-4 text-lg font-semibold shadow-sm"
+              className="interactive border-b border-niti-line py-4 text-lg font-semibold"
             >
               {t("nav.allProducts")}
             </Link>
             <Link
               href="/#new-arrivals"
               onClick={() => setMenuOpen(false)}
-              className="interactive border-b border-niti-line py-4 text-base font-medium"
+              className="interactive flex items-center gap-2 border-b border-niti-line py-4 text-base font-medium"
             >
+              <Sparkles className="h-4 w-4 text-niti-sage-dark" strokeWidth={1.5} />
               {t("home.newArrivals")}
-              <span className="ml-2 rounded-full bg-niti-sage px-2 py-0.5 text-xs text-white">
+              <span className="bg-niti-sage px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
                 {t("nav.new")}
               </span>
             </Link>
-            <p className="pt-4 text-xs font-semibold uppercase tracking-widest text-niti-muted">
+            <p className="pt-6 text-xs font-semibold uppercase tracking-widest text-niti-muted">
               {t("nav.browseCategories")}
             </p>
-            <div className="flex flex-col gap-1.5 py-2">
-              {navCategories.map((cat) => (
-                <Link
-                  key={cat.slug}
-                  href={`/shop/${cat.slug}`}
-                  onClick={() => setMenuOpen(false)}
-                  className="interactive rounded-xl border border-niti-line bg-white px-4 py-3.5 text-sm font-semibold"
-                >
-                  {cat.title}
-                  {cat.productCount > 0 && (
-                    <span className="ml-2 text-xs font-normal text-niti-muted">
-                      ({cat.productCount})
-                    </span>
-                  )}
-                </Link>
-              ))}
+            <div className="flex flex-col py-1">
+              {groupedMobile.map(({ group, categories }) => {
+                const expanded = openMobileGroup === group.id;
+                return (
+                  <div key={group.id} className="border-b border-niti-line">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenMobileGroup(expanded ? null : group.id)
+                      }
+                      className="interactive flex w-full items-center justify-between py-3.5 text-left text-sm font-semibold"
+                    >
+                      {group.title}
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 text-niti-muted transition-transform",
+                          expanded && "rotate-180"
+                        )}
+                      />
+                    </button>
+                    {expanded && (
+                      <div className="pb-3">
+                        <Link
+                          href={`/shop/${group.id}`}
+                          onClick={() => setMenuOpen(false)}
+                          className="interactive block py-2 text-sm font-semibold text-niti-charcoal"
+                        >
+                          {t("shop.allInRoom")}
+                        </Link>
+                        {categories.map((cat) => (
+                          <Link
+                            key={cat.slug}
+                            href={`/shop/${cat.slug}`}
+                            onClick={() => setMenuOpen(false)}
+                            className="interactive block py-2 text-sm text-niti-muted"
+                          >
+                            {cat.title}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
             <Link
               href="/#faq"
@@ -248,6 +302,8 @@ export function Header({ variant = "solid" }: HeaderProps) {
           </nav>
         </div>
       )}
+
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
     </>
   );
 }

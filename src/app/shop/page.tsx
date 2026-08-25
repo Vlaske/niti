@@ -1,6 +1,6 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { CategoryNavStrip } from "@/components/shop/CategoryNavStrip";
+import { RoomNavStrip } from "@/components/shop/RoomNavStrip";
 import { ShopPageClient } from "@/components/shop/ShopPageClient";
 import { getAllProducts } from "@/lib/catalog";
 
@@ -17,16 +17,16 @@ export default async function ShopPage() {
     <>
       <Header variant="solid" />
       <main className="pt-[var(--header-offset)]">
-        <section className="border-b border-niti-line bg-niti-sand/30 px-4 py-12 md:px-8 md:py-16 lg:px-12">
+        <section className="px-4 pt-10 md:px-8 md:pt-14 lg:px-12">
           <div className="mx-auto max-w-[1440px]">
-            <h1 className="font-serif text-4xl font-semibold text-niti-charcoal md:text-5xl lg:text-6xl">
+            <h1 className="font-serif text-4xl font-semibold text-niti-charcoal md:text-5xl">
               Sva ponuda
             </h1>
           </div>
         </section>
-        <CategoryNavStrip activeSlug="all" />
-        <div className="mx-auto max-w-[1440px] px-4 pb-20 pt-10 md:px-8 lg:px-12">
-          <ShopPageClient hideHeader productList={productList} />
+        <RoomNavStrip activeId="all" />
+        <div className="mx-auto max-w-[1440px] px-4 pb-20 pt-8 md:px-8 md:pt-10 lg:px-12">
+          <ShopPageClient hideHeader hideFilters productList={productList} />
         </div>
       </main>
       <Footer />
