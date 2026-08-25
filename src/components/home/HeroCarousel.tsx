@@ -142,7 +142,7 @@ export function HeroCarousel() {
       ref={containerRef}
       className="relative h-[min(100svh,760px)] min-h-[480px] w-full overflow-hidden md:h-[100svh] md:min-h-[560px]"
     >
-      <div className="absolute inset-0" data-hero-media>
+      <div className="absolute inset-0 overflow-hidden" data-hero-media>
         <HeroMedia slide={slide} onReady={markHeroReady} />
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-black/25" />
       </div>
@@ -191,34 +191,36 @@ export function HeroCarousel() {
       </div>
 
       {showControls && (
-        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 items-center gap-4 rounded-full bg-white/10 px-4 py-2 backdrop-blur-md">
-          <CarouselControls onPrev={prev} onNext={next} size="sm" />
-          <div className="flex gap-2">
-            {slides.map((s, i) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => goTo(i)}
-                aria-label={`${t("hero.slide")} ${i + 1}`}
-                className={cn(
-                  "interactive h-2 w-2 rounded-full transition-colors",
-                  i === index ? "bg-white" : "bg-white/40"
-                )}
-              />
-            ))}
+        <div className="absolute inset-x-3 bottom-6 flex justify-center sm:inset-x-4 sm:bottom-8">
+          <div className="flex max-w-full items-center gap-2 overflow-hidden rounded-full bg-white/10 px-3 py-1.5 backdrop-blur-md sm:gap-4 sm:px-4 sm:py-2">
+            <CarouselControls onPrev={prev} onNext={next} size="sm" />
+            <div className="flex max-w-[40vw] gap-1.5 overflow-hidden sm:max-w-none sm:gap-2">
+              {slides.map((s, i) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => goTo(i)}
+                  aria-label={`${t("hero.slide")} ${i + 1}`}
+                  className={cn(
+                    "interactive h-2 w-2 shrink-0 rounded-full transition-colors",
+                    i === index ? "bg-white" : "bg-white/40"
+                  )}
+                />
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setPlaying((p) => !p)}
+              aria-label={playing ? t("hero.pause") : t("hero.play")}
+              className="interactive flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/40 text-white"
+            >
+              {playing ? (
+                <Pause className="h-3.5 w-3.5" fill="currentColor" />
+              ) : (
+                <Play className="h-3.5 w-3.5" fill="currentColor" />
+              )}
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setPlaying((p) => !p)}
-            aria-label={playing ? t("hero.pause") : t("hero.play")}
-            className="interactive flex h-9 w-9 items-center justify-center rounded-full border border-white/40 text-white"
-          >
-            {playing ? (
-              <Pause className="h-3.5 w-3.5" fill="currentColor" />
-            ) : (
-              <Play className="h-3.5 w-3.5" fill="currentColor" />
-            )}
-          </button>
         </div>
       )}
     </section>

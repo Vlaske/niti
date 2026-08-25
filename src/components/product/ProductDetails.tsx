@@ -97,10 +97,10 @@ export function ProductDetails({
 
   return (
     <div className="lg:sticky lg:top-28 lg:self-start">
-      <p className="text-xs uppercase tracking-[0.2em] text-niti-muted">
+      <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-niti-muted">
         {product.brand}
       </p>
-      <h1 className="mt-2 font-serif text-[1.65rem] font-semibold leading-tight text-niti-charcoal sm:text-3xl md:text-4xl">
+      <h1 className="mt-2 font-display text-[1.65rem] font-medium leading-[1.2] tracking-[0.04em] text-niti-charcoal sm:text-[1.85rem] md:text-[2.15rem]">
         {product.title}
       </h1>
 
@@ -108,15 +108,15 @@ export function ProductDetails({
         <span
           className={
             savings
-              ? "text-[1.35rem] font-semibold tracking-tight text-niti-sale sm:text-2xl md:text-3xl"
-              : "text-[1.35rem] font-semibold tracking-tight text-niti-charcoal sm:text-2xl md:text-3xl"
+              ? "text-xl font-semibold tracking-tight text-niti-sale sm:text-2xl"
+              : "text-xl font-semibold tracking-tight text-niti-charcoal sm:text-2xl"
           }
         >
           {formatPrice(displayPrice, locale)}
         </span>
         {savings && (
           <>
-            <span className="pb-0.5 text-base text-niti-muted line-through md:text-lg">
+            <span className="pb-0.5 text-sm text-niti-muted line-through md:text-base">
               {formatPrice(displayCompare!, locale)}
             </span>
             <span className="pb-1 text-xs font-medium uppercase tracking-wider text-niti-sale">
@@ -146,7 +146,7 @@ export function ProductDetails({
         </div>
       ) : null}
 
-      <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Button
           variant="secondary"
           className="w-full sm:flex-1"

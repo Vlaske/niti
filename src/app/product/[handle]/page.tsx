@@ -45,7 +45,7 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <PageShell mainClassName="pt-[var(--header-offset)]">
-      <div className="mx-auto max-w-[1440px] px-4 pb-20 md:px-8 lg:px-12">
+      <div className="mx-auto w-full max-w-[1440px] px-4 pb-20 md:px-8 lg:px-12">
         <ProductPageView product={product} related={related} />
       </div>
     </PageShell>

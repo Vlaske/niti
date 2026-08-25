@@ -92,7 +92,13 @@ export function runHeroMediaZoom(mediaEl: Element | null) {
   gsap.killTweensOf(mediaEl);
   return gsap.fromTo(
     mediaEl,
-    { scale: 1.06 },
-    { scale: 1, duration: 1.4, ease: "power2.out" }
+    { scale: 1.04 },
+    {
+      scale: 1,
+      duration: 1.4,
+      ease: "power2.out",
+      // Avoid leaving a transform that can widen scrollWidth on some mobiles
+      clearProps: "transform",
+    }
   );
 }

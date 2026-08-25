@@ -5,7 +5,7 @@ import {
   guessColorSwatchStyle,
   isPatternOptionName,
 } from "@/lib/shopify/variants";
-import type { ProductOption } from "@/types";
+import type { ProductOption, ProductOptionValue } from "@/types";
 
 type ProductOptionPickerProps = {
   options: ProductOption[];
@@ -14,6 +14,114 @@ type ProductOptionPickerProps = {
   errors?: Record<string, boolean>;
 };
 
+function OptionHeading({
+  label,
+  selected,
+  hasError,
+}: {
+  label: string;
+  selected?: string;
+  hasError?: boolean;
+}) {
+  return (
+    <div className="mb-3 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+      <p
+        className={cn(
+          "text-[11px] font-semibold uppercase tracking-[0.16em]",
+          hasError ? "text-niti-sale" : "text-niti-charcoal"
+        )}
+      >
+        {label}
+      </p>
+      {selected ? (
+        <>
+          <span className="text-niti-line" aria-hidden>
+            ·
+          </span>
+          <span className="text-sm text-niti-muted">{selected}</span>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+function ChipButton({
+  value,
+  selected,
+  disabled,
+  hasError,
+  onClick,
+}: {
+  value: string;
+  selected: boolean;
+  disabled: boolean;
+  hasError: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      aria-pressed={selected}
+      className={cn(
+        "interactive min-w-0 rounded-md border px-3.5 py-2.5 text-left text-sm font-medium leading-snug break-words transition-colors",
+        selected
+          ? "border-niti-charcoal bg-niti-charcoal text-white"
+          : "border-niti-line bg-niti-cream text-niti-charcoal hover:border-niti-charcoal/40",
+        disabled && "cursor-not-allowed opacity-40",
+        hasError && !selected && "border-niti-sale"
+      )}
+    >
+      {value}
+    </button>
+  );
+}
+
+function ColorSwatchRow({
+  optionName,
+  values,
+  selectedValue,
+  hasError,
+  onChange,
+}: {
+  optionName: string;
+  values: ProductOptionValue[];
+  selectedValue?: string;
+  hasError: boolean;
+  onChange: (optionName: string, value: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2.5" role="listbox" aria-label={optionName}>
+      {values.map((val) => {
+        const selected = selectedValue === val.value;
+        const disabled = !val.available;
+        return (
+          <button
+            key={`${optionName}-${val.value}`}
+            type="button"
+            role="option"
+            aria-selected={selected}
+            aria-label={val.value}
+            title={val.value}
+            disabled={disabled}
+            onClick={() => onChange(optionName, val.value)}
+            className={cn(
+              "interactive relative h-10 w-10 shrink-0 rounded-full border transition-shadow md:h-11 md:w-11",
+              selected
+                ? "border-niti-charcoal shadow-[0_0_0_2px_var(--niti-cream),0_0_0_4px_var(--niti-charcoal)]"
+                : "border-niti-charcoal/15 hover:border-niti-charcoal/40",
+              disabled && "cursor-not-allowed opacity-40",
+              hasError && !selected && "border-niti-sale"
+            )}
+            style={guessColorSwatchStyle(val.value)}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 export function ProductOptionPicker({
   options,
   selections,
@@ -21,89 +129,47 @@ export function ProductOptionPicker({
   errors = {},
 }: ProductOptionPickerProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-7 border-t border-niti-line pt-7">
       {options.map((option) => {
-        const useSwatches =
-          option.type === "color" || isPatternOptionName(option.name);
+        const selectedValue = selections[option.name];
+        const hasError = Boolean(errors[option.name]);
+        const isColor =
+          option.type === "color" && !isPatternOptionName(option.name);
+        const isPattern = isPatternOptionName(option.name);
 
         return (
-          <div key={option.name}>
-            <div className="mb-3 flex items-baseline justify-between gap-2">
-              <p className="text-sm font-medium text-niti-charcoal">
-                {option.label}
-              </p>
-              {selections[option.name] && (
-                <span className="text-xs text-niti-muted">
-                  {selections[option.name]}
-                </span>
-              )}
-            </div>
+          <div key={option.name} className="min-w-0">
+            <OptionHeading
+              label={option.label}
+              selected={selectedValue}
+              hasError={hasError}
+            />
 
-            {useSwatches ? (
-              <div className="flex flex-wrap gap-2.5">
-                {option.values.map((val) => {
-                  const selected = selections[option.name] === val.value;
-                  const disabled = !val.available;
-                  return (
-                    <button
-                      key={`${option.name}-${val.value}`}
-                      type="button"
-                      title={val.value}
-                      disabled={disabled}
-                      onClick={() => onChange(option.name, val.value)}
-                      className={cn(
-                        "interactive group relative flex flex-col items-center gap-1.5",
-                        disabled && "cursor-not-allowed opacity-40"
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "block h-9 w-9 overflow-hidden rounded-full border-2 transition-all md:h-10 md:w-10",
-                          selected
-                            ? "border-niti-charcoal ring-2 ring-niti-charcoal/20 ring-offset-2"
-                            : "border-niti-line group-hover:scale-105",
-                          errors[option.name] && !selected && "border-niti-sale"
-                        )}
-                        // TEMP: photos on swatches disabled — use hex / pattern styles only.
-                        // Re-enable val.image backgroundImage when Shopify color↔image is ready.
-                        style={guessColorSwatchStyle(val.value)}
-                      />
-                      <span
-                        className={cn(
-                          "max-w-[4.5rem] truncate text-[10px] text-niti-muted",
-                          selected && "font-medium text-niti-charcoal"
-                        )}
-                      >
-                        {val.value}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+            {isColor ? (
+              <ColorSwatchRow
+                optionName={option.name}
+                values={option.values}
+                selectedValue={selectedValue}
+                hasError={hasError}
+                onChange={onChange}
+              />
             ) : (
-              <div className="flex flex-wrap gap-2">
-                {option.values.map((val) => {
-                  const selected = selections[option.name] === val.value;
-                  const disabled = !val.available;
-                  return (
-                    <button
-                      key={`${option.name}-${val.value}`}
-                      type="button"
-                      disabled={disabled}
-                      onClick={() => onChange(option.name, val.value)}
-                      className={cn(
-                        "interactive min-w-[3rem] rounded-lg border px-4 py-2.5 text-sm font-medium transition-all",
-                        selected
-                          ? "border-niti-charcoal bg-niti-charcoal text-white"
-                          : "border-niti-line bg-white text-niti-charcoal hover:border-niti-charcoal/30",
-                        disabled && "cursor-not-allowed opacity-40",
-                        errors[option.name] && !selected && "border-niti-sale"
-                      )}
-                    >
-                      {val.value}
-                    </button>
-                  );
-                })}
+              <div
+                className={cn(
+                  "flex flex-wrap gap-2",
+                  isPattern && "gap-2"
+                )}
+              >
+                {option.values.map((val) => (
+                  <ChipButton
+                    key={`${option.name}-${val.value}`}
+                    value={val.value}
+                    selected={selectedValue === val.value}
+                    disabled={!val.available}
+                    hasError={hasError}
+                    onClick={() => onChange(option.name, val.value)}
+                  />
+                ))}
               </div>
             )}
           </div>

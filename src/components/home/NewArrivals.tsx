@@ -29,9 +29,10 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
 
   const filters = useMemo(() => {
     const base = [{ id: "all", label: t("shop.filters.all") }];
-    const rooms = CATEGORY_GROUPS.map((g) => ({ id: g.id, label: g.title })).filter(
-      (g) => source.some((p) => productMatchesCategory(p, g.id))
-    );
+    const rooms = CATEGORY_GROUPS.map((g) => ({
+      id: g.id,
+      label: g.title,
+    })).filter((g) => source.some((p) => productMatchesCategory(p, g.id)));
     return [...base, ...rooms];
   }, [source, t]);
 
@@ -43,6 +44,11 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
   const mobileSlice = filtered.slice(0, MOBILE_VISIBLE);
   const visibleDesktop = 4;
   const maxOffset = Math.max(0, filtered.length - visibleDesktop);
+
+  const setRoomFilter = (id: string) => {
+    setFilter(id);
+    setOffset(0);
+  };
 
   useScrollReveal(sectionRef, {
     selector: "[data-section-reveal]",
@@ -65,17 +71,36 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
           />
         </div>
 
-        <div data-section-reveal className="mt-5 md:mt-8">
-          <FilterPills
-            filters={filters}
-            active={filter}
-            onChange={(id) => {
-              setFilter(id);
-              setOffset(0);
-            }}
-            className="gap-x-4 gap-y-2 md:gap-x-8"
-          />
-        </div>
+        {filters.length > 1 && (
+          <div data-section-reveal className="mt-5 md:mt-8">
+            {/* Mobile: one compact room select instead of 3 lines of pills */}
+            <label className="flex items-center gap-3 md:hidden">
+              <span className="shrink-0 text-xs font-medium uppercase tracking-[0.14em] text-niti-muted">
+                {t("shop.room")}
+              </span>
+              <select
+                value={filter}
+                onChange={(e) => setRoomFilter(e.target.value)}
+                className="interactive min-h-10 min-w-0 flex-1 rounded-md border border-niti-line bg-white px-3 py-2 text-sm text-niti-charcoal"
+              >
+                {filters.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="hidden md:block">
+              <FilterPills
+                filters={filters}
+                active={filter}
+                onChange={setRoomFilter}
+                className="gap-x-6 gap-y-2 md:gap-x-8"
+              />
+            </div>
+          </div>
+        )}
 
         {filtered.length === 0 ? (
           <p className="mt-10 text-center text-sm text-niti-muted">

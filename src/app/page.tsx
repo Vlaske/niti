@@ -24,7 +24,7 @@ export default async function HomePage() {
     <HomeLoaderProvider>
       <HeroMediaPreload />
       <Header variant="transparent" />
-      <main>
+      <main className="min-w-0 overflow-x-clip">
         <HeroCarousel />
         <NewArrivals products={newArrivals} />
         <CollectionsGrid />

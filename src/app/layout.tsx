@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
+import { Outfit, Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { FloatingActions } from "@/components/layout/FloatingActions";
 import { getEnrichedNavCategories } from "@/lib/catalog";
@@ -14,6 +14,14 @@ const playfair = Playfair_Display({
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-sans",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+/** Clean geometric sans — closer to NITI. wordmark; latin-ext for Serbian */
+const outfit = Outfit({
+  variable: "--font-outfit",
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700"],
   display: "swap",
@@ -61,12 +69,12 @@ export default async function RootLayout({
   return (
     <html
       lang="sr"
-      className={`${playfair.variable} ${plusJakarta.variable} h-full`}
+      className={`${playfair.variable} ${plusJakarta.variable} ${outfit.variable} h-full`}
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >
       <body
-        className="flex min-h-full flex-col font-sans antialiased"
+        className="site-shell flex min-h-full flex-col font-sans antialiased"
         suppressHydrationWarning
       >
         <AppProviders navCategories={navCategories}>

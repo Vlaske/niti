@@ -37,20 +37,33 @@
   --color-niti-marquee: var(--niti-marquee);
   --font-sans: var(--font-sans), system-ui, sans-serif;
   --font-serif: var(--font-serif), Georgia, serif;
+  --font-display: var(--font-outfit), var(--font-sans), system-ui, sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
   background: var(--niti-cream);
   color: var(--niti-charcoal);
   font-family: var(--font-sans), system-ui, sans-serif;
-  overflow-x: clip;
+  max-width: 100%;
+  overflow-x: hidden;
   overscroll-behavior-x: none;
+  position: relative;
+}
+
+/* Keep page children from stretching the document wider than the phone */
+main,
+.site-shell {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
 }
 
 /* Reduce accidental double-tap zoom / image callouts on mobile */
@@ -92,6 +105,10 @@ summary {
 
 .font-sans {
   font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-outfit), var(--font-sans), system-ui, sans-serif;
 }
 
 /* Pointer on all interactive elements */
@@ -199,6 +216,26 @@ button:disabled,
   margin-bottom: 0.5em;
   font-weight: 600;
   color: var(--niti-charcoal);
+}
+
+.product-prose {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.product-prose img,
+.product-prose video,
+.product-prose iframe,
+.product-prose table,
+.product-prose pre {
+  max-width: 100%;
+  height: auto;
+}
+
+.product-prose table {
+  display: block;
+  overflow-x: auto;
 }
 
 .product-prose p {

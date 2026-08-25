@@ -175,8 +175,8 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
         <h3
           className={
             variant === "compact"
-              ? "line-clamp-2 font-semibold leading-snug text-niti-charcoal md:text-base"
-              : "line-clamp-2 text-sm font-semibold leading-snug text-niti-charcoal md:text-base"
+              ? "line-clamp-2 font-display text-base font-medium leading-snug tracking-[0.02em] text-niti-charcoal"
+              : "line-clamp-2 font-display text-sm font-medium leading-snug tracking-[0.02em] text-niti-charcoal md:text-base"
           }
         >
           {product.title}

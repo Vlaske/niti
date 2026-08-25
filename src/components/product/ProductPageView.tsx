@@ -120,14 +120,14 @@ export function ProductPageView({
       </nav>
 
       <div className="grid gap-6 md:gap-10 lg:grid-cols-2 lg:gap-16">
-        <div data-pdp-reveal>
+        <div data-pdp-reveal className="min-w-0">
           <ProductGallery
             images={images}
             title={product.title}
             preferredSrc={preferredSrc}
           />
         </div>
-        <div data-pdp-reveal>
+        <div data-pdp-reveal className="min-w-0">
           <ProductDetails
             product={product}
             selections={selections}

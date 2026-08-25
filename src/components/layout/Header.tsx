@@ -92,13 +92,13 @@ export function Header({ variant = "solid" }: HeaderProps) {
           )}
         >
         <div className="relative mx-auto max-w-[1440px]">
-          <div className="site-header__bar flex items-center justify-between gap-3 px-4 md:gap-8 md:px-8 lg:px-12">
-            <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="site-header__bar flex items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4 md:gap-8 md:px-8 lg:px-12">
+            <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 aria-label={menuOpen ? "Zatvori meni" : "Otvori meni"}
                 onClick={() => setMenuOpen((o) => !o)}
-                className="interactive p-1.5 lg:hidden"
+                className="interactive shrink-0 p-1.5 lg:hidden"
               >
                 {menuOpen ? (
                   <X className="h-6 w-6" strokeWidth={1.5} />
@@ -137,9 +137,9 @@ export function Header({ variant = "solid" }: HeaderProps) {
             <Link
               href="/"
               className={cn(
-                "interactive shrink-0 font-serif font-bold leading-none tracking-[0.2em] transition-transform hover:scale-[1.02]",
-                "text-[2.25rem] sm:text-[2.5rem] md:text-[2.65rem] lg:text-[2.85rem]",
-                "px-1 md:px-3",
+                "interactive shrink-0 font-serif font-bold leading-none tracking-[0.14em] transition-transform hover:scale-[1.02] sm:tracking-[0.2em]",
+                "text-[1.85rem] sm:text-[2.5rem] md:text-[2.65rem] lg:text-[2.85rem]",
+                "px-0.5 sm:px-1 md:px-3",
                 isTransparent && !megaOpen
                   ? "text-white drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)]"
                   : "text-niti-charcoal",
@@ -149,7 +149,7 @@ export function Header({ variant = "solid" }: HeaderProps) {
               NITI.
             </Link>
 
-            <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 md:gap-3">
+            <div className="flex min-w-0 flex-1 items-center justify-end gap-0.5 sm:gap-1.5 md:gap-3">
               <button
                 type="button"
                 onClick={() => setLocale(locale === "sr" ? "en" : "sr")}
