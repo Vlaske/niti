@@ -11,19 +11,18 @@ export default function PrivatnostPage() {
         i njihovi procesori — mi ne čuvamo podatke o karticama.
       </p>
       <p>
-        Newsletter (ako se prijavite) koristimo samo za novosti i ponude.
-        Možete se odjaviti u svakom emailu.
+        Prijava na newsletter šalje vašu email adresu na info@nitihome.rs.
+        Koristimo je samo za novosti o kolekcijama i nezi tekstila.
       </p>
       <p>
         Za zahteve oko pristupa ili brisanja podataka pišite na{" "}
         <a
-          href="mailto:hello@niti.home"
+          href="mailto:info@nitihome.rs"
           className="text-niti-charcoal underline underline-offset-2"
         >
-          hello@niti.home
+          info@nitihome.rs
         </a>
-        . Ova stranica je informativna — pre lansiranja usklađujemo je sa
-        pravnim savetom i Shopify uslovima.
+        .
       </p>
     </LegalPage>
   );

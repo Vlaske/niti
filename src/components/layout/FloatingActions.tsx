@@ -1,10 +1,22 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
 export function FloatingActions() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 480);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  if (!visible) return null;
+
   return (
-    <div className="fixed bottom-6 right-4 z-40 md:right-8">
+    <div className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40 md:right-8">
       <button
         type="button"
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}

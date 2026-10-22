@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -40,6 +41,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local Viktorija import tooling + dumps (never deploy / never push)
+# Catalog dumps / images / exports (never deploy / never push)
 /data/viktorija/
+
+# Legacy local-only scraper (superseded by committed scripts/catalog/)
 /scripts/viktorija/
+
+# Catalog Studio runtime (if generated)
+/scripts/catalog/studio/.cache/

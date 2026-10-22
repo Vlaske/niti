@@ -1,8 +1,7 @@
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/layout/PageShell";
 import { ProductPageView } from "@/components/product/ProductPageView";
-import { productMatchesCategory } from "@/config/store-categories";
-import { getAllProducts, getProductByHandle, getProductHandles } from "@/lib/catalog";
+import { getProductByHandle, getProductHandles, getRelatedProducts } from "@/lib/catalog";
 
 type Props = {
   params: Promise<{ handle: string }>;
@@ -30,18 +29,7 @@ export default async function ProductPage({ params }: Props) {
 
   if (!product) notFound();
 
-  const all = await getAllProducts();
-  const related = all
-    .filter((p) => {
-      if (p.id === product.id) return false;
-      if (product.category !== "all") {
-        return productMatchesCategory(p, product.category);
-      }
-      return (
-        Boolean(product.collection) && p.collection === product.collection
-      );
-    })
-    .slice(0, 4);
+  const related = await getRelatedProducts(product);
 
   return (
     <PageShell mainClassName="pt-[var(--header-offset)]">

@@ -33,7 +33,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Shopify integration
 
-Copy `.env.example` to `.env.local` and add your Storefront API credentials. Replace mock data in `src/lib/data/` with queries from `src/lib/shopify/client.ts`.
+Copy `.env.example` to `.env.local` and add your Storefront API credentials.
+
+**Catalog import** (CSV/XML → Shopify) is a local toolkit — see [`PRODUCT_IMPORT.md`](PRODUCT_IMPORT.md). Dumps never go to GitHub/Vercel.
 
 ## Project structure
 

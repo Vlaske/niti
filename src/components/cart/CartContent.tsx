@@ -70,10 +70,10 @@ export function CartContent() {
                 sizes="112px"
               />
             </Link>
-            <div className="flex flex-1 flex-col">
+            <div className="flex min-w-0 flex-1 flex-col">
               <Link
                 href={`/product/${item.product.handle}`}
-                className="interactive font-semibold text-niti-charcoal hover:underline"
+                className="interactive font-semibold leading-snug text-niti-charcoal hover:underline"
               >
                 {item.product.title}
               </Link>
@@ -92,7 +92,7 @@ export function CartContent() {
                     onClick={() =>
                       updateQuantity(lineKey(item), item.quantity - 1)
                     }
-                    className="interactive p-2"
+                    className="interactive flex h-11 w-11 items-center justify-center"
                     aria-label="Smanji količinu"
                   >
                     <Minus className="h-4 w-4" />
@@ -105,7 +105,7 @@ export function CartContent() {
                     onClick={() =>
                       updateQuantity(lineKey(item), item.quantity + 1)
                     }
-                    className="interactive p-2"
+                    className="interactive flex h-11 w-11 items-center justify-center"
                     aria-label="Povećaj količinu"
                   >
                     <Plus className="h-4 w-4" />
@@ -132,10 +132,12 @@ export function CartContent() {
             <span className="text-niti-muted">{t("nav.subtotal")}</span>
             <span>{formatPrice(subtotal, locale)}</span>
           </div>
+          {/* Dostava se računa pri plaćanju — vrati kad trošak bude potvrđen
           <div className="flex justify-between">
             <span className="text-niti-muted">{t("cart.shipping")}</span>
             <span className="text-niti-sage-dark">{t("cart.shippingCalc")}</span>
           </div>
+          */}
         </div>
         <div className="mt-6 flex justify-between border-t border-niti-line pt-6 text-base font-semibold">
           <span>{t("cart.total")}</span>
@@ -156,11 +158,6 @@ export function CartContent() {
         <p className="mt-4 text-center text-xs text-niti-muted">
           {t("cart.secure")}
         </p>
-        {isShopifyCart && checkoutUrl && (
-          <p className="mt-2 text-center text-[11px] leading-relaxed text-niti-muted">
-            {t("cart.checkoutHint")}
-          </p>
-        )}
         <button
           type="button"
           onClick={clearCart}

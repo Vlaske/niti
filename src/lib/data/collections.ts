@@ -62,13 +62,15 @@ export const faqItems: FaqItem[] = [
     id: "4",
     question: "Kako funkcioniše dostava?",
     answer:
-      "Trošak i rok dostave potvrđuju se na Shopify checkout stranici pre plaćanja, u zavisnosti od adrese i težine pošiljke. Šaljemo na teritoriji Srbije.",
+      "Šaljemo na teritoriji Srbije. Rok isporuke zavisi od dostupnosti artikala i kurirske službe.",
+    // answer:
+    //   "Trošak i rok dostave potvrđuju se na Shopify checkout stranici pre plaćanja, u zavisnosti od adrese i težine pošiljke. Šaljemo na teritoriji Srbije.",
   },
   {
     id: "5",
     question: "Koja je politika povrata?",
     answer:
-      "Neiskorišćene artikle u originalnom stanju možete vratiti u roku od 30 dana. Detalje (troškovi, izuzeci za otvorenu posteljinu) dogovaramo putem podrške — pišite na hello@niti.home.",
+      "Neiskorišćene artikle u originalnom stanju možete vratiti u roku od 30 dana. Detalje (troškovi, izuzeci za otvorenu posteljinu) dogovaramo putem podrške — pišite na info@nitihome.rs.",
   },
 ];
 
@@ -82,7 +84,8 @@ export const valueProps = [
   {
     icon: "shipping",
     title: "Dostava",
-    description: "Šaljemo širom Srbije — trošak i rok vidiš pri plaćanju.",
+    description: "Šaljemo širom Srbije.",
+    // description: "Šaljemo širom Srbije — trošak i rok vidiš pri plaćanju.",
   },
   {
     icon: "service",
@@ -92,11 +95,12 @@ export const valueProps = [
   {
     icon: "payment",
     title: "Sigurno plaćanje",
-    description: "Plaćanje preko Shopify checkout-a — kartice i dostupne metode.",
+    description: "Kartice i ostale dostupne metode plaćanja.",
   },
   {
     icon: "contact",
     title: "Kontakt",
-    description: "hello@niti.home — tu smo za pitanja o tekstilu i porudžbinama.",
+    description:
+      "info@nitihome.rs i @nitihome.rs na Instagramu — tu smo za pitanja o tekstilu i porudžbinama.",
   },
 ];

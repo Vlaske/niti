@@ -170,6 +170,39 @@ export function isSizeOptionName(name: string): boolean {
   return SIZE_OPTION_NAMES.has(name.toLowerCase().trim());
 }
 
+/** True when a variant matches every currently selected option. */
+export function variantMatchesSelections(
+  selectedOptions: { name: string; value: string }[],
+  selections: Record<string, string>,
+  exceptOption?: string
+): boolean {
+  return Object.entries(selections).every(([name, value]) => {
+    if (exceptOption && name === exceptOption) return true;
+    if (!value) return true;
+    return selectedOptions.some((o) => o.name === name && o.value === value);
+  });
+}
+
+/**
+ * Whether an option value is available given the other selections
+ * (e.g. after picking Boja=Bordo, only sizes that exist for Bordo).
+ */
+export function isOptionValueAvailableForSelections(
+  variants: ProductVariantSnapshot[],
+  optionName: string,
+  value: string,
+  selections: Record<string, string>
+): boolean {
+  return variants.some(
+    (v) =>
+      v.availableForSale &&
+      v.selectedOptions.some(
+        (so) => so.name === optionName && so.value === value
+      ) &&
+      variantMatchesSelections(v.selectedOptions, selections, optionName)
+  );
+}
+
 type ShopifyOption = {
   name: string;
   values: string[];
@@ -182,6 +215,8 @@ type ShopifyVariant = {
   compareAtPrice?: { amount: string } | null;
   selectedOptions: { name: string; value: string }[];
   image?: { url: string; altText?: string | null } | null;
+  sku?: string | null;
+  barcode?: string | null;
 };
 
 export function mapVariantSnapshots(
@@ -196,6 +231,8 @@ export function mapVariantSnapshots(
       : undefined,
     selectedOptions: v.selectedOptions,
     image: v.image?.url || undefined,
+    sku: v.sku?.trim() || undefined,
+    barcode: v.barcode?.trim() || undefined,
   }));
 }
 

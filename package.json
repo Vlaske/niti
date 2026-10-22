@@ -6,7 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "catalog:ingest": "tsx scripts/catalog/ingest.ts",
+    "catalog:merge": "tsx scripts/catalog/merge-cli.ts",
+    "catalog:diff": "tsx scripts/catalog/diff-cli.ts",
+    "catalog:diff-sources": "tsx scripts/catalog/diff-sources-cli.ts",
+    "catalog:export": "tsx scripts/catalog/export-cli.ts",
+    "catalog:studio": "tsx scripts/catalog/studio/server.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -24,6 +30,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
     "tailwindcss": "^4",
+    "tsx": "^4.20.3",
     "typescript": "^5"
   }
 }

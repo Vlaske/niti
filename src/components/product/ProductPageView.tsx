@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ProductGallery } from "@/components/product/ProductGallery";
-import { ProductDescription } from "@/components/product/ProductDescription";
 import {
   ProductDetails,
   getDefaultProductSelections,
@@ -22,6 +21,7 @@ import {
 } from "@/config/store-categories";
 import type { Product } from "@/types";
 import { productImageSrc } from "@/lib/product-image";
+import { normalizeImageUrl } from "@/lib/shopify/color-images";
 
 type ProductPageViewProps = {
   product: Product;
@@ -48,7 +48,11 @@ export function ProductPageView({
       Boolean(src?.trim())
     );
     const preferred = getPreferredImageForSelections(product, selections);
-    if (preferred && !list.includes(preferred)) {
+    const preferredKey = preferred ? normalizeImageUrl(preferred) : "";
+    if (
+      preferred &&
+      !list.some((src) => normalizeImageUrl(src) === preferredKey)
+    ) {
       return [preferred, ...list];
     }
     return list.length ? list : [productImageSrc(product.image)];
@@ -119,7 +123,7 @@ export function ProductPageView({
         )}
       </nav>
 
-      <div className="grid gap-6 md:gap-10 lg:grid-cols-2 lg:gap-16">
+      <div className="grid items-start gap-8 md:gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:gap-12 xl:gap-16">
         <div data-pdp-reveal className="min-w-0">
           <ProductGallery
             images={images}
@@ -135,25 +139,6 @@ export function ProductPageView({
           />
         </div>
       </div>
-
-      <section
-        data-pdp-reveal
-        className="mt-8 grid gap-6 border-t border-niti-line py-8 sm:grid-cols-2 sm:gap-8 md:mt-12 md:py-10"
-      >
-        <div>
-          <h3 className="text-sm font-semibold uppercase tracking-wider">
-            {t("product.details")}
-          </h3>
-          <ProductDescription
-            html={product.descriptionHtml}
-            plain={product.description}
-          />
-        </div>
-        <ul className="space-y-2 text-sm text-niti-muted">
-          <li>{t("product.shipping")}</li>
-          <li>{t("product.returns")}</li>
-        </ul>
-      </section>
 
       {related.length > 0 && (
         <section className="mt-10 border-t border-niti-line pt-10 md:mt-12 md:pt-16">

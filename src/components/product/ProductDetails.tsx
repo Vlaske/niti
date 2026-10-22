@@ -2,15 +2,18 @@
 
 import { useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
+import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 import {
   findVariantBySelections,
+  isOptionValueAvailableForSelections,
   productRequiresOptionSelection,
 } from "@/lib/shopify/variants";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/types";
+import { ProductInfoPanel } from "./ProductInfoPanel";
 import { ProductOptionPicker } from "./ProductOptionPicker";
 
 type ProductDetailsProps = {
@@ -50,7 +53,22 @@ export function ProductDetails({
   );
 
   const handleOptionChange = (name: string, value: string) => {
-    const next = { ...selections, [name]: value };
+    const next: Record<string, string> = { ...selections, [name]: value };
+    // Drop other selections that no longer form a real variant with this choice
+    if (product.variants?.length) {
+      for (const opt of product.options ?? []) {
+        if (opt.name === name) continue;
+        const current = next[opt.name];
+        if (!current) continue;
+        const stillOk = isOptionValueAvailableForSelections(
+          product.variants,
+          opt.name,
+          current,
+          next
+        );
+        if (!stillOk) delete next[opt.name];
+      }
+    }
     onSelectionsChange(next);
     if (product.options?.every((o) => Boolean(next[o.name]))) {
       setOptionErrors({});
@@ -126,6 +144,23 @@ export function ProductDetails({
         )}
       </div>
 
+      {(activeVariant?.sku || activeVariant?.barcode) && (
+        <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[13px] font-normal text-niti-muted/80">
+          {activeVariant.sku ? (
+            <div className="flex items-baseline gap-1.5">
+              <dt>{t("product.sku")}</dt>
+              <dd>{activeVariant.sku}</dd>
+            </div>
+          ) : null}
+          {activeVariant.barcode ? (
+            <div className="flex items-baseline gap-1.5">
+              <dt>{t("product.barcode")}</dt>
+              <dd>{activeVariant.barcode}</dd>
+            </div>
+          ) : null}
+        </dl>
+      )}
+
       {allOptionsSelected && activeVariant && !activeVariant.availableForSale && (
         <p className="mt-3 text-sm text-niti-sale">{t("product.outOfStock")}</p>
       )}
@@ -137,6 +172,7 @@ export function ProductDetails({
             selections={selections}
             onChange={handleOptionChange}
             errors={optionErrors}
+            variants={product.variants}
           />
           {showOptionHint && (
             <p className="mt-3 text-sm text-niti-sale">
@@ -146,10 +182,10 @@ export function ProductDetails({
         </div>
       ) : null}
 
-      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+      <div className="mt-7 flex flex-col gap-3 min-[420px]:flex-row">
         <Button
           variant="secondary"
-          className="w-full sm:flex-1"
+          className="w-full min-h-12 min-[420px]:flex-1"
           onClick={handleAdd}
           disabled={
             !canAdd ||
@@ -162,10 +198,24 @@ export function ProductDetails({
         >
           <span ref={addBtnRef}>{t("product.addToCart")}</span>
         </Button>
-        <Button href="/cart" variant="outline" className="w-full sm:w-auto">
+        <Button href="/cart" variant="outline" className="w-full min-h-12 min-[420px]:w-auto">
           {t("product.viewCart")}
         </Button>
       </div>
+
+      <div className="mt-5 space-y-2.5 text-sm text-niti-muted">
+        {/* Dostava se računa pri plaćanju — vrati kad trošak bude potvrđen
+        <p className="flex items-center gap-2.5">
+          <span>{t("product.shipping")}</span>
+        </p>
+        */}
+        <p className="flex items-center gap-2.5">
+          <RotateCcw className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+          <span>{t("product.returns")}</span>
+        </p>
+      </div>
+
+      <ProductInfoPanel product={product} />
     </div>
   );
 }
@@ -181,11 +231,14 @@ export function getDefaultProductSelections(
   );
 }
 
-/** Resolve gallery image for current color via precomputed colorImages map. */
+/** Gallery image for the current options. Variant photo wins, including the featured shot. */
 export function getPreferredImageForSelections(
   product: Product,
   selections: Record<string, string>
 ): string | undefined {
+  const variant = findVariantBySelections(product, selections);
+  if (variant?.image) return variant.image;
+
   const colorOpt = product.options?.find((o) => o.type === "color");
   if (!colorOpt) return undefined;
   const colorValue = selections[colorOpt.name];

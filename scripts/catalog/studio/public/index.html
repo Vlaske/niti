@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NITI. Catalog Studio (local)</title>
+  <style>
+    :root {
+      --bg: #f6f3ee;
+      --ink: #1c1917;
+      --muted: #78716c;
+      --line: #e7e5e4;
+      --card: #fffcf8;
+      --accent: #3f4f3a;
+      --warn: #9a3412;
+      --ok: #166534;
+      --panel: #1c1917;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, #efe8dc, var(--bg));
+      color: var(--ink);
+      line-height: 1.45;
+    }
+    header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,252,248,.92);
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(8px);
+      z-index: 2;
+    }
+    header h1 { margin: 0; font-size: 1.15rem; letter-spacing: .02em; }
+    header p { margin: .35rem 0 0; color: var(--muted); font-size: .9rem; }
+    main { padding: 1.25rem 1.5rem 3rem; max-width: 1280px; margin: 0 auto; }
+    .banner {
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: var(--warn);
+      padding: .75rem 1rem;
+      margin-bottom: 1rem;
+      font-size: .9rem;
+    }
+    .banner strong { color: var(--ink); }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: .75rem;
+      margin-bottom: 1.25rem;
+    }
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--line);
+      padding: .85rem 1rem;
+    }
+    .stat b { display: block; font-size: 1.25rem; }
+    .stat span { color: var(--muted); font-size: .78rem; }
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; align-items: center;
+    }
+    input, select, button {
+      font: inherit; padding: .45rem .65rem; border: 1px solid var(--line); background: #fff;
+    }
+    button { background: var(--accent); color: #fff; border-color: var(--accent); cursor: pointer; }
+    button.secondary { background: #fff; color: var(--ink); }
+    button:disabled { opacity: .55; cursor: wait; }
+    table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); }
+    th, td { text-align: left; padding: .55rem .65rem; border-bottom: 1px solid var(--line); font-size: .86rem; vertical-align: top; }
+    th { font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+    tr { cursor: pointer; }
+    tr:hover td { background: #fafaf9; }
+    tr.active td { background: #f0ebe3; }
+    .tag {
+      display: inline-block; padding: .1rem .4rem; border: 1px solid var(--line);
+      font-size: .72rem; margin: 0 .2rem .2rem 0; color: var(--muted);
+    }
+    .status-new { color: var(--ok); font-weight: 600; }
+    .status-changed { color: var(--warn); font-weight: 600; }
+    .status-missing_in_source { color: #7f1d1d; }
+    .status-unchanged { color: var(--muted); }
+    .empty { color: var(--muted); padding: 2rem; text-align: center; }
+    .msg { font-size: .85rem; color: var(--muted); margin: .35rem 0 0; }
+    .msg.err { color: var(--warn); }
+
+    /* Detail drawer */
+    .drawer-backdrop {
+      position: fixed; inset: 0; background: rgba(28,25,23,.35);
+      opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 20;
+    }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed; top: 0; right: 0; width: min(520px, 100%); height: 100%;
+      background: var(--card); border-left: 1px solid var(--line);
+      transform: translateX(100%); transition: transform .22s ease; z-index: 21;
+      display: flex; flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer header {
+      position: static; display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start;
+    }
+    .drawer .body { overflow: auto; padding: 1rem 1.25rem 2rem; flex: 1; }
+    .drawer h2 { margin: 0; font-size: 1.05rem; }
+    .drawer h3 {
+      margin: 1.25rem 0 .5rem; font-size: .72rem; text-transform: uppercase;
+      letter-spacing: .06em; color: var(--muted); font-weight: 600;
+    }
+    .kv { display: grid; grid-template-columns: 120px 1fr; gap: .35rem .75rem; font-size: .88rem; }
+    .kv dt { color: var(--muted); }
+    .kv dd { margin: 0; word-break: break-word; }
+    .thumb {
+      width: 100%; max-height: 220px; object-fit: contain; background: #f5f5f4;
+      border: 1px solid var(--line); margin-top: .5rem;
+    }
+    .desc {
+      font-size: .85rem; color: #44403c; max-height: 160px; overflow: auto;
+      border: 1px solid var(--line); padding: .65rem; background: #fff;
+    }
+    .variants { font-size: .82rem; }
+    .variants li { margin-bottom: .35rem; }
+    code { font-size: .84em; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>NITI. Catalog Studio</h1>
+    <p>Local only on <code>127.0.0.1</code> — never part of the live website deploy.</p>
+  </header>
+  <main>
+    <div class="banner">
+      <strong>This tool stays on your PC.</strong>
+      Pipeline: ingest (CSV or XML) → merge → diff → export → Shopify Admin.
+      Order tracking uses variant <strong>SKU</strong> (= Viktorija šifra).
+      Click any row for full fields.
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="toolbar">
+      <input id="q" type="search" placeholder="Search title / SKU / barcode / handle…" style="min-width:220px;flex:1" />
+      <select id="leaf"><option value="">All collections</option></select>
+      <select id="diffStatus">
+        <option value="">All diff statuses</option>
+        <option value="new">new</option>
+        <option value="changed">changed</option>
+        <option value="missing_in_source">missing_in_source</option>
+        <option value="unchanged">unchanged</option>
+      </select>
+      <button type="button" class="secondary" id="reload">Reload</button>
+      <button type="button" class="secondary" id="diffSnapshot">Diff vs last merge</button>
+      <button type="button" id="diffLive">Compare to live Shopify</button>
+    </div>
+    <p class="msg" id="statusMsg"></p>
+    <div id="content" class="empty">Loading…</div>
+  </main>
+
+  <div class="drawer-backdrop" id="backdrop"></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <header>
+      <div>
+        <h2 id="dTitle">Product</h2>
+        <p id="dSub" style="margin:.25rem 0 0;color:var(--muted);font-size:.85rem"></p>
+      </div>
+      <button type="button" class="secondary" id="closeDrawer">Close</button>
+    </header>
+    <div class="body" id="dBody"></div>
+  </aside>
+
+  <script>
+    let canonical = null;
+    let ingest = null;
+    let report = null;
+    let diffBySku = new Map();
+    let diffMeta = null;
+    let selectedKey = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    function setMsg(text, isErr) {
+      const el = $("statusMsg");
+      el.textContent = text || "";
+      el.className = "msg" + (isErr ? " err" : "");
+    }
+
+    async function load() {
+      setMsg("Loading…");
+      const [cRes, dRes, rRes, iRes] = await Promise.all([
+        fetch("/api/canonical").then((r) => r.json()),
+        fetch("/api/diff").then((r) => r.json()),
+        fetch("/api/report").then((r) => r.json()),
+        fetch("/api/ingest").then((r) => r.json()),
+      ]);
+      canonical = cRes.products ? cRes : null;
+      ingest = iRes.skus ? iRes : null;
+      report = rRes;
+      diffBySku = new Map();
+      diffMeta = dRes.counts ? dRes : null;
+      if (dRes.entries) {
+        for (const e of dRes.entries) diffBySku.set(e.sku, e);
+      }
+
+      const counts = dRes.counts || {};
+      const productCount = canonical?.productCount ?? 0;
+      const variantCount = (canonical?.products || []).reduce((n, p) => n + (p.variants?.length || 0), 0);
+      $("stats").innerHTML = [
+        ["Products", productCount],
+        ["Variants / SKUs", variantCount],
+        ["Ingest SKUs", rRes.ingest?.skuCount ?? "—"],
+        ["Diff new", counts.new ?? "—"],
+        ["Diff changed", counts.changed ?? "—"],
+        ["Missing", counts.missing_in_source ?? "—"],
+        ["Excluded", rRes.unmapped?.excluded?.length ?? "—"],
+      ].map(([label, val]) => `<div class="stat"><b>${val}</b><span>${label}</span></div>`).join("");
+
+      const handles = [...new Set((canonical?.products || []).map((p) => p.collectionHandle))].sort();
+      $("leaf").innerHTML = `<option value="">All collections</option>` +
+        handles.map((h) => `<option value="${h}">${h}</option>`).join("");
+
+      const liveOk = rRes.health?.shopifyAdminConfigured;
+      const xmlOk = rRes.health?.xmlUrlConfigured;
+      $("diffLive").disabled = false;
+      setMsg(
+        `Diff against: ${dRes.against || "none yet"} · Live Admin ready: ${liveOk ? "yes" : "no"} · XML URL in env: ${xmlOk ? "yes" : "no"}`
+      );
+      render();
+    }
+
+    function ingestBySku(sku) {
+      if (!ingest?.skus) return null;
+      return ingest.skus.find((s) => s.sku === sku) || null;
+    }
+
+    function rows() {
+      if (!canonical?.products) return [];
+      const q = $("q").value.trim().toLowerCase();
+      const leaf = $("leaf").value;
+      const status = $("diffStatus").value;
+      const out = [];
+      for (const p of canonical.products) {
+        if (leaf && p.collectionHandle !== leaf) continue;
+        for (const v of p.variants || []) {
+          const d = diffBySku.get(v.sku);
+          if (status && (!d || d.status !== status)) continue;
+          const hay = `${p.title} ${p.handle} ${v.sku} ${v.barcode || ""} ${(p.tags || []).join(" ")}`.toLowerCase();
+          if (q && !hay.includes(q)) continue;
+          out.push({ p, v, d });
+        }
+      }
+      return out;
+    }
+
+    function render() {
+      const data = rows();
+      const el = $("content");
+      if (!canonical?.products) {
+        el.className = "empty";
+        el.textContent = canonical?.error || "No canonical.json yet. Run catalog:ingest then catalog:merge.";
+        return;
+      }
+      if (!data.length) {
+        el.className = "empty";
+        el.textContent = "No rows match filters.";
+        return;
+      }
+      el.className = "";
+      el.innerHTML = `<table>
+        <thead><tr>
+          <th>SKU</th><th>Title</th><th>Options</th><th>Collection</th><th>Price</th><th>Barcode</th><th>Diff</th>
+        </tr></thead>
+        <tbody>
+          ${data.slice(0, 400).map(({ p, v, d }, i) => {
+            const key = v.sku;
+            const opts = (v.options || []).map((o) => `${o.name}: ${o.value}`).join(" · ");
+            return `<tr data-sku="${escapeAttr(key)}" class="${selectedKey === key ? "active" : ""}">
+              <td><code>${escapeHtml(v.sku)}</code></td>
+              <td>${escapeHtml(p.title)}<div style="color:var(--muted);font-size:.75rem">${escapeHtml(p.handle)}</div></td>
+              <td>${escapeHtml(opts || "—")}</td>
+              <td>${escapeHtml(p.collectionHandle)}</td>
+              <td>${v.price}${v.compareAtPrice ? ` <span style="color:var(--muted);text-decoration:line-through">${v.compareAtPrice}</span>` : ""}</td>
+              <td>${escapeHtml(v.barcode || "—")}</td>
+              <td class="status-${d?.status || "unchanged"}">${d?.status || "—"}${d?.reasons?.length ? " (" + escapeHtml(d.reasons.join(", ")) + ")" : ""}</td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table>
+      ${data.length > 400 ? `<p class="empty">Showing 400 of ${data.length}. Narrow search.</p>` : ""}`;
+
+      el.querySelectorAll("tr[data-sku]").forEach((tr) => {
+        tr.addEventListener("click", () => openDetail(tr.getAttribute("data-sku")));
+      });
+    }
+
+    function openDetail(sku) {
+      selectedKey = sku;
+      render();
+      const hit = rows().find((r) => r.v.sku === sku) ||
+        (() => {
+          for (const p of canonical.products) {
+            const v = (p.variants || []).find((x) => x.sku === sku);
+            if (v) return { p, v, d: diffBySku.get(sku) };
+          }
+          return null;
+        })();
+      if (!hit) return;
+
+      const { p, v, d } = hit;
+      const raw = ingestBySku(sku);
+      $("dTitle").textContent = p.title;
+      $("dSub").textContent = `${p.handle} · ${p.collectionHandle}`;
+
+      const attrs = Object.entries(p.attributes || {});
+      const rawAttrs = Object.entries(raw?.attributes || {});
+
+      $("dBody").innerHTML = `
+        ${p.images?.[0]?.src ? `<img class="thumb" src="${escapeAttr(p.images[0].src)}" alt="" />` : ""}
+
+        <h3>Identity (orders)</h3>
+        <dl class="kv">
+          <dt>Variant SKU</dt><dd><code>${escapeHtml(v.sku)}</code></dd>
+          <dt>Barcode</dt><dd>${escapeHtml(v.barcode || "—")}</dd>
+          <dt>Woo ID</dt><dd>${escapeHtml(String(v.sourceWooId ?? raw?.sourceId ?? "—"))}</dd>
+          <dt>Handle</dt><dd><code>${escapeHtml(p.handle)}</code></dd>
+          <dt>Status</dt><dd>${escapeHtml(p.status)} · published=${p.published ? "yes" : "no"}</dd>
+        </dl>
+
+        <h3>Pricing & availability</h3>
+        <dl class="kv">
+          <dt>Price (RSD)</dt><dd>${v.price}</dd>
+          <dt>Compare at</dt><dd>${v.compareAtPrice ?? "—"}</dd>
+          <dt>Available</dt><dd>${v.available ? "yes" : "no"}</dd>
+          <dt>Vendor / type</dt><dd>${escapeHtml(p.vendor)} · ${escapeHtml(p.productType)}</dd>
+        </dl>
+
+        <h3>Variant options</h3>
+        <dl class="kv">
+          ${(v.options || []).map((o) => `<dt>${escapeHtml(o.name)}</dt><dd>${escapeHtml(o.value)}</dd>`).join("") || "<dt>—</dt><dd>Default</dd>"}
+        </dl>
+
+        <h3>Product options (all values)</h3>
+        <dl class="kv">
+          ${(p.options || []).map((o) => `<dt>${escapeHtml(o.name)}</dt><dd>${escapeHtml((o.values || []).join(", "))}</dd>`).join("")}
+        </dl>
+
+        <h3>All variants on this product (${(p.variants || []).length})</h3>
+        <ul class="variants">
+          ${(p.variants || []).map((x) => `<li><code>${escapeHtml(x.sku)}</code> — ${(x.options || []).map((o) => o.value).join(" / ")} — ${x.price} RSD${x.barcode ? " · " + escapeHtml(x.barcode) : ""}</li>`).join("")}
+        </ul>
+
+        <h3>NITI tags</h3>
+        <div>${(p.tags || []).map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("") || "—"}</div>
+
+        <h3>Source categories</h3>
+        <dl class="kv">
+          <dt>Slugs</dt><dd>${escapeHtml((p.sourceCategorySlugs || []).join(", ") || "—")}</dd>
+          <dt>Raw paths</dt><dd>${escapeHtml((raw?.categoryPaths || []).join(" · ") || "—")}</dd>
+          <dt>Ingest source</dt><dd>${escapeHtml(raw?.source || canonical?.source || "—")}</dd>
+        </dl>
+
+        <h3>Attributes (care / material / …)</h3>
+        <dl class="kv">
+          ${(attrs.length ? attrs : rawAttrs).map(([k, val]) => `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(val)}</dd>`).join("") || "<dt>—</dt><dd>None</dd>"}
+        </dl>
+
+        <h3>Description</h3>
+        <div class="desc">${p.descriptionHtml || "<em>No description</em>"}</div>
+
+        <h3>Images</h3>
+        <dl class="kv">
+          ${(p.images || []).map((img, i) => `<dt>#${i + 1}</dt><dd><a href="${escapeAttr(img.src)}" target="_blank" rel="noreferrer">${escapeHtml(img.src)}</a></dd>`).join("") || "<dt>—</dt><dd>None</dd>"}
+        </dl>
+
+        <h3>Diff</h3>
+        <dl class="kv">
+          <dt>Status</dt><dd class="status-${d?.status || "unchanged"}">${d?.status || "— (run a diff)"}</dd>
+          <dt>Reasons</dt><dd>${escapeHtml(d?.reasons?.join(", ") || "—")}</dd>
+          <dt>Live / remote</dt><dd>${d?.remote ? escapeHtml(JSON.stringify(d.remote)) : "—"}</dd>
+          <dt>Source index</dt><dd>${d?.source ? escapeHtml(JSON.stringify(d.source)) : "—"}</dd>
+        </dl>
+
+        ${raw ? `
+        <h3>Raw ingest row (CSV/XML)</h3>
+        <dl class="kv">
+          <dt>Title</dt><dd>${escapeHtml(raw.title)}</dd>
+          <dt>Price</dt><dd>${raw.price}${raw.compareAtPrice ? " / was " + raw.compareAtPrice : ""}</dd>
+          <dt>Images</dt><dd>${escapeHtml((raw.imageUrls || []).join(", ") || "—")}</dd>
+          <dt>Published</dt><dd>${raw.published ? "yes" : "no"}</dd>
+        </dl>` : ""}
+      `;
+
+      $("drawer").classList.add("open");
+      $("backdrop").classList.add("open");
+      $("drawer").setAttribute("aria-hidden", "false");
+    }
+
+    function closeDetail() {
+      $("drawer").classList.remove("open");
+      $("backdrop").classList.remove("open");
+      $("drawer").setAttribute("aria-hidden", "true");
+    }
+
+    async function runDiff(against) {
+      const btn = against === "shopify" ? $("diffLive") : $("diffSnapshot");
+      btn.disabled = true;
+      setMsg(against === "shopify" ? "Fetching live Shopify catalog…" : "Diffing vs previous merge…");
+      try {
+        const res = await fetch(`/api/diff-run?against=${against}`, { method: "POST" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Diff failed");
+        diffBySku = new Map();
+        for (const e of data.entries || []) diffBySku.set(e.sku, e);
+        diffMeta = data;
+        const c = data.counts || {};
+        setMsg(`Diff vs ${data.against}: new=${c.new} changed=${c.changed} missing=${c.missing_in_source} unchanged=${c.unchanged}`);
+        // refresh stats counts
+        await load();
+      } catch (err) {
+        setMsg(err.message || String(err), true);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? "").replace(/[&<>"']/g, (c) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[c]);
+    }
+    function escapeAttr(s) {
+      return escapeHtml(s).replace(/`/g, "");
+    }
+
+    $("q").addEventListener("input", render);
+    $("leaf").addEventListener("change", render);
+    $("diffStatus").addEventListener("change", render);
+    $("reload").addEventListener("click", load);
+    $("diffSnapshot").addEventListener("click", () => runDiff("snapshot"));
+    $("diffLive").addEventListener("click", () => runDiff("shopify"));
+    $("closeDrawer").addEventListener("click", closeDetail);
+    $("backdrop").addEventListener("click", closeDetail);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDetail(); });
+
+    load();
+  </script>
+</body>
+</html>

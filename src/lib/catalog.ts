@@ -1,3 +1,4 @@
+import { cache } from "react";
 import {
   getProductByHandle as getMockProductByHandle,
   getProductsByCategory as getMockProductsByCategory,
@@ -14,7 +15,10 @@ import {
   fetchShopifyProducts,
   fetchShopifyProductsByCategory,
   fetchShopifyNewArrivalsCollection,
+  fetchShopifyRecommendations,
+  fetchShopifyCollectionProducts,
 } from "@/lib/shopify/catalog";
+import { toListingProduct } from "@/lib/catalog/listing";
 import { selectNewArrivalsShowcase } from "@/lib/catalog/ranking";
 import type { Product } from "@/types";
 
@@ -32,7 +36,7 @@ export function isShopifyCatalogActive(): boolean {
 
 export { getEnrichedNavCategories } from "@/lib/catalog/categories";
 
-export async function getAllProducts() {
+export const getAllProducts = cache(async function getAllProducts() {
   if (shopifyServerConfigured) {
     try {
       const products = await fetchShopifyProducts();
@@ -44,9 +48,9 @@ export async function getAllProducts() {
   }
   lastCatalogSource = "mock";
   return mockProducts;
-}
+});
 
-export async function getProductByHandle(handle: string) {
+export const getProductByHandle = cache(async function getProductByHandle(handle: string) {
   if (shopifyServerConfigured) {
     try {
       const product = await fetchShopifyProductByHandle(handle);
@@ -59,6 +63,47 @@ export async function getProductByHandle(handle: string) {
   }
   lastCatalogSource = "mock";
   return getMockProductByHandle(handle) ?? null;
+});
+
+export async function getRelatedProducts(product: Product, limit = 4) {
+  const pick = (list: Product[]) =>
+    list
+      .filter((p) => p.handle !== product.handle && p.availableForSale !== false)
+      .slice(0, limit)
+      .map(toListingProduct);
+
+  if (shopifyServerConfigured && product.id.startsWith("gid://")) {
+    try {
+      const recommended = await fetchShopifyRecommendations(product.id);
+      const fromRecs = pick(recommended);
+      if (fromRecs.length > 0) return fromRecs;
+    } catch (e) {
+      console.error("[catalog] Recommendations failed:", e);
+    }
+
+    if (product.collection) {
+      try {
+        const fromCollection = await fetchShopifyCollectionProducts(
+          product.collection,
+          12
+        );
+        const picked = pick(fromCollection);
+        if (picked.length > 0) return picked;
+      } catch (e) {
+        console.error("[catalog] Related collection failed:", e);
+      }
+    }
+  }
+
+  const all = await getAllProducts();
+  return pick(
+    all.filter((p) => {
+      if (product.category && product.category !== "all") {
+        return productMatchesCategory(p, product.category);
+      }
+      return Boolean(product.collection) && p.collection === product.collection;
+    })
+  );
 }
 
 export async function getProductsByCategory(categorySlug: string) {
@@ -105,8 +150,6 @@ export async function getProductHandles(): Promise<string[]> {
 }
 
 export async function getNewArrivalsProducts(all?: Product[]) {
-  const catalog = all ?? (await getAllProducts());
-
   if (shopifyServerConfigured) {
     try {
       const fromCollection = await fetchShopifyNewArrivalsCollection();
@@ -121,5 +164,6 @@ export async function getNewArrivalsProducts(all?: Product[]) {
     }
   }
 
+  const catalog = all ?? (await getAllProducts());
   return selectNewArrivalsShowcase(catalog);
 }

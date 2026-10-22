@@ -241,7 +241,7 @@ export function ShopPageClient({
           title={`${filtered.length} ${t("shop.products")}`}
           className="flex-1"
         />
-        <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+        <div className="flex w-full flex-wrap items-center gap-2 md:w-auto md:justify-end md:gap-3">
           <div
             className="flex items-center gap-0.5 rounded-md border border-niti-line bg-white p-1"
             role="group"

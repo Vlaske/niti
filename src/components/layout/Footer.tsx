@@ -6,8 +6,6 @@ import {
   Headphones,
   Home,
   Mail,
-  Phone,
-  Share2,
   ShoppingBag,
 } from "lucide-react";
 import { NewsletterForm } from "@/components/layout/NewsletterForm";
@@ -16,8 +14,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { valueProps } from "@/lib/data/collections";
 
 const companyLinks = [
-  { label: "Naša priča", href: "/#faq" },
-  { label: "Kontakt", href: "mailto:hello@niti.home" },
+  { label: "Kontakt", href: "mailto:info@nitihome.rs" },
+  { label: "Instagram", href: "https://www.instagram.com/nitihome.rs/" },
 ];
 
 const careLinks = [
@@ -117,10 +115,33 @@ export function Footer() {
                 <Home className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} />
                 Beograd, Srbija
               </p>
-              <p className="flex items-center gap-2.5">
-                <Phone className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                +381 11 123 4567
-              </p>
+              <a
+                href="mailto:info@nitihome.rs"
+                className="interactive flex items-center gap-2.5 hover:text-white"
+              >
+                <Mail className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                info@nitihome.rs
+              </a>
+              <a
+                href="https://www.instagram.com/nitihome.rs/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="interactive flex items-center gap-2.5 hover:text-white"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                  className="h-4 w-4 shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <rect x="3" y="3" width="18" height="18" rx="5" />
+                  <circle cx="12" cy="12" r="4" />
+                  <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none" />
+                </svg>
+                @nitihome.rs
+              </a>
             </div>
           </div>
 
@@ -128,9 +149,20 @@ export function Footer() {
             <ul className="space-y-2.5 text-sm leading-snug text-white/70">
               {companyLinks.map((l) => (
                 <li key={l.label}>
-                  <Link href={l.href} className="interactive hover:text-white">
-                    {l.label}
-                  </Link>
+                  {l.href.startsWith("http") ? (
+                    <a
+                      href={l.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="interactive hover:text-white"
+                    >
+                      {l.label}
+                    </a>
+                  ) : (
+                    <Link href={l.href} className="interactive hover:text-white">
+                      {l.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -187,22 +219,13 @@ export function Footer() {
                 </Link>
               ))}
             </div>
-            <div className="flex items-center gap-4">
-              <select
-                className="interactive rounded border border-white/20 bg-transparent px-2 py-1.5 text-xs text-white/80"
-                defaultValue="rs"
-                aria-label="Region"
-              >
-                <option value="rs">Srbija (RSD)</option>
-              </select>
-              <Link
-                href="#"
-                aria-label="Društvene mreže"
-                className="interactive text-white/70 hover:text-white"
-              >
-                <Share2 className="h-4 w-4" strokeWidth={1.5} />
-              </Link>
-            </div>
+            <select
+              className="interactive w-fit rounded border border-white/20 bg-transparent px-2 py-1.5 text-xs text-white/80"
+              defaultValue="rs"
+              aria-label="Region"
+            >
+              <option value="rs">Srbija (RSD)</option>
+            </select>
           </div>
         </div>
       </div>

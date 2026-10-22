@@ -11,6 +11,7 @@ import {
   isNavCategorySlug,
 } from "@/config/store-categories";
 import { getProductsByCategory, getProductsByGroup } from "@/lib/catalog";
+import { toListingProduct } from "@/lib/catalog/listing";
 import { fetchCollectionMeta } from "@/lib/shopify/collections";
 import type { Category } from "@/types";
 
@@ -48,7 +49,7 @@ export default async function CategoryPage({ params }: Props) {
     return (
       <GroupPageLayout
         group={group}
-        productList={productList}
+        productList={productList.map(toListingProduct)}
         subcategorySlugs={subcategorySlugs}
       />
     );
@@ -81,7 +82,7 @@ export default async function CategoryPage({ params }: Props) {
     <CategoryPageLayout
       category={cat}
       activeSlug={category}
-      productList={productList}
+      productList={productList.map(toListingProduct)}
       initialFilter={category}
       groupCategorySlugs={groupCategories}
     />

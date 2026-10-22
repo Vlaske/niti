@@ -18,10 +18,12 @@ export default function DostavaPage() {
         stranici pre plaćanja.
       </p>
       */}
+      {/* Trošak se računa pri plaćanju — vrati kad iznos bude potvrđen
       <p>
         Trošak dostave prikazuje se na Shopify checkout stranici pre plaćanja,
         u zavisnosti od adrese i pošiljke.
       </p>
+      */}
       <p>
         Tačna adresa i kontakt telefon su važni za uspešnu isporuku. Ako
         paket nije preuzet, kurir može naplatiti ponovnu dostavu prema svojim

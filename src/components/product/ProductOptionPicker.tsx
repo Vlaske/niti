@@ -1,17 +1,25 @@
 "use client";
 
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import {
   guessColorSwatchStyle,
+  isOptionValueAvailableForSelections,
   isPatternOptionName,
 } from "@/lib/shopify/variants";
-import type { ProductOption, ProductOptionValue } from "@/types";
+import type {
+  ProductOption,
+  ProductOptionValue,
+  ProductVariantSnapshot,
+} from "@/types";
 
 type ProductOptionPickerProps = {
   options: ProductOption[];
   selections: Record<string, string>;
   onChange: (optionName: string, value: string) => void;
   errors?: Record<string, boolean>;
+  /** When provided, sizes/colors disable based on other selections */
+  variants?: ProductVariantSnapshot[];
 };
 
 function OptionHeading({
@@ -127,10 +135,27 @@ export function ProductOptionPicker({
   selections,
   onChange,
   errors = {},
+  variants = [],
 }: ProductOptionPickerProps) {
+  const enriched = useMemo(() => {
+    if (!variants.length) return options;
+    return options.map((option) => ({
+      ...option,
+      values: option.values.map((val) => ({
+        ...val,
+        available: isOptionValueAvailableForSelections(
+          variants,
+          option.name,
+          val.value,
+          selections
+        ),
+      })),
+    }));
+  }, [options, variants, selections]);
+
   return (
     <div className="space-y-7 border-t border-niti-line pt-7">
-      {options.map((option) => {
+      {enriched.map((option) => {
         const selectedValue = selections[option.name];
         const hasError = Boolean(errors[option.name]);
         const isColor =

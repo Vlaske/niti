@@ -15,7 +15,7 @@ export function RoomNavStrip({ activeId }: RoomNavStripProps) {
 
   const linkClass = (active: boolean) =>
     cn(
-      "interactive shrink-0 border-b pb-1 text-[11px] font-medium uppercase tracking-[0.12em] sm:tracking-[0.16em] md:text-xs",
+      "interactive shrink-0 border-b py-2 text-[11px] font-medium uppercase tracking-[0.12em] sm:tracking-[0.16em] md:py-1 md:text-xs",
       active
         ? "border-niti-charcoal text-niti-charcoal"
         : "border-transparent text-niti-muted hover:text-niti-charcoal"
@@ -24,7 +24,7 @@ export function RoomNavStrip({ activeId }: RoomNavStripProps) {
   return (
     <nav className="border-b border-niti-line bg-niti-cream">
       <div className="mx-auto max-w-[1440px] px-4 md:px-8 lg:px-12">
-        <div className="flex flex-wrap gap-x-4 gap-y-2.5 py-3.5 md:gap-x-8 md:py-5">
+        <div className="flex gap-x-5 overflow-x-auto py-3 scrollbar-hide md:flex-wrap md:gap-x-8 md:overflow-visible md:py-5">
           <Link
             href="/shop"
             className={linkClass(!activeId || activeId === "all")}

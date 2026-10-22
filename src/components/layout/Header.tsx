@@ -98,7 +98,7 @@ export function Header({ variant = "solid" }: HeaderProps) {
                 type="button"
                 aria-label={menuOpen ? "Zatvori meni" : "Otvori meni"}
                 onClick={() => setMenuOpen((o) => !o)}
-                className="interactive shrink-0 p-1.5 lg:hidden"
+                className="interactive flex h-11 w-11 shrink-0 items-center justify-center lg:hidden"
               >
                 {menuOpen ? (
                   <X className="h-6 w-6" strokeWidth={1.5} />
@@ -138,7 +138,7 @@ export function Header({ variant = "solid" }: HeaderProps) {
               href="/"
               className={cn(
                 "interactive shrink-0 font-serif font-bold leading-none tracking-[0.14em] transition-transform hover:scale-[1.02] sm:tracking-[0.2em]",
-                "text-[1.85rem] sm:text-[2.5rem] md:text-[2.65rem] lg:text-[2.85rem]",
+                "text-[1.65rem] min-[380px]:text-[1.85rem] sm:text-[2.35rem] md:text-[2.65rem] lg:text-[2.85rem]",
                 "px-0.5 sm:px-1 md:px-3",
                 isTransparent && !megaOpen
                   ? "text-white drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)]"
@@ -162,14 +162,14 @@ export function Header({ variant = "solid" }: HeaderProps) {
               <button
                 type="button"
                 onClick={openSearch}
-                className="interactive hidden p-2 md:block"
+                className="interactive hidden p-2 lg:block"
                 aria-label={t("nav.search")}
               >
                 <Search className="h-5 w-5" strokeWidth={1.5} />
               </button>
               <Link
                 href="/cart"
-                className="interactive flex items-center gap-2 p-2"
+                className="interactive flex h-11 items-center gap-2 px-2"
                 aria-label={t("nav.cart")}
               >
                 <span className="relative">
@@ -187,7 +187,7 @@ export function Header({ variant = "solid" }: HeaderProps) {
               <button
                 type="button"
                 onClick={openSearch}
-                className="interactive p-2 lg:hidden"
+                className="interactive flex h-11 w-11 items-center justify-center lg:hidden"
                 aria-label={t("nav.search")}
               >
                 <Search className="h-5 w-5" strokeWidth={1.5} />

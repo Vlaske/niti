@@ -18,10 +18,10 @@ export default function PovratiPage() {
       <p>
         Za pokretanje povrata pišite na{" "}
         <a
-          href="mailto:hello@niti.home"
+          href="mailto:info@nitihome.rs"
           className="text-niti-charcoal underline underline-offset-2"
         >
-          hello@niti.home
+          info@nitihome.rs
         </a>{" "}
         sa brojem porudžbine. Troškove povratne pošiljke dogovaramo od
         slučaja do slučaja.

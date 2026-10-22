@@ -9,17 +9,16 @@ import { DesignCarousel } from "@/components/home/DesignCarousel";
 import { FeaturedHero } from "@/components/home/FeaturedHero";
 // import { MarqueeBanner } from "@/components/home/MarqueeBanner";
 import { FaqSection } from "@/components/home/FaqSection";
-import { getAllProducts, getNewArrivalsProducts } from "@/lib/catalog";
+import { getNewArrivalsProducts } from "@/lib/catalog";
 import { getDesignShowcaseItems } from "@/lib/catalog/design-showcase";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [products, designShowcase] = await Promise.all([
-    getAllProducts(),
+  const [newArrivals, designShowcase] = await Promise.all([
+    getNewArrivalsProducts(),
     getDesignShowcaseItems(),
   ]);
-  const newArrivals = await getNewArrivalsProducts(products);
   return (
     <HomeLoaderProvider>
       <HeroMediaPreload />

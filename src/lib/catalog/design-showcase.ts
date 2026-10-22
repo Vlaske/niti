@@ -1,6 +1,5 @@
 import { designShowcaseEntries } from "@/config/design-showcase";
-import { getAllProducts, getProductByHandle } from "@/lib/catalog";
-import type { Product } from "@/types";
+import { getProductByHandle } from "@/lib/catalog";
 
 export type DesignShowcaseItem = {
   id: string;
@@ -15,51 +14,21 @@ export type DesignShowcaseItem = {
   poster: string;
 };
 
-function resolveProduct(
-  entryHandle: string,
-  entryId: string,
-  allProducts: Product[]
-): Product | null {
-  const direct = allProducts.find((p) => p.handle === entryHandle);
-  if (direct) return direct;
-
-  return new Promise<Product | null>((resolve) => {
-    getProductByHandle(entryHandle).then((fetched) => {
-      if (fetched) {
-        resolve(fetched);
-        return;
-      }
-      const idx = parseInt(entryId, 10) - 1;
-      const fallback = allProducts[idx] ?? null;
-      if (fallback) {
-        console.warn(
-          `[design-showcase] Handle "${entryHandle}" nije pronađen — koristim "${fallback.handle}" za stavku ${entryId}. Ažuriraj src/config/design-showcase.ts`
-        );
-      }
-      resolve(fallback);
-    });
-  }) as unknown as Product | null;
-}
-
 export async function getDesignShowcaseItems(): Promise<DesignShowcaseItem[]> {
   const items: DesignShowcaseItem[] = [];
-  const allProducts = await getAllProducts();
+  const products = await Promise.all(
+    designShowcaseEntries.map((entry) => getProductByHandle(entry.productHandle))
+  );
 
-  for (const entry of designShowcaseEntries) {
-    let product = allProducts.find((p) => p.handle === entry.productHandle);
+  for (let i = 0; i < designShowcaseEntries.length; i++) {
+    const entry = designShowcaseEntries[i]!;
+    const product = products[i];
     if (!product) {
-      product = (await getProductByHandle(entry.productHandle)) ?? undefined;
+      console.warn(
+        `[design-showcase] Handle "${entry.productHandle}" nije pronađen — stavka ${entry.id} je preskočena. Ažuriraj src/config/design-showcase.ts`
+      );
+      continue;
     }
-    if (!product) {
-      const idx = parseInt(entry.id, 10) - 1;
-      product = allProducts[idx];
-      if (product) {
-        console.warn(
-          `[design-showcase] Handle "${entry.productHandle}" nije pronađen — koristim "${product.handle}" za stavku ${entry.id}. Ažuriraj src/config/design-showcase.ts`
-        );
-      }
-    }
-    if (!product) continue;
 
     const mediaType = entry.mediaType ?? "image";
     const poster = entry.poster ?? product.image;

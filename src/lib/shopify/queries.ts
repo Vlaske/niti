@@ -1,3 +1,5 @@
+import { productMetafieldsSelection } from "@/lib/shopify/product-metafields";
+
 export const PRODUCT_CARD_FRAGMENT = `
   fragment ProductCard on Product {
     id
@@ -77,6 +79,8 @@ export const PRODUCT_CARD_FRAGMENT = `
         id
         title
         availableForSale
+        sku
+        barcode
         image {
           id
           url
@@ -116,8 +120,105 @@ export const SHOP_NAME_QUERY = `
   }
 `;
 
+/** Grid, search, and recommendations — no HTML description or duplicate media. */
+export const PRODUCT_LISTING_FRAGMENT = `
+  fragment ProductListing on Product {
+    id
+    handle
+    title
+    description
+    vendor
+    options {
+      name
+      values
+      optionValues {
+        name
+        swatch {
+          color
+          image {
+            ... on MediaImage {
+              image {
+                url
+                altText
+              }
+            }
+          }
+        }
+        firstSelectableVariant {
+          image {
+            id
+            url
+            altText
+          }
+        }
+      }
+    }
+    tags
+    availableForSale
+    featuredImage {
+      id
+      url
+      altText
+    }
+    images(first: 8) {
+      nodes {
+        url
+        altText
+      }
+    }
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+      maxVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    compareAtPriceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+    }
+    variants(first: 100) {
+      nodes {
+        id
+        title
+        availableForSale
+        sku
+        barcode
+        image {
+          id
+          url
+          altText
+        }
+        price {
+          amount
+          currencyCode
+        }
+        compareAtPrice {
+          amount
+          currencyCode
+        }
+        selectedOptions {
+          name
+          value
+        }
+      }
+    }
+    collections(first: 16) {
+      nodes {
+        handle
+        title
+      }
+    }
+  }
+`;
+
 export const PRODUCTS_QUERY = `
-  ${PRODUCT_CARD_FRAGMENT}
+  ${PRODUCT_LISTING_FRAGMENT}
   query Products($first: Int!, $after: String) {
     products(first: $first, after: $after, sortKey: CREATED_AT, reverse: true) {
       pageInfo {
@@ -125,7 +226,7 @@ export const PRODUCTS_QUERY = `
         endCursor
       }
       nodes {
-        ...ProductCard
+        ...ProductListing
       }
     }
   }
@@ -136,12 +237,13 @@ export const PRODUCT_BY_HANDLE_QUERY = `
   query ProductByHandle($handle: String!) {
     product(handle: $handle) {
       ...ProductCard
+      ${productMetafieldsSelection()}
     }
   }
 `;
 
 export const COLLECTION_PRODUCTS_QUERY = `
-  ${PRODUCT_CARD_FRAGMENT}
+  ${PRODUCT_LISTING_FRAGMENT}
   query CollectionProducts($handle: String!, $first: Int!, $after: String) {
     collection(handle: $handle) {
       id
@@ -153,9 +255,18 @@ export const COLLECTION_PRODUCTS_QUERY = `
           endCursor
         }
         nodes {
-          ...ProductCard
+          ...ProductListing
         }
       }
+    }
+  }
+`;
+
+export const PRODUCT_RECOMMENDATIONS_QUERY = `
+  ${PRODUCT_LISTING_FRAGMENT}
+  query ProductRecommendations($productId: ID!) {
+    productRecommendations(productId: $productId) {
+      ...ProductListing
     }
   }
 `;

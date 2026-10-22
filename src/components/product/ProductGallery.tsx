@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { normalizeImageUrl } from "@/lib/shopify/color-images";
 import { cn } from "@/lib/utils";
 
 type ProductGalleryProps = {
@@ -24,8 +25,20 @@ export function ProductGallery({
 }: ProductGalleryProps) {
   const list = images.length > 0 ? images : [];
   const [index, setIndex] = useState(0);
+  const preferredKey = preferredSrc ?? "";
+  const selectionKey = `${title}::${preferredKey}`;
+  const [seenSelection, setSeenSelection] = useState(selectionKey);
   const thumbsRef = useRef<HTMLDivElement>(null);
   const mobileThumbsRef = useRef<HTMLDivElement>(null);
+
+  if (selectionKey !== seenSelection) {
+    setSeenSelection(selectionKey);
+    const target = preferredKey ? normalizeImageUrl(preferredKey) : "";
+    const next = target
+      ? list.findIndex((src) => normalizeImageUrl(src) === target)
+      : 0;
+    if (next >= 0 && next !== index) setIndex(next);
+  }
 
   const hasMultiple = list.length > 1;
 
@@ -36,16 +49,6 @@ export function ProductGallery({
   const goNext = useCallback(() => {
     setIndex((i) => (i + 1) % list.length);
   }, [list.length]);
-
-  useEffect(() => {
-    if (!preferredSrc) return;
-    const i = list.findIndex((src) => src === preferredSrc);
-    if (i >= 0) setIndex(i);
-  }, [preferredSrc, list]);
-
-  useEffect(() => {
-    setIndex(0);
-  }, [title]);
 
   useEffect(() => {
     const scrollThumb = (
@@ -176,7 +179,7 @@ export function ProductGallery({
                 onClick={() => setIndex(i)}
                 aria-label={`Slika ${i + 1}`}
                 className={cn(
-                  "interactive relative h-14 w-14 shrink-0 overflow-hidden border",
+                  "interactive relative h-16 w-16 shrink-0 overflow-hidden border",
                   i === index
                     ? "border-niti-charcoal"
                     : "border-niti-line opacity-75"
@@ -187,7 +190,7 @@ export function ProductGallery({
                   alt=""
                   fill
                   className="pointer-events-none object-cover"
-                  sizes="56px"
+                  sizes="64px"
                   draggable={false}
                 />
               </button>

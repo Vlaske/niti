@@ -16,6 +16,10 @@ import {
   isColorOptionName,
   mapVariantSnapshots,
 } from "@/lib/shopify/variants";
+import {
+  mapProductMetafields,
+  type ShopifyMetafieldNode,
+} from "@/lib/shopify/product-metafields";
 import type { CartItem, Product, ProductColor } from "@/types";
 
 type ShopifyMoney = { amount: string; currencyCode: string };
@@ -28,6 +32,8 @@ type ShopifyVariant = {
   compareAtPrice?: ShopifyMoney | null;
   selectedOptions: { name: string; value: string }[];
   image?: { id?: string; url: string; altText?: string | null } | null;
+  sku?: string | null;
+  barcode?: string | null;
 };
 
 export type ShopifyProductNode = {
@@ -62,6 +68,7 @@ export type ShopifyProductNode = {
   };
   variants: { nodes: ShopifyVariant[] };
   collections: { nodes: { handle: string; title: string }[] };
+  metafields?: (ShopifyMetafieldNode | null)[] | null;
 };
 
 function parseMoneyAmount(money?: ShopifyMoney | null): number {
@@ -449,7 +456,16 @@ export function mapShopifyProduct(node: ShopifyProductNode): Product {
   const image = productImageSrc(node.featuredImage?.url ?? images[0]);
 
   const isNew = node.tags.some((t) =>
-    ["new", "novo", "new-arrival"].includes(t.toLowerCase())
+    [
+      "new",
+      "novo",
+      "new-arrival",
+      "new-arrivals",
+      "novo-u-ponudi",
+      "novo u ponudi",
+      "showcase:novo",
+      "showcase:new-arrivals",
+    ].includes(t.toLowerCase().trim())
   );
   const isSale =
     compareAt > 0 && compareAt > minPrice;
@@ -485,12 +501,13 @@ export function mapShopifyProduct(node: ShopifyProductNode): Product {
   const plainDescription = node.description?.trim()
     ? node.description
     : stripHtml(node.descriptionHtml ?? "");
+  const metafields = mapProductMetafields(node.metafields);
 
   return {
     id: node.id,
     handle: node.handle,
     title: node.title,
-    brand: node.vendor || "NITI.",
+    brand: "NITI.",
     description: plainDescription,
     descriptionHtml: node.descriptionHtml || undefined,
     price: minPrice,
@@ -504,6 +521,7 @@ export function mapShopifyProduct(node: ShopifyProductNode): Product {
     colorImages: colorImages && Object.keys(colorImages).length
       ? colorImages
       : undefined,
+    metafields: metafields.length ? metafields : undefined,
     colors: buildColors(variants),
     options: options.length ? options : undefined,
     variants: variantSnapshots,
@@ -580,7 +598,7 @@ export function mapCartLines(cart: ShopifyCartPayload): CartItem[] {
       id: m.product.id,
       handle: m.product.handle,
       title: m.product.title,
-      brand: m.product.vendor || "NITI.",
+      brand: "NITI.",
       description: "",
       price: parseMoneyAmount(m.price),
       category: "accessories",

@@ -329,6 +329,26 @@ export function buildColorImageMap(
     if (mediaHit) result[color] = mediaHit.url;
   }
 
+  // A color whose only photo is the featured image was skipped above on purpose,
+  // so it would not be copied onto every color. If that color really owns the
+  // featured shot, keep it — otherwise switching back to it has no image.
+  for (const color of colorValues) {
+    if (result[color]) continue;
+    const urlsForColor: string[] = [];
+    for (const v of variants) {
+      const matchesColor = v.selectedOptions.some(
+        (o) => o.name === colorOptionName && o.value === color
+      );
+      if (!matchesColor) continue;
+      const url = getVariantImageUrl(v);
+      if (url) urlsForColor.push(url);
+    }
+    const unique = new Set(urlsForColor.map(normalizeImageUrl));
+    if (unique.size === 1 && urlsForColor[0]) {
+      result[color] = urlsForColor[0];
+    }
+  }
+
   const urls = Object.values(result);
   if (urls.length > 1 && new Set(urls.map(normalizeImageUrl)).size === 1) {
     return {};

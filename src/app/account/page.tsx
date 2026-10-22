@@ -16,14 +16,13 @@ export default function AccountPage() {
           Nalog kupca
         </h1>
         <p className="mt-4 text-sm leading-relaxed text-niti-muted md:text-base">
-          Lični nalozi stižu uz Shopify Customer Accounts — praćenje porudžbina,
-          adrese i brži checkout. Do tada porudžbine završavate bez naloga, a
-          pitanja šaljite na{" "}
+          Porudžbine završavate na checkout-u, bez naloga. Za pitanja o
+          porudžbini ili tekstilu pišite na{" "}
           <a
-            href="mailto:hello@niti.home"
+            href="mailto:info@nitihome.rs"
             className="interactive text-niti-charcoal underline underline-offset-2"
           >
-            hello@niti.home
+            info@nitihome.rs
           </a>
           .
         </p>

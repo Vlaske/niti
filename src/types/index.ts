@@ -1,3 +1,9 @@
+export type ProductMetafield = {
+  namespace: string;
+  key: string;
+  value: string;
+};
+
 export type ProductColor = {
   name: string;
   hex: string;
@@ -28,6 +34,8 @@ export type ProductVariantSnapshot = {
   compareAtPrice?: number;
   selectedOptions: { name: string; value: string }[];
   image?: string;
+  sku?: string;
+  barcode?: string;
 };
 
 export type Product = {
@@ -51,6 +59,8 @@ export type Product = {
   media?: { url: string; altText?: string }[];
   /** Resolved color value → image URL (unique per color only) */
   colorImages?: Record<string, string>;
+  /** Shopify product metafields exposed on the storefront (namespace niti) */
+  metafields?: ProductMetafield[];
   /** @deprecated Koristi options */
   colors?: ProductColor[];
   options?: ProductOption[];

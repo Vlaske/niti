@@ -22,10 +22,10 @@ export function LegalPage({ title, children }: LegalPageProps) {
         <p className="mt-10 text-sm text-niti-muted">
           Pitanja?{" "}
           <a
-            href="mailto:hello@niti.home"
+            href="mailto:info@nitihome.rs"
             className="interactive text-niti-charcoal underline underline-offset-2"
           >
-            hello@niti.home
+            info@nitihome.rs
           </a>
           {" · "}
           <Link href="/shop" className="interactive text-niti-charcoal underline underline-offset-2">

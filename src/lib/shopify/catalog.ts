@@ -4,6 +4,7 @@ import { mapShopifyProduct, type ShopifyProductNode } from "@/lib/shopify/mapper
 import {
   COLLECTION_PRODUCTS_QUERY,
   PRODUCT_BY_HANDLE_QUERY,
+  PRODUCT_RECOMMENDATIONS_QUERY,
   PRODUCTS_QUERY,
 } from "@/lib/shopify/queries";
 import type { Product } from "@/types";
@@ -111,6 +112,16 @@ export async function fetchShopifyCollectionProducts(
   }
 
   return nodes.map(mapShopifyProduct);
+}
+
+export async function fetchShopifyRecommendations(
+  productId: string
+): Promise<Product[]> {
+  const data = await shopifyFetch<{
+    productRecommendations: ShopifyProductNode[] | null;
+  }>(PRODUCT_RECOMMENDATIONS_QUERY, { productId }, { revalidate: 60 });
+
+  return (data.productRecommendations ?? []).map(mapShopifyProduct);
 }
 
 export async function fetchShopifyNewArrivalsCollection(): Promise<Product[]> {
