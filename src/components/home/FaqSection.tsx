@@ -22,7 +22,7 @@ export function FaqSection() {
         <div className="relative min-h-[360px] lg:min-h-[640px]">
           <Image
             src={FAQ_SECTION_IMAGE}
-            alt="Mekana posteljina i miran enterijer — NITI."
+            alt="Mekana posteljina i miran enterijer - NITI."
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 50vw"
@@ -30,17 +30,12 @@ export function FaqSection() {
         </div>
 
         <div className="bg-niti-sand px-4 py-14 md:px-10 md:py-20 lg:px-14">
-          <div
+          <h2
             data-faq-reveal
-            className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
+            className="mb-8 text-2xl font-semibold text-niti-charcoal md:mb-10 md:text-3xl"
           >
-            <h2 className="text-2xl font-semibold text-niti-charcoal md:text-3xl">
-              {t("home.faqTitle")}
-            </h2>
-            <p className="max-w-xs text-sm text-niti-muted">
-              {t("home.faqHint")}
-            </p>
-          </div>
+            {t("home.faqTitle")}
+          </h2>
 
           <ul className="divide-y divide-niti-charcoal/10">
             {faqItems.map((item) => {

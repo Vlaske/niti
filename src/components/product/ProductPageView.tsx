@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
 import { ProductGallery } from "@/components/product/ProductGallery";
+import { ProductInfoPanel } from "@/components/product/ProductInfoPanel";
 import {
   ProductDetails,
   getDefaultProductSelections,
@@ -20,6 +21,7 @@ import {
   getStoreCategoryBySlug,
 } from "@/config/store-categories";
 import type { Product } from "@/types";
+import { prefersReducedMotion } from "@/lib/animations";
 import { productImageSrc } from "@/lib/product-image";
 import { normalizeImageUrl } from "@/lib/shopify/color-images";
 
@@ -27,6 +29,69 @@ type ProductPageViewProps = {
   product: Product;
   related: Product[];
 };
+
+/** Gallery follows the scroll, and stops with the right-hand column. */
+function BoundedGallery({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    let lastY = window.scrollY;
+    let top = 0;
+
+    const headerGap = () => {
+      const raw = getComputedStyle(document.documentElement)
+        .getPropertyValue("--header-offset")
+        .trim();
+      const parsed = Number.parseFloat(raw);
+      return (Number.isFinite(parsed) ? parsed : 64) + 16;
+    };
+
+    const place = (delta: number) => {
+      if (!desktop.matches) {
+        el.style.top = "";
+        return;
+      }
+      const header = headerGap();
+      const minTop = Math.min(header, window.innerHeight - el.offsetHeight - 16);
+      top = Math.min(header, Math.max(minTop, top - delta));
+      el.style.top = `${top}px`;
+    };
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      lastY = y;
+      place(delta);
+    };
+
+    const onResize = () => {
+      lastY = window.scrollY;
+      place(0);
+    };
+
+    top = headerGap();
+    place(0);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    const observer = new ResizeObserver(onResize);
+    observer.observe(el);
+    if (el.parentElement) observer.observe(el.parentElement);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      observer.disconnect();
+    };
+  }, []);
+
+  return (
+    <div ref={ref} className="lg:sticky lg:self-start">
+      {children}
+    </div>
+  );
+}
 
 export function ProductPageView({
   product,
@@ -73,7 +138,7 @@ export function ProductPageView({
   }, [product.handle, addViewed]);
 
   useEffect(() => {
-    if (!mainRef.current) return;
+    if (!mainRef.current || prefersReducedMotion()) return;
     const els = mainRef.current.querySelectorAll("[data-pdp-reveal]");
     gsap.fromTo(
       els,
@@ -90,7 +155,7 @@ export function ProductPageView({
     <div ref={mainRef}>
       <nav
         data-pdp-reveal
-        className="mb-5 mt-4 flex flex-wrap gap-1 pt-2 text-xs text-niti-muted sm:text-sm md:mb-8 md:mt-10 md:pt-4"
+        className="mb-5 mt-8 flex flex-wrap gap-1 text-xs text-niti-muted sm:text-sm md:mb-8 md:mt-12"
       >
         <Link href="/" className="interactive hover:text-niti-charcoal">
           {t("product.home")}
@@ -124,12 +189,16 @@ export function ProductPageView({
       </nav>
 
       <div className="grid items-start gap-8 md:gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:gap-12 xl:gap-16">
-        <div data-pdp-reveal className="min-w-0">
-          <ProductGallery
-            images={images}
-            title={product.title}
-            preferredSrc={preferredSrc}
-          />
+        <div className="min-w-0 self-stretch">
+          <BoundedGallery>
+            <div data-pdp-reveal>
+              <ProductGallery
+                images={images}
+                title={product.title}
+                preferredSrc={preferredSrc}
+              />
+            </div>
+          </BoundedGallery>
         </div>
         <div data-pdp-reveal className="min-w-0">
           <ProductDetails
@@ -137,13 +206,14 @@ export function ProductPageView({
             selections={selections}
             onSelectionsChange={setSelections}
           />
+          <ProductInfoPanel product={product} />
         </div>
       </div>
 
       {related.length > 0 && (
         <section className="mt-10 border-t border-niti-line pt-10 md:mt-12 md:pt-16">
           <SectionHeader title={t("product.alsoLike")} className="mb-6 md:mb-10" />
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-6">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 md:grid-cols-4 md:gap-x-8 md:gap-y-12">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
@@ -157,7 +227,7 @@ export function ProductPageView({
             title={t("product.recentlyViewed")}
             className="mb-6 md:mb-10"
           />
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-6">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 md:grid-cols-4 md:gap-x-8 md:gap-y-12">
             {recentExcluding.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}

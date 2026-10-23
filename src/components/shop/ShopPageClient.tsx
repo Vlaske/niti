@@ -40,11 +40,12 @@ type ShopPageClientProps = {
 };
 
 const GRID_CLASS: Record<GridDensity, string> = {
-  large: "grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-2 md:gap-6 lg:grid-cols-3",
+  large:
+    "grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 md:grid-cols-2 md:gap-x-8 md:gap-y-12 lg:grid-cols-3",
   medium:
-    "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4",
+    "grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-6 sm:gap-y-10 md:grid-cols-3 md:gap-x-8 md:gap-y-12 lg:grid-cols-4",
   small:
-    "grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6",
+    "grid grid-cols-2 gap-x-3 gap-y-7 sm:grid-cols-3 sm:gap-x-4 md:grid-cols-4 md:gap-y-9 lg:grid-cols-5 xl:grid-cols-6",
 };
 
 function GridDensityIcon({

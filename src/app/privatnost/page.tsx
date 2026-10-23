@@ -8,11 +8,12 @@ export default function PrivatnostPage() {
       <p>
         NITI. obrađuje lične podatke potrebne za porudžbinu, dostavu i
         komunikaciju (ime, adresa, email, telefon). Plaćanje obrađuje Shopify
-        i njihovi procesori — mi ne čuvamo podatke o karticama.
+        i njihovi procesori - mi ne čuvamo podatke o karticama.
       </p>
       <p>
-        Prijava na newsletter šalje vašu email adresu na info@nitihome.rs.
-        Koristimo je samo za novosti o kolekcijama i nezi tekstila.
+        Prijava na newsletter čuva vašu email adresu radi novosti o
+        kolekcijama i nezi tekstila. Odjava je moguća u svakom mailu, ili
+        pisanjem na info@nitihome.rs.
       </p>
       <p>
         Za zahteve oko pristupa ili brisanja podataka pišite na{" "}

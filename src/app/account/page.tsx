@@ -16,7 +16,7 @@ export default function AccountPage() {
           Nalog kupca
         </h1>
         <p className="mt-4 text-sm leading-relaxed text-niti-muted md:text-base">
-          Porudžbine završavate na checkout-u, bez naloga. Za pitanja o
+          Porudžbine završavate pri plaćanju, bez naloga. Za pitanja o
           porudžbini ili tekstilu pišite na{" "}
           <a
             href="mailto:info@nitihome.rs"

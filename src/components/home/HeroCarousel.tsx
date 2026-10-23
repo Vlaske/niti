@@ -152,7 +152,7 @@ export function HeroCarousel() {
           data-hero-tag
           className="mb-3 w-fit border border-white/55 px-3 py-1.5 text-xs text-white/95 md:mb-5 md:text-sm"
         >
-          {slide.productTag ?? "Premium tekstil — NITI."}
+          {slide.productTag ?? "Premium tekstil - NITI."}
         </p>
 
         <p

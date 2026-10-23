@@ -1,7 +1,7 @@
 import type { Category } from "@/types";
 import { PLACEHOLDER_IMAGES } from "@/config/placeholders";
 
-/** Prostorije / programi — glavni sloj navigacije za kupca */
+/** Prostorije / programi - glavni sloj navigacije za kupca */
 export type CategoryGroupId =
   | "spavaca-soba"
   | "kupatilo"
@@ -63,7 +63,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
  * Specifične stvari poput „čaršav sa lastišem”, „nepromočivi čaršavi”,
  * „plažni peškiri”, „frotirni prekrivači” i sl. treba da budu
  * sekundarni sloj u Shopify-u: tagovi, product type, metafields ili dodatne
- * kolekcije — ne glavni nivo navigacije.
+ * kolekcije - ne glavni nivo navigacije.
  */
 export type StoreCategoryConfig = Category & {
   collectionHandle: string;
@@ -75,7 +75,7 @@ export type StoreCategoryConfig = Category & {
 };
 
 export const STORE_CATEGORIES: StoreCategoryConfig[] = [
-  // —— Spavaća soba ——
+  // Spavaća soba
   {
     slug: "posteljine",
     collectionHandle: "posteljine",
@@ -100,7 +100,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     group: "spavaca-soba",
     featured: true,
     title: "Čaršavi",
-    description: "Klasični, lastiš i nepromočivi čaršavi — sve na jednom mestu.",
+    description: "Klasični, lastiš i nepromočivi čaršavi - sve na jednom mestu.",
     image: "",
     productCount: 0,
   },
@@ -111,7 +111,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     group: "spavaca-soba",
     featured: true,
     title: "Jastuci",
-    description: "Jastuci za svaki stil spavanja — od klasičnih do memorijske pene.",
+    description: "Jastuci za svaki stil spavanja - od klasičnih do memorijske pene.",
     image: "",
     productCount: 0,
   },
@@ -122,7 +122,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     group: "spavaca-soba",
     featured: true,
     title: "Jastučnice",
-    description: "Jastučnice za krevet — pamuk, saten i dezeni.",
+    description: "Jastučnice za krevet - pamuk, saten i dezeni.",
     image: "",
     productCount: 0,
   },
@@ -150,7 +150,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     group: "spavaca-soba",
     featured: true,
     title: "Jorgani i prekrivači",
-    description: "Topli slojevi za krevet — od jorgana do dekorativnih prekrivača.",
+    description: "Topli slojevi za krevet - od jorgana do dekorativnih prekrivača.",
     image: "",
     productCount: 0,
   },
@@ -176,7 +176,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     productCount: 0,
   },
 
-  // —— Kupatilo ——
+  // Kupatilo
   {
     slug: "peskiri",
     collectionHandle: "peskiri",
@@ -184,7 +184,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     group: "kupatilo",
     featured: true,
     title: "Peškiri",
-    description: "Klasični i plažni peškiri — mekani, upijajući i dugotrajni.",
+    description: "Klasični i plažni peškiri - mekani, upijajući i dugotrajni.",
     image: "",
     productCount: 0,
   },
@@ -220,7 +220,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     productCount: 0,
   },
 
-  // —— Kuhinja ——
+  // Kuhinja
   {
     slug: "stolnjaci",
     collectionHandle: "stolnjaci",
@@ -239,7 +239,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     group: "kuhinja",
     featured: true,
     title: "Kuhinjske krpe",
-    description: "Krpe za sudove i radnu površinu — praktične i lepe.",
+    description: "Krpe za sudove i radnu površinu - praktične i lepe.",
     image: "",
     productCount: 0,
   },
@@ -255,7 +255,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     productCount: 0,
   },
 
-  // —— Dnevna soba ——
+  // Dnevna soba
   {
     slug: "dekorativni-tekstil",
     collectionHandle: "dekorativni-tekstil",
@@ -274,7 +274,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     productCount: 0,
   },
 
-  // —— Dečiji program ——
+  // Dečiji program
   {
     slug: "decija-posteljina",
     collectionHandle: "decija-posteljina",
@@ -327,7 +327,7 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
     productCount: 0,
   },
 
-  // —— Hotelski program ——
+  // Hotelski program
   {
     slug: "hotelski-program",
     collectionHandle: "hotelski-program",
@@ -540,7 +540,7 @@ export const FILTER_TAG_LABELS: Record<string, string> = {
   "filter:memorijska-pena": "Memorijska pena",
 };
 
-/** Unique slugs for /shop/[category] — rooms + leaf categories */
+/** Unique slugs for /shop/[category] - rooms + leaf categories */
 export function getShopRouteSlugs(): string[] {
   return Array.from(new Set([...getGroupSlugs(), ...getCategorySlugs()]));
 }
@@ -599,7 +599,7 @@ export function getProductCategorySlugs(product: {
   return [...new Set(slugs.filter(Boolean))];
 }
 
-/** Product appears in this room or leaf — supports overlap. */
+/** Product appears in this room or leaf - supports overlap. */
 export function productMatchesCategory(
   product: { category: string; categories?: string[] },
   slug: string

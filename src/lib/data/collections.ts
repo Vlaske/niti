@@ -44,7 +44,7 @@ export const faqItems: FaqItem[] = [
     id: "2",
     question: "Kako da izaberem veličinu?",
     answer:
-      "Na stranici proizvoda birate veličinu (npr. 160×200, 200×220) i boju pre dodavanja u korpu. Ako niste sigurni, pišite nam — pomoći ćemo oko dimenzija kreveta i čaršava.",
+      "Na stranici proizvoda birate veličinu (npr. 160×200, 200×220) i boju pre dodavanja u korpu. Ako niste sigurni, pišite nam - pomoći ćemo oko dimenzija kreveta i čaršava.",
   },
   {
     id: "3",
@@ -56,7 +56,7 @@ export const faqItems: FaqItem[] = [
   //   id: "4",
   //   question: "Da li nudite besplatnu dostavu?",
   //   answer:
-  //     "Da — besplatna standardna dostava za porudžbine preko 13.000 RSD. Tačan iznos i rokovi potvrđuju se na Shopify checkout stranici pre plaćanja.",
+  //     "Da - besplatna standardna dostava za porudžbine preko 13.000 RSD. Tačan iznos i rokovi potvrđuju se na Shopify checkout stranici pre plaćanja.",
   // },
   {
     id: "4",
@@ -70,12 +70,12 @@ export const faqItems: FaqItem[] = [
     id: "5",
     question: "Koja je politika povrata?",
     answer:
-      "Neiskorišćene artikle u originalnom stanju možete vratiti u roku od 30 dana. Detalje (troškovi, izuzeci za otvorenu posteljinu) dogovaramo putem podrške — pišite na info@nitihome.rs.",
+      "Neiskorišćene artikle u originalnom stanju možete vratiti u roku od 14 dana. Detalje (troškovi, izuzeci za otvorenu posteljinu) dogovaramo putem podrške - pišite na info@nitihome.rs.",
   },
 ];
 
 export const valueProps = [
-  // Free-shipping promo — re-enable when threshold is confirmed in Shopify
+  // Free-shipping promo - re-enable when threshold is confirmed in Shopify
   // {
   //   icon: "shipping",
   //   title: "Besplatna dostava",
@@ -85,12 +85,12 @@ export const valueProps = [
     icon: "shipping",
     title: "Dostava",
     description: "Šaljemo širom Srbije.",
-    // description: "Šaljemo širom Srbije — trošak i rok vidiš pri plaćanju.",
+    // description: "Šaljemo širom Srbije - trošak i rok vidiš pri plaćanju.",
   },
   {
     icon: "service",
     title: "Podrška kupcima",
-    description: "Pomoć oko veličina, nege i porudžbina — odgovaramo radnim danom.",
+    description: "Pomoć oko veličina, nege i porudžbina.",
   },
   {
     icon: "payment",
@@ -100,7 +100,6 @@ export const valueProps = [
   {
     icon: "contact",
     title: "Kontakt",
-    description:
-      "info@nitihome.rs i @nitihome.rs na Instagramu — tu smo za pitanja o tekstilu i porudžbinama.",
+    description: "info@nitihome.rs - tu smo za sva pitanja.",
   },
 ];

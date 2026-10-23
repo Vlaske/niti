@@ -7,12 +7,12 @@ export default function PovratiPage() {
     <LegalPage title="Povrati i zamene">
       <p>
         Neiskorišćene proizvode u originalnom stanju možete vratiti u roku od{" "}
-        <strong className="font-medium text-niti-charcoal">30 dana</strong> od
+        <strong className="font-medium text-niti-charcoal">14 dana</strong> od
         prijema.
       </p>
       <p>
         Za posteljinu i čaršave: ako ste otvorili pakovanje samo da
-        proverite veličinu i proizvod nije korišćen, javite nam se — dogovaramo
+        proverite veličinu i proizvod nije korišćen, javite nam se - dogovaramo
         zamenu ili kredit gde je moguće.
       </p>
       <p>

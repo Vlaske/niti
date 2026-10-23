@@ -108,7 +108,7 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
           </p>
         ) : (
           <>
-            <div className="mt-6 grid grid-cols-2 gap-3 md:hidden">
+            <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 md:hidden">
               {mobileSlice.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
@@ -116,7 +116,7 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
 
             <div className="relative mt-10 hidden overflow-hidden md:block">
               <div
-                className="flex gap-6 transition-transform duration-700 ease-out"
+                className="flex gap-8 transition-transform duration-700 ease-out"
                 style={{
                   transform: `translateX(-${offset * (100 / visibleDesktop)}%)`,
                 }}
@@ -124,7 +124,7 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
                 {filtered.map((product) => (
                   <div
                     key={product.id}
-                    className="w-[calc(25%-18px)] shrink-0"
+                    className="w-[calc(25%-24px)] shrink-0"
                   >
                     <ProductCard product={product} />
                   </div>

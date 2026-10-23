@@ -14,13 +14,16 @@ export function ProductDescription({
   className,
 }: ProductDescriptionProps) {
   if (html?.trim()) {
+    const cleaned = html
+      .replace(/<p>(?:\s|&nbsp;|<br\s*\/?>)*<\/p>/gi, "")
+      .replace(/(?:<br\s*\/?>\s*){3,}/gi, "<br><br>");
     return (
       <div
         className={cn(
-          "product-prose text-sm leading-relaxed text-niti-muted md:text-base",
+          "product-prose text-sm leading-relaxed text-niti-muted",
           className
         )}
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: cleaned }}
       />
     );
   }

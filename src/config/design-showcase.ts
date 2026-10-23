@@ -1,8 +1,8 @@
 /**
- * Sekcija „Gde dizajn oživljava“ — jedan fajl za sve izmene.
+ * Sekcija „Gde dizajn oživljava“ - jedan fajl za sve izmene.
  *
  * Kako ažurirati:
- * 1. `productHandle` — Shopify handle proizvoda (isti kao u URL-u /product/…)
+ * 1. `productHandle` - Shopify handle proizvoda (isti kao u URL-u /product/…)
  * 2. Video: stavi .mp4 u `public/videos/showcase/`, zatim:
  *    mediaType: "video",
  *    mediaSrc: "/videos/showcase/ime-fajla.mp4",
@@ -14,7 +14,7 @@
  */
 export type DesignShowcaseEntry = {
   id: string;
-  /** Shopify product handle — mora postojati u prodavnici */
+  /** Shopify product handle - mora postojati u prodavnici */
   productHandle: string;
   /** Kratki tekst preko videa (srpski) */
   description: string;
@@ -30,7 +30,7 @@ export const designShowcaseEntries: DesignShowcaseEntry[] = [
     id: "1",
     productHandle: "pamucni-carsav-sa-lastisem",
     description:
-      "Mekani slojevi i pastelnih tonova — posteljina koja poziva na odmor.",
+      "Mekani slojevi i pastelnih tonova - posteljina koja poziva na odmor.",
     mediaType: "video",
     mediaSrc: "/videos/showcase/prekrivac-live.mp4",
     poster:
@@ -39,7 +39,7 @@ export const designShowcaseEntries: DesignShowcaseEntry[] = [
   {
     id: "2",
     productHandle: "jastuk-premium",
-    description: "Savršena podrška i mekana tkanina — detalj koji čini razliku.",
+    description: "Savršena podrška i mekana tkanina - detalj koji čini razliku.",
     mediaType: "video",
     mediaSrc: "/videos/showcase/jastuk-live-1.mp4",
     poster:
@@ -48,7 +48,7 @@ export const designShowcaseEntries: DesignShowcaseEntry[] = [
   {
     id: "3",
     productHandle: "luksuzni-pamucni-peskir-niti",
-    description: "Osećaj kao kod kuće — peškiri koji voli vaša koža.",
+    description: "Osećaj kao kod kuće - peškiri koji voli vaša koža.",
     mediaType: "video",
     mediaSrc: "/videos/showcase/peskir-plaza-live.mp4",
     poster:

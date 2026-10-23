@@ -39,11 +39,11 @@ export const metadata: Metadata = {
       "https://niti.home"
   ),
   title: {
-    default: "NITI. — Premium tekstil za dom",
+    default: "NITI. - Premium tekstil za dom",
     template: "%s | NITI.",
   },
   description:
-    "Kućni tekstil za spavaću sobu, kupatilo i kuhinju — posteljine, peškiri, stolnjaci i više. NITI.",
+    "Kućni tekstil za spavaću sobu, kupatilo i kuhinju - posteljine, peškiri, stolnjaci i više. NITI.",
   icons: {
     icon: [{ url: "/brand/niti-favicon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/brand/niti-mark.svg" }],

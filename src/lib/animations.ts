@@ -12,6 +12,13 @@ export function registerGsap() {
   registered = true;
 }
 
+export function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
 /** Kill all GSAP scroll animations — call on route change */
 export function killAllScrollAnimations() {
   if (typeof window === "undefined") return;
@@ -45,7 +52,7 @@ export function useScrollReveal<T extends HTMLElement>(
     if (!root) return;
 
     const targets = root.querySelectorAll(selector);
-    if (!targets.length) return;
+    if (!targets.length || prefersReducedMotion()) return;
 
     gsap.set(targets, { opacity: 0, y: options?.y ?? 18 });
 
@@ -79,6 +86,8 @@ export function runHeroEntrance(container: HTMLElement) {
   gsap.killTweensOf([...tags, ...headlines, ...ctas]);
   gsap.set([...tags, ...headlines, ...ctas], { clearProps: "all" });
 
+  if (prefersReducedMotion()) return gsap.timeline();
+
   const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
   tl.from(tags, { opacity: 0, y: 20, duration: 0.7 })
     .from(headlines, { opacity: 0, y: 36, duration: 0.9 }, "-=0.4")
@@ -88,7 +97,7 @@ export function runHeroEntrance(container: HTMLElement) {
 }
 
 export function runHeroMediaZoom(mediaEl: Element | null) {
-  if (!mediaEl) return;
+  if (!mediaEl || prefersReducedMotion()) return;
   gsap.killTweensOf(mediaEl);
   return gsap.fromTo(
     mediaEl,

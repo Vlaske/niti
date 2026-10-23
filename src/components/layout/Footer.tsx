@@ -13,10 +13,8 @@ import { CATEGORY_GROUPS, getGroupHref } from "@/config/store-categories";
 import { useLanguage } from "@/context/LanguageContext";
 import { valueProps } from "@/lib/data/collections";
 
-const companyLinks = [
-  { label: "Kontakt", href: "mailto:info@nitihome.rs" },
-  { label: "Instagram", href: "https://www.instagram.com/nitihome.rs/" },
-];
+const LEGAL_NAME =
+  "Ljubiša Todorović PR, ostala trgovina na malo izvan prodavnica, tezgi i pijaca, Viktorija-KV Kraljevo";
 
 const careLinks = [
   { label: "Politika dostave", href: "/dostava" },
@@ -65,7 +63,7 @@ export function Footer() {
   return (
     <footer className="mt-auto">
       <section className="border-t border-niti-line bg-niti-cream py-10 md:py-14">
-        <div className={`${FOOTER_INSET} grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-4 md:gap-8`}>
+        <div className={`${FOOTER_INSET} grid grid-cols-1 gap-8 min-[480px]:grid-cols-2 lg:grid-cols-4 lg:gap-8`}>
           {valueProps.map((item) => (
             <div key={item.title} className="flex min-w-0 flex-col">
               <div className="mb-3 text-niti-charcoal">{icons[item.icon]}</div>
@@ -104,16 +102,30 @@ export function Footer() {
 
       <div className="bg-niti-footer text-white">
         <div
-          className={`${FOOTER_INSET} grid grid-cols-2 gap-x-8 gap-y-10 py-12 md:grid-cols-4 md:gap-x-10 md:py-14 lg:gap-x-12 lg:py-16`}
+          className={`${FOOTER_INSET} grid grid-cols-1 gap-10 py-12 sm:grid-cols-2 sm:gap-x-10 lg:grid-cols-[minmax(16rem,1.35fr)_1fr_1fr] lg:gap-x-14 lg:py-16`}
         >
-          <div className="col-span-2 md:col-span-1">
+          <div className="min-w-0 sm:col-span-2 lg:col-span-1">
             <p className="font-serif text-2xl font-semibold tracking-[0.12em] md:text-3xl">
               NITI.
             </p>
-            <div className="mt-5 space-y-2.5 text-sm text-white/70">
+            <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/90">
+              Podaci o privredniku
+            </p>
+            <p className="mt-2 max-w-md text-xs leading-relaxed text-white/70">
+              {LEGAL_NAME}
+            </p>
+            <div className="mt-4 space-y-2.5 text-sm text-white/70">
               <p className="flex items-start gap-2.5">
                 <Home className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} />
-                Beograd, Srbija
+                <span>
+                  Milorada Karapandžića Rakice br. 4
+                  <span className="mt-0.5 block">Kraljevo</span>
+                  <span className="mt-1.5 block text-xs tracking-wide text-white/55">
+                    MB 66008657
+                    <span className="mx-2 text-white/30">·</span>
+                    PIB 112297829
+                  </span>
+                </span>
               </p>
               <a
                 href="mailto:info@nitihome.rs"
@@ -144,29 +156,6 @@ export function Footer() {
               </a>
             </div>
           </div>
-
-          <FooterColumn title={t("footer.company")}>
-            <ul className="space-y-2.5 text-sm leading-snug text-white/70">
-              {companyLinks.map((l) => (
-                <li key={l.label}>
-                  {l.href.startsWith("http") ? (
-                    <a
-                      href={l.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="interactive hover:text-white"
-                    >
-                      {l.label}
-                    </a>
-                  ) : (
-                    <Link href={l.href} className="interactive hover:text-white">
-                      {l.label}
-                    </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </FooterColumn>
 
           <FooterColumn title={t("footer.shop")}>
             <ul className="space-y-2.5 text-sm leading-snug text-white/70">

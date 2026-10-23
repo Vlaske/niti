@@ -5,9 +5,39 @@ import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
+import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { formatPrice } from "@/lib/utils";
 import { productImageSrc } from "@/lib/product-image";
+
+function CartActions({ align = "center" }: { align?: "center" | "start" }) {
+  const { t } = useLanguage();
+  const { handles } = useRecentlyViewed();
+  const last = handles[0];
+
+  return (
+    <div
+      className={
+        align === "center"
+          ? "mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          : "col-span-full mb-2 flex flex-col gap-3 sm:flex-row"
+      }
+    >
+      <Button href="/shop" variant="secondary" className="min-h-12">
+        {t("cart.continue")}
+      </Button>
+      {last ? (
+        <Button
+          href={`/product/${last}`}
+          variant="outline"
+          className="min-h-12"
+        >
+          {t("cart.lastViewed")}
+        </Button>
+      ) : null}
+    </div>
+  );
+}
 
 export function CartContent() {
   const {
@@ -38,15 +68,14 @@ export function CartContent() {
     return (
       <div className="py-20 text-center">
         <p className="text-lg text-niti-muted">{t("cart.empty")}</p>
-        <Button href="/shop" variant="secondary" className="mt-8">
-          {t("cart.continue")}
-        </Button>
+        <CartActions />
       </div>
     );
   }
 
   return (
     <div className="grid gap-12 lg:grid-cols-[1fr_380px]">
+      <CartActions align="start" />
       {cartError && (
         <p className="col-span-full rounded-lg border border-niti-sale/30 bg-niti-sale/5 px-4 py-3 text-sm text-niti-sale">
           {cartError}

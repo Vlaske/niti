@@ -2,18 +2,17 @@
 
 import { useMemo, useRef, useState } from "react";
 import { gsap } from "gsap";
-import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
 import {
   findVariantBySelections,
-  isOptionValueAvailableForSelections,
   productRequiresOptionSelection,
+  selectionsAfterOptionChange,
 } from "@/lib/shopify/variants";
+import { prefersReducedMotion } from "@/lib/animations";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/types";
-import { ProductInfoPanel } from "./ProductInfoPanel";
 import { ProductOptionPicker } from "./ProductOptionPicker";
 
 type ProductDetailsProps = {
@@ -53,22 +52,9 @@ export function ProductDetails({
   );
 
   const handleOptionChange = (name: string, value: string) => {
-    const next: Record<string, string> = { ...selections, [name]: value };
-    // Drop other selections that no longer form a real variant with this choice
-    if (product.variants?.length) {
-      for (const opt of product.options ?? []) {
-        if (opt.name === name) continue;
-        const current = next[opt.name];
-        if (!current) continue;
-        const stillOk = isOptionValueAvailableForSelections(
-          product.variants,
-          opt.name,
-          current,
-          next
-        );
-        if (!stillOk) delete next[opt.name];
-      }
-    }
+    const next = product.variants?.length
+      ? selectionsAfterOptionChange(product.variants, selections, name, value)
+      : { ...selections, [name]: value };
     onSelectionsChange(next);
     if (product.options?.every((o) => Boolean(next[o.name]))) {
       setOptionErrors({});
@@ -99,7 +85,7 @@ export function ProductDetails({
 
     addItem(product, 1, { variantId, selectedColor, selections });
 
-    if (addBtnRef.current) {
+    if (addBtnRef.current && !prefersReducedMotion()) {
       gsap.fromTo(
         addBtnRef.current,
         { scale: 1 },
@@ -114,7 +100,7 @@ export function ProductDetails({
       : null;
 
   return (
-    <div className="lg:sticky lg:top-28 lg:self-start">
+    <div>
       <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-niti-muted">
         {product.brand}
       </p>
@@ -126,8 +112,8 @@ export function ProductDetails({
         <span
           className={
             savings
-              ? "text-xl font-semibold tracking-tight text-niti-sale sm:text-2xl"
-              : "text-xl font-semibold tracking-tight text-niti-charcoal sm:text-2xl"
+              ? "text-2xl font-medium tracking-tight text-niti-sale sm:text-[1.75rem]"
+              : "text-2xl font-medium tracking-tight text-niti-sage-deep sm:text-[1.75rem]"
           }
         >
           {formatPrice(displayPrice, locale)}
@@ -202,20 +188,6 @@ export function ProductDetails({
           {t("product.viewCart")}
         </Button>
       </div>
-
-      <div className="mt-5 space-y-2.5 text-sm text-niti-muted">
-        {/* Dostava se računa pri plaćanju — vrati kad trošak bude potvrđen
-        <p className="flex items-center gap-2.5">
-          <span>{t("product.shipping")}</span>
-        </p>
-        */}
-        <p className="flex items-center gap-2.5">
-          <RotateCcw className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-          <span>{t("product.returns")}</span>
-        </p>
-      </div>
-
-      <ProductInfoPanel product={product} />
     </div>
   );
 }

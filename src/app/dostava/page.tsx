@@ -7,7 +7,7 @@ export default function DostavaPage() {
     <LegalPage title="Politika dostave">
       <p>
         Porudžbine šaljemo na teritoriji Srbije. Rok isporuke zavisi od
-        dostupnosti artikala i kurirske službe — obično 1–5 radnih dana nakon
+        dostupnosti artikala i kurirske službe - obično 1–5 radnih dana nakon
         potvrde porudžbine.
       </p>
       {/* Free-shipping threshold — uncomment when confirmed in Shopify

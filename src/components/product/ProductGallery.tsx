@@ -129,7 +129,7 @@ export function ProductGallery({
 
       <div className="order-1 min-w-0 flex-1 sm:order-2">
         {/* Shorter on mobile so product info isn’t dwarfed by a full-bleed square */}
-        <div className="group relative aspect-[4/5] overflow-hidden bg-niti-sand/60 sm:aspect-square">
+        <div className="group relative aspect-[4/5] overflow-hidden bg-niti-sand/60 sm:aspect-square lg:aspect-[4/5]">
           <Image
             key={current}
             src={current}

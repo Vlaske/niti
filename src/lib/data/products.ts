@@ -27,7 +27,7 @@ export const products: Product[] = [
       { name: "Mist", hex: "#e8e4f0" },
     ],
     tagline:
-      "Every thread is chosen for softness and longevity — a calm foundation for restful nights.",
+      "Every thread is chosen for softness and longevity - a calm foundation for restful nights.",
     isSale: true,
     isNew: true,
   },
@@ -65,7 +65,7 @@ export const products: Product[] = [
       { name: "Peach", hex: "#f8e8dc" },
     ],
     tagline:
-      "Soft color, softer touch — designed to elevate everyday bedding into something serene.",
+      "Soft color, softer touch - designed to elevate everyday bedding into something serene.",
   },
   {
     id: "4",
@@ -139,7 +139,7 @@ export const products: Product[] = [
       "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80",
     isSale: true,
     tagline:
-      "Layered comfort with a sculptural quilt pattern — made for beds that feel intentionally styled.",
+      "Layered comfort with a sculptural quilt pattern - made for beds that feel intentionally styled.",
   },
 ];
 

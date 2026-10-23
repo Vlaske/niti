@@ -183,6 +183,56 @@ export function variantMatchesSelections(
   });
 }
 
+/** True when any in-stock variant carries this option value. */
+export function isOptionValueInStock(
+  variants: ProductVariantSnapshot[],
+  optionName: string,
+  value: string
+): boolean {
+  return variants.some(
+    (v) =>
+      v.availableForSale &&
+      v.selectedOptions.some(
+        (so) => so.name === optionName && so.value === value
+      )
+  );
+}
+
+/**
+ * Apply a new option choice and keep a real variant.
+ * If the other options don't exist with this choice (for example a color
+ * that is only sold in a different size), those options move to the
+ * in-stock variant that keeps as many of the previous choices as possible.
+ */
+export function selectionsAfterOptionChange(
+  variants: ProductVariantSnapshot[],
+  selections: Record<string, string>,
+  optionName: string,
+  value: string
+): Record<string, string> {
+  const next = { ...selections, [optionName]: value };
+  const inStock = variants.filter((v) => v.availableForSale);
+  const pool = inStock.length > 0 ? inStock : variants;
+  const matches = pool.filter((v) =>
+    v.selectedOptions.some((o) => o.name === optionName && o.value === value)
+  );
+  if (matches.length === 0) return next;
+
+  const kept = (variant: ProductVariantSnapshot) =>
+    variant.selectedOptions.reduce((count, option) => {
+      if (option.name === optionName) return count;
+      return selections[option.name] === option.value ? count + 1 : count;
+    }, 0);
+
+  const best = matches.reduce((top, variant) =>
+    kept(variant) > kept(top) ? variant : top
+  );
+
+  return Object.fromEntries(
+    best.selectedOptions.map((option) => [option.name, option.value])
+  );
+}
+
 /**
  * Whether an option value is available given the other selections
  * (e.g. after picking Boja=Bordo, only sizes that exist for Bordo).

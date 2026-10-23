@@ -8,7 +8,6 @@ import { gsap } from "gsap";
 import { ColorSwatches } from "@/components/ui/ColorSwatches";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { getStoreCategoryBySlug } from "@/config/store-categories";
 import { productRequiresOptionSelection } from "@/lib/shopify/variants";
 import { productImageSrc } from "@/lib/product-image";
 import { formatPrice } from "@/lib/utils";
@@ -33,7 +32,6 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
       : null;
 
   const needsSelection = productRequiresOptionSelection(product);
-  const categoryTitle = getStoreCategoryBySlug(product.category)?.title;
 
   const cardColors =
     product.options?.find((o) => o.type === "color")?.values.map((v) => ({
@@ -64,7 +62,7 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div ref={frameRef} className="product-card-frame mb-3 shrink-0">
+      <div ref={frameRef} className="product-card-frame shrink-0">
         <div className="relative aspect-[4/5] overflow-hidden bg-[#ebe8e2]">
           <Link
             href={`/product/${product.handle}`}
@@ -82,7 +80,7 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
           </Link>
 
           {product.isNew && (
-            <span className="pointer-events-none absolute left-3 top-3 z-20 bg-niti-sage px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white">
+            <span className="pointer-events-none absolute left-2.5 top-2.5 z-20 bg-white/95 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-[0.14em] text-niti-charcoal">
               {t("nav.new")}
             </span>
           )}
@@ -119,33 +117,44 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
         </div>
       </div>
 
-      <div className="mb-2 flex h-4 shrink-0 items-center">
+      <div className="mt-3 flex min-w-0 flex-col gap-1.5">
+        <Link href={`/product/${product.handle}`} className="interactive">
+          <h3
+            className={
+              variant === "compact"
+                ? "line-clamp-2 text-[15px] font-medium leading-snug text-niti-charcoal"
+                : "line-clamp-2 text-sm font-medium leading-snug text-niti-charcoal md:text-[15px]"
+            }
+          >
+            {product.title}
+          </h3>
+        </Link>
+
+        <div className="flex flex-wrap items-baseline gap-x-2">
+          {product.compareAtPrice && product.compareAtPrice > product.price ? (
+            <>
+              <span className="text-base font-semibold tabular-nums tracking-tight text-niti-sale">
+                {formatPrice(product.price, locale)}
+              </span>
+              <span className="text-xs tabular-nums text-niti-muted line-through">
+                {formatPrice(product.compareAtPrice, locale)}
+              </span>
+            </>
+          ) : (
+            <span className="text-base font-semibold tabular-nums tracking-tight text-niti-charcoal">
+              {product.price >= 10000
+                ? `${t("product.from")} ${formatPrice(product.price, locale)}`
+                : formatPrice(product.price, locale)}
+            </span>
+          )}
+        </div>
+
         {cardColors.length > 0 ? (
           <ColorSwatches colors={cardColors} maxVisible={6} />
         ) : null}
       </div>
 
-      {/* Price under media — same line on every card, no gap under short titles */}
-      <div className="mb-2 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-        {product.compareAtPrice && product.compareAtPrice > product.price ? (
-          <>
-            <span className="text-base font-semibold tracking-tight text-niti-sale md:text-[17px]">
-              {formatPrice(product.price, locale)}
-            </span>
-            <span className="text-xs text-niti-muted line-through md:text-sm">
-              {formatPrice(product.compareAtPrice, locale)}
-            </span>
-          </>
-        ) : (
-          <span className="text-base font-semibold tracking-tight text-niti-charcoal md:text-[17px]">
-            {product.price >= 10000
-              ? `${t("product.from")} ${formatPrice(product.price, locale)}`
-              : formatPrice(product.price, locale)}
-          </span>
-        )}
-      </div>
-
-      <div className="mb-2 shrink-0 md:hidden">
+      <div className="mt-3 shrink-0 md:hidden">
         {needsSelection ? (
           <Link
             href={`/product/${product.handle}`}
@@ -165,23 +174,6 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
         )}
       </div>
 
-      {categoryTitle && (
-        <p className="mb-1 text-[10px] font-medium uppercase tracking-[0.18em] text-niti-muted md:text-xs">
-          {categoryTitle}
-        </p>
-      )}
-
-      <Link href={`/product/${product.handle}`} className="interactive">
-        <h3
-          className={
-            variant === "compact"
-              ? "line-clamp-2 font-display text-base font-medium leading-snug tracking-[0.02em] text-niti-charcoal"
-              : "line-clamp-2 font-display text-sm font-medium leading-snug tracking-[0.02em] text-niti-charcoal md:text-base"
-          }
-        >
-          {product.title}
-        </h3>
-      </Link>
     </article>
   );
 }

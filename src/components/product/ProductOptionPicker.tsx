@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import {
   guessColorSwatchStyle,
-  isOptionValueAvailableForSelections,
+  isOptionValueInStock,
   isPatternOptionName,
 } from "@/lib/shopify/variants";
 import type {
@@ -18,7 +18,7 @@ type ProductOptionPickerProps = {
   selections: Record<string, string>;
   onChange: (optionName: string, value: string) => void;
   errors?: Record<string, boolean>;
-  /** When provided, sizes/colors disable based on other selections */
+  /** In-stock variants. A value stays clickable if any of them use it. */
   variants?: ProductVariantSnapshot[];
 };
 
@@ -76,7 +76,7 @@ function ChipButton({
         "interactive min-w-0 rounded-md border px-3.5 py-2.5 text-left text-sm font-medium leading-snug break-words transition-colors",
         selected
           ? "border-niti-charcoal bg-niti-charcoal text-white"
-          : "border-niti-line bg-niti-cream text-niti-charcoal hover:border-niti-charcoal/40",
+          : "border-niti-line bg-white text-niti-charcoal hover:border-niti-charcoal/35",
         disabled && "cursor-not-allowed opacity-40",
         hasError && !selected && "border-niti-sale"
       )}
@@ -143,15 +143,10 @@ export function ProductOptionPicker({
       ...option,
       values: option.values.map((val) => ({
         ...val,
-        available: isOptionValueAvailableForSelections(
-          variants,
-          option.name,
-          val.value,
-          selections
-        ),
+        available: isOptionValueInStock(variants, option.name, val.value),
       })),
     }));
-  }, [options, variants, selections]);
+  }, [options, variants]);
 
   return (
     <div className="space-y-7 border-t border-niti-line pt-7">
