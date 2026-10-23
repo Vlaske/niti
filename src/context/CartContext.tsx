@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -99,6 +100,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cartLoading, setCartLoading] = useState(shopifyCart);
   const [cartError, setCartError] = useState<string | null>(null);
   const [toast, setToast] = useState<CartToast | null>(null);
+  const cartRevision = useRef(0);
 
   const dismissToast = useCallback(() => setToast(null), []);
 
@@ -111,22 +113,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const ensureCartId = useCallback(async (): Promise<string> => {
+    if (cartId) return cartId;
     const stored = localStorage.getItem(CART_ID_KEY);
     if (stored) {
-      try {
-        const existing = await fetchCart(stored, locale);
-        if (existing) {
-          applyRemoteCart(existing);
-          return existing.cartId;
-        }
-      } catch {
-        localStorage.removeItem(CART_ID_KEY);
-      }
+      setCartId(stored);
+      return stored;
     }
     const created = await postCart({ action: "create" }, locale);
-    applyRemoteCart(created);
+    setCartId(created.cartId);
+    setCheckoutUrl(created.checkoutUrl);
+    localStorage.setItem(CART_ID_KEY, created.cartId);
     return created.cartId;
-  }, [applyRemoteCart, locale]);
+  }, [cartId, locale]);
 
   useEffect(() => {
     if (!shopifyCart) {
@@ -135,17 +133,24 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
 
     let cancelled = false;
+    const revision = cartRevision.current;
 
     (async () => {
       try {
         const stored = localStorage.getItem(CART_ID_KEY);
         if (stored) {
           const cart = await fetchCart(stored, locale);
-          if (!cancelled && cart) {
+          if (
+            !cancelled &&
+            cart &&
+            revision === cartRevision.current
+          ) {
             applyRemoteCart(cart);
             return;
           }
-          localStorage.removeItem(CART_ID_KEY);
+          if (!cancelled && revision === cartRevision.current) {
+            localStorage.removeItem(CART_ID_KEY);
+          }
         }
       } catch (e) {
         if (!cancelled) {
@@ -226,6 +231,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       const previousItems = items;
       const previousSubtotal = subtotal;
+      cartRevision.current += 1;
+      const revision = cartRevision.current;
       applyOptimisticAdd(product, quantity, selectedColor);
 
       (async () => {
@@ -251,9 +258,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
             },
             locale
           );
+          if (revision !== cartRevision.current) return;
           applyRemoteCart(cart);
           setToast({ product, variant: "success", visible: true });
         } catch (e) {
+          if (revision !== cartRevision.current) return;
           setItems(previousItems);
           setSubtotal(previousSubtotal);
           const message = e instanceof Error ? e.message : "Greška";

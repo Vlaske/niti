@@ -19,7 +19,10 @@ import {
   fetchShopifyCollectionProducts,
 } from "@/lib/shopify/catalog";
 import { toListingProduct } from "@/lib/catalog/listing";
-import { selectNewArrivalsShowcase } from "@/lib/catalog/ranking";
+import {
+  selectNewArrivalsShowcase,
+  selectTaggedNewArrivals,
+} from "@/lib/catalog/ranking";
 import type { Product } from "@/types";
 
 export type CatalogSource = "shopify" | "mock";
@@ -150,6 +153,13 @@ export async function getProductHandles(): Promise<string[]> {
 }
 
 export async function getNewArrivalsProducts(all?: Product[]) {
+  const catalog = all ?? (await getAllProducts());
+  const tagged = selectTaggedNewArrivals(catalog);
+  if (tagged.length > 0) {
+    lastCatalogSource = shopifyServerConfigured ? "shopify" : "mock";
+    return tagged;
+  }
+
   if (shopifyServerConfigured) {
     try {
       const fromCollection = await fetchShopifyNewArrivalsCollection();
@@ -164,6 +174,5 @@ export async function getNewArrivalsProducts(all?: Product[]) {
     }
   }
 
-  const catalog = all ?? (await getAllProducts());
   return selectNewArrivalsShowcase(catalog);
 }

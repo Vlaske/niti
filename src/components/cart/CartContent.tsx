@@ -10,34 +10,48 @@ import { useLanguage } from "@/context/LanguageContext";
 import { formatPrice } from "@/lib/utils";
 import { productImageSrc } from "@/lib/product-image";
 
-function CartActions({ align = "center" }: { align?: "center" | "start" }) {
+function CartLinks({ prominent = false }: { prominent?: boolean }) {
   const { t } = useLanguage();
   const { handles } = useRecentlyViewed();
   const last = handles[0];
 
+  if (prominent) {
+    return (
+      <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <Button href="/shop" variant="secondary" className="min-h-12">
+          {t("cart.continue")}
+        </Button>
+        {last ? (
+          <Button href={`/product/${last}`} variant="outline" className="min-h-12">
+            {t("cart.lastViewed")}
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={
-        align === "center"
-          ? "mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
-          : "col-span-full mb-2 flex flex-col gap-3 sm:flex-row"
-      }
-    >
-      <Button href="/shop" variant="secondary" className="min-h-12">
+    <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+      <Link
+        href="/shop"
+        className="interactive text-niti-charcoal underline underline-offset-4"
+      >
         {t("cart.continue")}
-      </Button>
+      </Link>
       {last ? (
-        <Button
+        <Link
           href={`/product/${last}`}
-          variant="outline"
-          className="min-h-12"
+          className="interactive text-niti-muted underline underline-offset-4"
         >
           {t("cart.lastViewed")}
-        </Button>
+        </Link>
       ) : null}
     </div>
   );
 }
+
+const checkoutClass =
+  "interactive flex min-h-12 w-full items-center justify-center rounded-md bg-niti-charcoal px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-niti-charcoal/90 hover:shadow-md";
 
 export function CartContent() {
   const {
@@ -68,16 +82,28 @@ export function CartContent() {
     return (
       <div className="py-20 text-center">
         <p className="text-lg text-niti-muted">{t("cart.empty")}</p>
-        <CartActions />
+        <CartLinks prominent />
       </div>
     );
   }
 
+  const checkoutButton = () =>
+    isShopifyCart && checkoutUrl ? (
+      <a href={checkoutUrl} className={checkoutClass}>
+        {t("cart.checkout")}
+      </a>
+    ) : (
+      <Button variant="outline" className="w-full" disabled>
+        {t("cart.checkout")}
+      </Button>
+    );
+
   return (
-    <div className="grid gap-12 lg:grid-cols-[1fr_380px]">
-      <CartActions align="start" />
+    <>
+    <div className="grid gap-10 lg:grid-cols-[1fr_380px] lg:gap-12">
+      <div className="min-w-0">
       {cartError && (
-        <p className="col-span-full rounded-lg border border-niti-sale/30 bg-niti-sale/5 px-4 py-3 text-sm text-niti-sale">
+        <p className="mb-4 rounded-lg border border-niti-sale/30 bg-niti-sale/5 px-4 py-3 text-sm text-niti-sale">
           {cartError}
         </p>
       )}
@@ -153,6 +179,8 @@ export function CartContent() {
           </li>
         ))}
       </ul>
+      <CartLinks />
+      </div>
 
       <aside className="h-fit border border-niti-line bg-white p-6 lg:sticky lg:top-28">
         <h2 className="text-lg font-semibold">{t("cart.summary")}</h2>
@@ -172,18 +200,7 @@ export function CartContent() {
           <span>{t("cart.total")}</span>
           <span>{formatPrice(subtotal, locale)}</span>
         </div>
-        {isShopifyCart && checkoutUrl ? (
-          <a
-            href={checkoutUrl}
-            className="interactive mt-8 flex w-full items-center justify-center rounded-md bg-niti-charcoal px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-niti-charcoal/90 hover:shadow-md"
-          >
-            {t("cart.checkout")}
-          </a>
-        ) : (
-          <Button variant="outline" className="mt-8 w-full" disabled>
-            {t("cart.checkout")}
-          </Button>
-        )}
+        <div className="mt-8 hidden lg:block">{checkoutButton()}</div>
         <p className="mt-4 text-center text-xs text-niti-muted">
           {t("cart.secure")}
         </p>
@@ -196,5 +213,21 @@ export function CartContent() {
         </button>
       </aside>
     </div>
+
+    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-niti-line bg-niti-cream/95 px-4 py-3 backdrop-blur-md lg:hidden" style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}>
+      <div className="mx-auto flex max-w-[1440px] items-center gap-3">
+        <div className="min-w-0 shrink-0">
+          <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-niti-muted">
+            {t("cart.total")}
+          </p>
+          <p className="text-base font-semibold tabular-nums text-niti-charcoal">
+            {formatPrice(subtotal, locale)}
+          </p>
+        </div>
+        <div className="min-w-0 flex-1">{checkoutButton()}</div>
+      </div>
+    </div>
+    <div className="h-24 lg:hidden" aria-hidden />
+    </>
   );
 }

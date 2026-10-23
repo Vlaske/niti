@@ -455,18 +455,25 @@ export function mapShopifyProduct(node: ShopifyProductNode): Product {
 
   const image = productImageSrc(node.featuredImage?.url ?? images[0]);
 
-  const isNew = node.tags.some((t) =>
-    [
-      "new",
-      "novo",
-      "new-arrival",
-      "new-arrivals",
-      "novo-u-ponudi",
-      "novo u ponudi",
-      "showcase:novo",
-      "showcase:new-arrivals",
-    ].includes(t.toLowerCase().trim())
-  );
+  const isNew = node.tags.some((t) => {
+    const normalized = t.toLowerCase().trim();
+    return (
+      normalized === "new" ||
+      normalized === "novo" ||
+      normalized === "novo-u-ponudi" ||
+      normalized === "novo u ponudi" ||
+      normalized.startsWith("novo-u-ponudi:") ||
+      normalized.startsWith("novo u ponudi:") ||
+      normalized === "new-arrival" ||
+      normalized === "new-arrivals" ||
+      normalized.startsWith("new-arrival:") ||
+      normalized.startsWith("new-arrivals:") ||
+      normalized === "showcase:novo" ||
+      normalized === "showcase:new-arrivals" ||
+      normalized.startsWith("showcase:novo:") ||
+      normalized.startsWith("showcase:new-arrivals:")
+    );
+  });
   const isSale =
     compareAt > 0 && compareAt > minPrice;
 

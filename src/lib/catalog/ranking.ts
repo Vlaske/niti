@@ -1,28 +1,64 @@
 /**
  * Catalog ranking helpers — featured sort, new-arrivals curation.
  *
- * Shopify control: tag products with `novo-u-ponudi` (or `new-arrivals`) in Admin
- * to pin them on the homepage "Novo u ponudi" strip. Order among tagged items
- * still follows featured score.
+ * Shopify Admin → product → Tags:
+ * - `istaknuto:1` puts that product first on the shop's recommended order.
+ *   `istaknuto:2` is second. Lower number is earlier.
+ * - `istaknuto` with no number still comes before ordinary products.
+ * - Products without the tag keep the automatic order.
+ * - `novo-u-ponudi` or `novo u ponudi` fills the homepage "Novo u ponudi"
+ *   row. `novo-u-ponudi:1` is first, `:2` is second. When any product has
+ *   this tag, that row shows only the tagged products.
  */
 import { getGroupForCategorySlug } from "@/config/store-categories";
 import type { Product } from "@/types";
 
-const NEW_ARRIVALS_TAGS = new Set([
+const NEW_ARRIVAL_PREFIXES = [
   "novo-u-ponudi",
   "novo u ponudi",
   "new-arrivals",
   "new-arrival",
   "showcase:novo",
   "showcase:new-arrivals",
-]);
+];
 
-/** Explicit homepage showcase pick — set via Shopify product tags. */
-export function isNewArrivalsFeatured(p: Product): boolean {
-  return (
-    p.tags?.some((t) => NEW_ARRIVALS_TAGS.has(t.toLowerCase().trim())) ??
-    false
-  );
+const HIGHLIGHT_PREFIXES = ["istaknuto", "featured", "highlight"];
+
+function productTags(product: Product): string[] {
+  return (product.tags ?? []).map((tag) => tag.toLowerCase().trim());
+}
+
+/** Explicit index from `prefix` or `prefix:12`. No number sorts after numbered tags. */
+function indexFromPrefixes(product: Product, prefixes: string[]): number | null {
+  let best: number | null = null;
+  for (const tag of productTags(product)) {
+    for (const prefix of prefixes) {
+      if (tag !== prefix && !tag.startsWith(`${prefix}:`)) continue;
+      const raw = tag === prefix ? "" : tag.slice(prefix.length + 1).trim();
+      const parsed = raw ? Number.parseInt(raw, 10) : Number.POSITIVE_INFINITY;
+      const index = Number.isFinite(parsed) && parsed >= 0 ? parsed : Number.POSITIVE_INFINITY;
+      best = best == null ? index : Math.min(best, index);
+    }
+  }
+  return best;
+}
+
+function compareIndexes(a: number | null, b: number | null): number {
+  const aPinned = a != null;
+  const bPinned = b != null;
+  if (aPinned !== bPinned) return aPinned ? -1 : 1;
+  if (aPinned && bPinned && a !== b) return a! - b!;
+  return 0;
+}
+
+/** Shop first-page control. Tag `istaknuto` or `istaknuto:1` in Shopify. */
+export function isHighlighted(product: Product): boolean {
+  return indexFromPrefixes(product, HIGHLIGHT_PREFIXES) != null;
+}
+
+/** Homepage "Novo u ponudi" pick, including `novo-u-ponudi:3`. */
+export function isNewArrivalsFeatured(product: Product): boolean {
+  return indexFromPrefixes(product, NEW_ARRIVAL_PREFIXES) != null;
 }
 
 /** Prefer products that look complete / shoppable over raw newest SKUs. */
@@ -48,12 +84,53 @@ export function productFeatureScore(p: Product): number {
   return score;
 }
 
+function byScoreThenTitle(a: Product, b: Product): number {
+  const diff = productFeatureScore(b) - productFeatureScore(a);
+  if (diff !== 0) return diff;
+  return a.title.localeCompare(b.title, "sr");
+}
+
+/** Recommended shop order. Numbered `istaknuto` tags lead; the rest stay automatic. */
 export function sortByFeatured(list: Product[]): Product[] {
   return [...list].sort((a, b) => {
-    const diff = productFeatureScore(b) - productFeatureScore(a);
-    if (diff !== 0) return diff;
-    return b.price - a.price;
+    const pin = compareIndexes(
+      indexFromPrefixes(a, HIGHLIGHT_PREFIXES),
+      indexFromPrefixes(b, HIGHLIGHT_PREFIXES)
+    );
+    if (pin !== 0) return pin;
+    return byScoreThenTitle(a, b);
   });
+}
+
+function showcaseIndex(product: Product): number | null {
+  const highlighted = indexFromPrefixes(product, HIGHLIGHT_PREFIXES);
+  const arrival = indexFromPrefixes(product, NEW_ARRIVAL_PREFIXES);
+  if (highlighted == null) return arrival;
+  if (arrival == null) return highlighted;
+  return Math.min(highlighted, arrival);
+}
+
+/** Homepage row when Shopify tags are set. Untagged products stay out. */
+export function selectTaggedNewArrivals(
+  all: Product[],
+  maxTotal = 24
+): Product[] {
+  return all
+    .filter(
+      (product) =>
+        Boolean(product.image?.trim()) &&
+        product.availableForSale !== false &&
+        isNewArrivalsFeatured(product)
+    )
+    .sort((a, b) => {
+      const pin = compareIndexes(
+        indexFromPrefixes(a, NEW_ARRIVAL_PREFIXES),
+        indexFromPrefixes(b, NEW_ARRIVAL_PREFIXES)
+      );
+      if (pin !== 0) return pin;
+      return byScoreThenTitle(a, b);
+    })
+    .slice(0, maxTotal);
 }
 
 /**
@@ -69,7 +146,13 @@ export function selectNewArrivalsShowcase(
     (p) => Boolean(p.image?.trim()) && p.availableForSale !== false
   );
 
-  const curated = sortByFeatured(usable.filter(isNewArrivalsFeatured));
+  const curated = [...usable]
+    .filter((product) => isNewArrivalsFeatured(product) || isHighlighted(product))
+    .sort((a, b) => {
+      const pin = compareIndexes(showcaseIndex(a), showcaseIndex(b));
+      if (pin !== 0) return pin;
+      return byScoreThenTitle(a, b);
+    });
   const picked: Product[] = [];
   const seen = new Set<string>();
 

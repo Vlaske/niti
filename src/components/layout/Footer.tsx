@@ -63,7 +63,7 @@ export function Footer() {
   return (
     <footer className="mt-auto">
       <section className="border-t border-niti-line bg-niti-cream py-10 md:py-14">
-        <div className={`${FOOTER_INSET} grid grid-cols-1 gap-8 min-[480px]:grid-cols-2 lg:grid-cols-4 lg:gap-8`}>
+        <div className={`${FOOTER_INSET} grid grid-cols-2 gap-x-4 gap-y-6 sm:gap-x-6 lg:grid-cols-4 lg:gap-8`}>
           {valueProps.map((item) => (
             <div key={item.title} className="flex min-w-0 flex-col">
               <div className="mb-3 text-niti-charcoal">{icons[item.icon]}</div>

@@ -122,8 +122,8 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
           <h3
             className={
               variant === "compact"
-                ? "line-clamp-2 text-[15px] font-medium leading-snug text-niti-charcoal"
-                : "line-clamp-2 text-sm font-medium leading-snug text-niti-charcoal md:text-[15px]"
+                ? "line-clamp-2 min-h-[2lh] text-[15px] font-medium leading-snug text-niti-charcoal"
+                : "line-clamp-2 min-h-[2lh] text-sm font-medium leading-snug text-niti-charcoal md:text-[15px]"
             }
           >
             {product.title}
@@ -149,9 +149,11 @@ export function ProductCard({ product, variant = "grid" }: ProductCardProps) {
           )}
         </div>
 
-        {cardColors.length > 0 ? (
-          <ColorSwatches colors={cardColors} maxVisible={6} />
-        ) : null}
+        <div className="min-h-3.5">
+          {cardColors.length > 0 ? (
+            <ColorSwatches colors={cardColors} maxVisible={6} />
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-3 shrink-0 md:hidden">
