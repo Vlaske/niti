@@ -19,7 +19,7 @@ export function FaqSection({ image = FAQ_SECTION_IMAGE }: { image?: string }) {
   return (
     <section ref={ref} id="faq" className="bg-niti-cream">
       <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
-        <div className="relative min-h-[360px] lg:min-h-[640px]">
+        <div className="relative hidden min-h-[360px] lg:block lg:min-h-[640px]">
           <Image
             src={image}
             alt="Mekana posteljina i miran enterijer - NITI."
