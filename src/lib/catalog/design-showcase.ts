@@ -1,5 +1,6 @@
 import { designShowcaseEntries } from "@/config/design-showcase";
 import { getProductByHandle } from "@/lib/catalog";
+import { resolveShowcasePoster } from "@/lib/site-images";
 
 export type DesignShowcaseItem = {
   id: string;
@@ -31,7 +32,7 @@ export async function getDesignShowcaseItems(): Promise<DesignShowcaseItem[]> {
     }
 
     const mediaType = entry.mediaType ?? "image";
-    const poster = entry.poster ?? product.image;
+    const poster = resolveShowcasePoster(entry.id, entry.poster ?? product.image);
     const mediaSrc =
       entry.mediaSrc ?? (mediaType === "video" ? poster : product.image);
 

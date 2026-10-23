@@ -9,7 +9,7 @@ import { faqItems } from "@/lib/data/collections";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 
-export function FaqSection() {
+export function FaqSection({ image = FAQ_SECTION_IMAGE }: { image?: string }) {
   const { t } = useLanguage();
   const [openId, setOpenId] = useState<string | null>(null);
   const ref = useRef<HTMLElement>(null);
@@ -21,7 +21,7 @@ export function FaqSection() {
       <div className="mx-auto grid max-w-[1440px] lg:grid-cols-2">
         <div className="relative min-h-[360px] lg:min-h-[640px]">
           <Image
-            src={FAQ_SECTION_IMAGE}
+            src={image}
             alt="Mekana posteljina i miran enterijer - NITI."
             fill
             className="object-cover"

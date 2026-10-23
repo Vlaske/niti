@@ -1,0 +1,50 @@
+Drop your photos in this folder. Use lowercase .jpg names exactly as written.
+The site uses your file when it is here. If a file is missing, the current stock photo stays.
+
+You can also use .jpeg, .png, or .webp with the same name. .jpg is the one to use.
+
+Rooms — homepage tiles and the banner at the top of each room page
+  rooms/spavaca-soba.jpg       Spavaća soba
+  rooms/kupatilo.jpg            Kupatilo
+  rooms/kuhinja.jpg             Kuhinja
+  rooms/dnevna-soba.jpg         Dnevna soba
+  rooms/deciji-program.jpg      Dečiji program
+  rooms/hotelski-program.jpg    Hotelski program
+
+Categories — banner at the top of each category page
+  categories/posteljine.jpg
+  categories/carsavi.jpg
+  categories/jastuci.jpg
+  categories/jastucnice.jpg
+  categories/jorgani-i-prekrivaci.jpg
+  categories/cebad.jpg
+  categories/nadduseci.jpg
+  categories/peskiri.jpg
+  categories/bade-mantili.jpg
+  categories/kupatilski-setovi.jpg
+  categories/prostirke.jpg
+  categories/stolnjaci.jpg
+  categories/kuhinjske-krpe.jpg
+  categories/kecelje.jpg
+  categories/dekorativni-tekstil.jpg
+  categories/decija-posteljina.jpg
+  categories/decija-cebad.jpg
+  categories/deciji-jastuci-i-jastucnice.jpg
+  categories/deciji-peskiri.jpg
+  categories/hotelski-program.jpg
+
+Homepage scenes
+  home/hero-spavaca-soba.jpg       First slide, and the cover before the video plays
+  home/hero-kupatilo.jpg           Kupatilo slide
+  home/hero-kuhinja.jpg            Kuhinja slide
+  home/featured-spavaca-soba.jpg   Large banner "Slojevi za miran san"
+  home/faq.jpg                     Photo beside Česta pitanja
+  home/newsletter.jpg              Photo behind the newsletter
+  home/showcase-posteljina.jpg     Cover for the posteljina video
+  home/showcase-jastuk.jpg         Cover for the jastuk video
+  home/showcase-peskir.jpg         Cover for the peškir video
+
+Wide photos (about 1600px or more) work best for the hero, newsletter, and banners.
+Room and category tiles can be portrait.
+
+Product photos stay in Shopify. This folder does not replace those.

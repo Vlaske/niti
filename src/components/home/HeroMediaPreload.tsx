@@ -1,13 +1,9 @@
-import { heroSlides } from "@/config/hero-slides";
-import { heroConfig } from "@/config/hero";
-
-function getActiveSlide() {
-  return heroConfig.singleVideoLoop ? heroSlides[0] : heroSlides[0];
-}
+import type { HeroSlide } from "@/types";
 
 /** Preload hero medija u <head> radi bržeg prvog prikaza */
-export function HeroMediaPreload() {
-  const slide = getActiveSlide();
+export function HeroMediaPreload({ slides }: { slides: HeroSlide[] }) {
+  const slide = slides[0];
+  if (!slide) return null;
   const mediaType = slide.mediaType ?? "image";
   const poster = slide.poster ?? slide.image;
   const videoSrc =

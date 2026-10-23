@@ -3,6 +3,7 @@ import { Outfit, Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { FloatingActions } from "@/components/layout/FloatingActions";
 import { getEnrichedNavCategories } from "@/lib/catalog";
+import { preferSiteImage } from "@/lib/site-images";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -62,7 +63,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const navCategories = await getEnrichedNavCategories();
+  const navCategories = (await getEnrichedNavCategories()).map((category) => ({
+    ...category,
+    image: preferSiteImage(`categories/${category.slug}`, category.image),
+  }));
+  const newsletterImage = preferSiteImage(
+    "home/newsletter",
+    "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&q=80"
+  );
 
   return (
     <html
@@ -75,7 +83,10 @@ export default async function RootLayout({
         className="site-shell flex min-h-full flex-col font-sans antialiased"
         suppressHydrationWarning
       >
-        <AppProviders navCategories={navCategories}>
+        <AppProviders
+          navCategories={navCategories}
+          newsletterImage={newsletterImage}
+        >
           {children}
           <FloatingActions />
         </AppProviders>

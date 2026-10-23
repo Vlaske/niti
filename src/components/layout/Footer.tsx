@@ -11,6 +11,7 @@ import {
 import { NewsletterForm } from "@/components/layout/NewsletterForm";
 import { CATEGORY_GROUPS, getGroupHref } from "@/config/store-categories";
 import { useLanguage } from "@/context/LanguageContext";
+import { useNewsletterImage } from "@/context/SiteImagesContext";
 import { valueProps } from "@/lib/data/collections";
 
 const LEGAL_NAME =
@@ -59,6 +60,7 @@ function FooterColumn({
 
 export function Footer() {
   const { t } = useLanguage();
+  const newsletterImage = useNewsletterImage();
 
   return (
     <footer className="mt-auto">
@@ -82,8 +84,7 @@ export function Footer() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url(https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&q=80)",
+            backgroundImage: `url(${newsletterImage})`,
           }}
         />
         <div className="absolute inset-0 bg-niti-charcoal/55" />

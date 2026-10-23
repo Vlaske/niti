@@ -13,6 +13,7 @@ import {
 import { getProductsByCategory, getProductsByGroup } from "@/lib/catalog";
 import { toListingProduct } from "@/lib/catalog/listing";
 import { fetchCollectionMeta } from "@/lib/shopify/collections";
+import { preferSiteImage } from "@/lib/site-images";
 import type { Category } from "@/types";
 
 type Props = {
@@ -48,7 +49,10 @@ export default async function CategoryPage({ params }: Props) {
     const subcategorySlugs = getCategoriesByGroup(category).map((c) => c.slug);
     return (
       <GroupPageLayout
-        group={group}
+        group={{
+          ...group,
+          image: preferSiteImage(`rooms/${group.id}`, group.image || HERO_FALLBACK),
+        }}
         productList={productList.map(toListingProduct)}
         subcategorySlugs={subcategorySlugs}
       />
@@ -69,7 +73,10 @@ export default async function CategoryPage({ params }: Props) {
     slug: catConfig.slug,
     title: shopifyMeta?.title ?? catConfig.title,
     description: shopifyMeta?.description?.trim() || catConfig.description,
-    image: shopifyMeta?.imageUrl || catConfig.image || HERO_FALLBACK,
+    image: preferSiteImage(
+      `categories/${catConfig.slug}`,
+      shopifyMeta?.imageUrl || catConfig.image || HERO_FALLBACK
+    ),
     productCount: productList.length,
   };
 

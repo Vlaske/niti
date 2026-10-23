@@ -8,10 +8,17 @@ import { useScrollReveal } from "@/lib/animations";
 import { useLanguage } from "@/context/LanguageContext";
 import { CATEGORY_GROUPS, getGroupHref } from "@/config/store-categories";
 
-export function CollectionsGrid() {
+export function CollectionsGrid({
+  images,
+}: {
+  images: Record<string, string>;
+}) {
   const { t } = useLanguage();
   const ref = useRef<HTMLElement>(null);
-  const rooms = CATEGORY_GROUPS;
+  const rooms = CATEGORY_GROUPS.map((room) => ({
+    ...room,
+    image: images[room.id] ?? room.image,
+  }));
   const featured = rooms.slice(0, 2);
   const rest = rooms.slice(2);
 

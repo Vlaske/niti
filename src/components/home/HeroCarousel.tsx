@@ -92,12 +92,16 @@ function HeroMedia({
   );
 }
 
-export function HeroCarousel() {
+export function HeroCarousel({
+  slides: slideSource = heroSlides,
+}: {
+  slides?: HeroSlide[];
+}) {
   const { t } = useLanguage();
   const { markHeroReady } = useHomeLoader();
   const slides = heroConfig.singleVideoLoop
-    ? heroSlides.slice(0, 1)
-    : heroSlides;
+    ? slideSource.slice(0, 1)
+    : slideSource;
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
   const containerRef = useRef<HTMLElement>(null);
