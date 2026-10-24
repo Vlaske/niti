@@ -50,7 +50,7 @@ function FooterColumn({
 }) {
   return (
     <div className="min-w-0">
-      <h4 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-white">
+      <h4 className="mb-3 text-[11px] font-semibold uppercase leading-snug tracking-[0.14em] text-white sm:mb-4 sm:tracking-[0.18em]">
         {title}
       </h4>
       {children}
@@ -102,20 +102,18 @@ export function Footer() {
       </section>
 
       <div className="bg-niti-footer text-white">
-        <div
-          className={`${FOOTER_INSET} grid grid-cols-1 gap-10 py-12 sm:grid-cols-2 sm:gap-x-10 lg:grid-cols-[minmax(16rem,1.35fr)_1fr_1fr] lg:gap-x-14 lg:py-16`}
-        >
-          <div className="min-w-0 sm:col-span-2 lg:col-span-1">
+        <div className="mx-auto max-w-[1440px] lg:grid lg:grid-cols-[minmax(16rem,1.35fr)_minmax(0,1fr)_minmax(0,1fr)] lg:items-start lg:gap-x-14 lg:px-12 lg:py-16">
+          <div className="min-w-0 px-4 py-8 lg:px-0 lg:py-0">
             <p className="font-serif text-2xl font-semibold tracking-[0.12em] md:text-3xl">
               NITI.
             </p>
-            <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/90">
+            <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/90 lg:mt-5">
               Podaci o privredniku
             </p>
             <p className="mt-2 max-w-md text-xs leading-relaxed text-white/70">
               {LEGAL_NAME}
             </p>
-            <div className="mt-4 space-y-2.5 text-sm text-white/70">
+            <div className="mt-4 text-sm text-white/70">
               <p className="flex items-start gap-2.5">
                 <Home className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.5} />
                 <span>
@@ -128,19 +126,20 @@ export function Footer() {
                   </span>
                 </span>
               </p>
-              <a
-                href="mailto:info@nitihome.rs"
-                className="interactive flex items-center gap-2.5 hover:text-white"
-              >
-                <Mail className="h-4 w-4 shrink-0" strokeWidth={1.5} />
-                info@nitihome.rs
-              </a>
-              <a
-                href="https://www.instagram.com/nitihome.rs/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="interactive flex items-center gap-2.5 hover:text-white"
-              >
+              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+                <a
+                  href="mailto:info@nitihome.rs"
+                  className="interactive flex items-center gap-2.5 hover:text-white"
+                >
+                  <Mail className="h-4 w-4 shrink-0" strokeWidth={1.5} />
+                  info@nitihome.rs
+                </a>
+                <a
+                  href="https://www.instagram.com/nitihome.rs/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="interactive flex items-center gap-2.5 hover:text-white"
+                >
                 <svg
                   viewBox="0 0 24 24"
                   aria-hidden
@@ -153,13 +152,16 @@ export function Footer() {
                   <circle cx="12" cy="12" r="4" />
                   <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none" />
                 </svg>
-                @nitihome.rs
-              </a>
+                  @nitihome.rs
+                </a>
+              </div>
             </div>
           </div>
 
+          <div className="border-t border-white/15 px-4 py-8 lg:col-span-2 lg:grid lg:grid-cols-2 lg:gap-x-14 lg:border-0 lg:p-0">
+          <div className="grid grid-cols-2 gap-x-8 lg:contents">
           <FooterColumn title={t("footer.shop")}>
-            <ul className="space-y-2.5 text-sm leading-snug text-white/70">
+            <ul className="space-y-2 text-sm leading-snug text-white/70 sm:space-y-2.5">
               {CATEGORY_GROUPS.map((g) => (
                 <li key={g.id}>
                   <Link
@@ -182,7 +184,7 @@ export function Footer() {
           </FooterColumn>
 
           <FooterColumn title={t("footer.care")}>
-            <ul className="space-y-2.5 text-sm leading-snug text-white/70">
+            <ul className="space-y-2 text-sm leading-snug text-white/70 sm:space-y-2.5">
               {careLinks.map((l) => (
                 <li key={l.label}>
                   <Link href={l.href} className="interactive hover:text-white">
@@ -192,11 +194,13 @@ export function Footer() {
               ))}
             </ul>
           </FooterColumn>
+          </div>
+          </div>
         </div>
 
         <div className="border-t border-white/10 bg-niti-footer-dark">
           <div
-            className={`${FOOTER_INSET} flex flex-col gap-4 py-5 md:flex-row md:items-center md:justify-between md:py-6`}
+            className={`${FOOTER_INSET} flex flex-col gap-4 pt-5 pb-16 md:flex-row md:items-center md:justify-between md:py-6`}
           >
             <div className="flex flex-wrap gap-x-5 gap-y-2 text-[11px] text-white/55 md:text-xs">
               {legalLinks.map((item) => (
