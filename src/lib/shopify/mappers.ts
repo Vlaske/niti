@@ -127,6 +127,36 @@ function looksLikeHotel(text: string): boolean {
   return /hotel|ugostitelj/.test(n);
 }
 
+/** Shopify control: collection plazni-peskiri, tag niti:plazni-peskiri or filter:plazni, or a beach title. */
+function looksLikeBeachTowel(node: {
+  title?: string;
+  tags?: string[];
+  collections?: { nodes?: { handle: string }[] };
+}): boolean {
+  const title = normalizeToken(node.title ?? "");
+  if (/plazn|beach-towel|za-plazu/.test(title)) return true;
+
+  for (const tag of node.tags ?? []) {
+    const raw = tag.toLowerCase().trim();
+    const token = normalizeToken(raw);
+    if (
+      raw === "filter:plazni" ||
+      raw === "niti:plazni-peskiri" ||
+      token === "plazni-peskiri" ||
+      token === "plazni-peskir" ||
+      token === "beach-towels"
+    ) {
+      return true;
+    }
+  }
+
+  for (const col of node.collections?.nodes ?? []) {
+    if (/plazn|beach-towel/.test(normalizeToken(col.handle))) return true;
+  }
+
+  return false;
+}
+
 function isKidsCollectionHandle(handle: string): boolean {
   const n = normalizeToken(handle);
   return /decij/.test(n);
@@ -206,6 +236,7 @@ function resolveFromTitle(title: string): string | null {
   }
   if (/bade.?mantil|mantil/.test(n)) return "bade-mantili";
   if (/prostir|rukavic/.test(n)) return "prostirke";
+  if (/plazn|beach-towel|za-plazu/.test(n)) return "plazni-peskiri";
   if (/peskir/.test(n)) return "peskiri";
   if (/naddusec|nad.?dusec/.test(n)) return "nadduseci";
   if (/carsav/.test(n)) return "carsavi";
@@ -281,6 +312,13 @@ function resolveCategories(node: ShopifyProductNode): {
     collections.some((c) => isKidsCollectionHandle(c.handle));
   if (isKids) found.add(resolveKidsLeaf(title, collections));
 
+  if (isHotel || isKids) {
+    found.delete("plazni-peskiri");
+  } else if (looksLikeBeachTowel(node)) {
+    found.add("plazni-peskiri");
+    found.delete("peskiri");
+  }
+
   if (
     looksLikeDecorative(blob) ||
     /ukrasne-jastucnice|prekrivaci-tdf|dekorativni/.test(handleBlob)
@@ -345,6 +383,10 @@ function resolvePrimaryCategory(
     collections.some((c) => normalizeToken(c.handle).includes("hotel"))
   ) {
     return "hotelski-program";
+  }
+
+  if (looksLikeBeachTowel({ title, tags, collections: { nodes: collections } })) {
+    return "plazni-peskiri";
   }
 
   for (const tag of tags) {

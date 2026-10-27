@@ -33,7 +33,7 @@ export default async function HomePage() {
   return (
     <HomeLoaderProvider>
       <HeroMediaPreload slides={slides} />
-      <Header variant="transparent" />
+      <Header variant="transparent" />/
       <main className="min-w-0 overflow-x-clip">
         <HeroCarousel slides={slides} />
         <NewArrivals products={newArrivals} />

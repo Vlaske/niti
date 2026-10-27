@@ -27,7 +27,7 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
   {
     id: "kupatilo",
     title: "Kupatilo",
-    description: "Peškiri, mantili i tekstil za svakodnevni spa osećaj.",
+    description: "Peškiri, plažni peškiri, mantili i tekstil za svakodnevni spa osećaj.",
     image: PLACEHOLDER_IMAGES.towels,
   },
   {
@@ -61,9 +61,9 @@ export const CATEGORY_GROUPS: CategoryGroup[] = [
  *
  * Ovo su kategorije koje kupac vidi na sajtu.
  * Specifične stvari poput „čaršav sa lastišem”, „nepromočivi čaršavi”,
- * „plažni peškiri”, „frotirni prekrivači” i sl. treba da budu
- * sekundarni sloj u Shopify-u: tagovi, product type, metafields ili dodatne
- * kolekcije - ne glavni nivo navigacije.
+ * „frotirni prekrivači” i sl. treba da budu sekundarni sloj u Shopify-u:
+ * tagovi, product type, metafields ili dodatne kolekcije - ne glavni nivo
+ * navigacije. Plažni peškiri su posebna kategorija u kupatilu.
  */
 export type StoreCategoryConfig = Category & {
   collectionHandle: string;
@@ -180,11 +180,22 @@ export const STORE_CATEGORIES: StoreCategoryConfig[] = [
   {
     slug: "peskiri",
     collectionHandle: "peskiri",
-    internalHandles: ["peskiri", "plazni-peskiri", "peskiri-kupatilo"],
+    internalHandles: ["peskiri", "peskiri-kupatilo"],
     group: "kupatilo",
     featured: true,
     title: "Peškiri",
-    description: "Klasični i plažni peškiri - mekani, upijajući i dugotrajni.",
+    description: "Kupatilski peškiri - mekani, upijajući i dugotrajni.",
+    image: "",
+    productCount: 0,
+  },
+  {
+    slug: "plazni-peskiri",
+    collectionHandle: "plazni-peskiri",
+    internalHandles: ["plazni-peskiri", "plazni-peskir", "beach-towels"],
+    group: "kupatilo",
+    featured: true,
+    title: "Plažni peškiri",
+    description: "Veliki peškiri za plažu, bazen i letovanje.",
     image: "",
     productCount: 0,
   },
@@ -497,7 +508,7 @@ export function getCollectionHandlesForSlug(slug: string): string[] {
 /** Tagovi koji imaju smisla kao „refine” unutar jedne leaf kategorije */
 export const LEAF_REFINE_TAGS: Record<string, string[]> = {
   carsavi: ["filter:lastis", "filter:nepromociv", "filter:klasicni"],
-  peskiri: ["filter:kupatilski", "filter:plazni"],
+  peskiri: ["filter:kupatilski"],
   jastuci: ["filter:memorijska-pena"],
   jastucnice: ["filter:ukrasne-jastucnice"],
   "jastuci-i-jastucnice": [

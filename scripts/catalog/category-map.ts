@@ -324,7 +324,7 @@ export const CATEGORY_MAP: Record<string, CategoryMapResult> = {
     priority: 50,
   },
   "plazni-peskiri": {
-    collectionHandle: "peskiri",
+    collectionHandle: "plazni-peskiri",
     tags: ["filter:plazni"],
     priority: 60,
   },
@@ -406,7 +406,7 @@ export const CATEGORY_MAP: Record<string, CategoryMapResult> = {
   },
   "deciji-peskiri": {
     collectionHandle: "deciji-peskiri",
-    tags: ["filter:plazni"],
+    tags: [],
     priority: 70,
   },
   "deciji-program": {

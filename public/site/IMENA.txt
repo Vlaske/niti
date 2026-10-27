@@ -20,6 +20,7 @@ Categories — banner at the top of each category page
   categories/cebad.jpg
   categories/nadduseci.jpg
   categories/peskiri.jpg
+  categories/plazni-peskiri.jpg
   categories/bade-mantili.jpg
   categories/kupatilski-setovi.jpg
   categories/prostirke.jpg
