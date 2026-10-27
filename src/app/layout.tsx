@@ -46,8 +46,11 @@ export const metadata: Metadata = {
   description:
     "Kućni tekstil za spavaću sobu, kupatilo i kuhinju - posteljine, peškiri, stolnjaci i više. NITI.",
   icons: {
-    icon: [{ url: "/brand/niti-favicon.svg", type: "image/svg+xml" }],
-    apple: [{ url: "/brand/niti-mark.svg" }],
+    icon: [
+      { url: "/brand/niti-favicon.svg", type: "image/svg+xml" },
+      { url: "/brand/niti-favicon.png", sizes: "64x64", type: "image/png" },
+    ],
+    apple: [{ url: "/brand/niti-apple.png", sizes: "180x180" }],
   },
   openGraph: {
     title: "NITI.",
