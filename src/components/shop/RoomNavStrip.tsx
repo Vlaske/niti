@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CATEGORY_GROUPS, getGroupHref } from "@/config/store-categories";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import { ScrollableNav } from "@/components/shop/ScrollableNav";
 
 type RoomNavStripProps = {
   activeId?: string;
@@ -23,8 +24,8 @@ export function RoomNavStrip({ activeId }: RoomNavStripProps) {
 
   return (
     <nav className="border-b border-niti-line bg-niti-cream">
-      <div className="mx-auto max-w-[1440px] px-4 md:px-8 lg:px-12">
-        <div className="flex gap-x-5 overflow-x-auto py-3 scrollbar-hide md:flex-wrap md:gap-x-8 md:overflow-visible md:py-5">
+      <div className="mx-auto max-w-[1440px]">
+        <ScrollableNav>
           <Link
             href="/shop"
             className={linkClass(!activeId || activeId === "all")}
@@ -40,7 +41,7 @@ export function RoomNavStrip({ activeId }: RoomNavStripProps) {
               {room.title}
             </Link>
           ))}
-        </div>
+        </ScrollableNav>
       </div>
     </nav>
   );

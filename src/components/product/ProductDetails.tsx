@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Minus, Plus } from "lucide-react";
 import { gsap } from "gsap";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
@@ -34,6 +35,11 @@ export function ProductDetails({
     {}
   );
   const [showOptionHint, setShowOptionHint] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    setQuantity(1);
+  }, [product.id]);
 
   const activeVariant = useMemo(
     () => findVariantBySelections(product, selections),
@@ -83,7 +89,8 @@ export function ProductDetails({
       ? selections[colorSelection.name]
       : undefined;
 
-    addItem(product, 1, { variantId, selectedColor, selections });
+    addItem(product, quantity, { variantId, selectedColor, selections });
+    setQuantity(1);
 
     if (addBtnRef.current && !prefersReducedMotion()) {
       gsap.fromTo(
@@ -168,10 +175,38 @@ export function ProductDetails({
         </div>
       ) : null}
 
-      <div className="mt-7 flex flex-col gap-3 min-[420px]:flex-row">
+      <div className="mt-7 flex flex-col gap-3">
+        <div className="flex gap-3">
+        <div
+          className="flex h-12 shrink-0 items-center rounded-md border border-niti-line bg-white"
+          role="group"
+          aria-label={t("product.quantity")}
+        >
+          <button
+            type="button"
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            disabled={quantity <= 1}
+            className="interactive flex h-12 w-11 items-center justify-center text-niti-charcoal disabled:cursor-default disabled:opacity-35"
+            aria-label={t("product.decreaseQty")}
+          >
+            <Minus className="h-4 w-4" />
+          </button>
+          <span className="min-w-[2ch] text-center text-sm tabular-nums text-niti-charcoal">
+            {quantity}
+          </span>
+          <button
+            type="button"
+            onClick={() => setQuantity((q) => Math.min(99, q + 1))}
+            disabled={quantity >= 99}
+            className="interactive flex h-12 w-11 items-center justify-center text-niti-charcoal disabled:cursor-default disabled:opacity-35"
+            aria-label={t("product.increaseQty")}
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
         <Button
           variant="secondary"
-          className="w-full min-h-12 min-[420px]:flex-1"
+          className="min-h-12 min-w-0 flex-1"
           onClick={handleAdd}
           disabled={
             !canAdd ||
@@ -184,7 +219,8 @@ export function ProductDetails({
         >
           <span ref={addBtnRef}>{t("product.addToCart")}</span>
         </Button>
-        <Button href="/cart" variant="outline" className="w-full min-h-12 min-[420px]:w-auto">
+        </div>
+        <Button href="/cart" variant="outline" className="min-h-12 w-full">
           {t("product.viewCart")}
         </Button>
       </div>

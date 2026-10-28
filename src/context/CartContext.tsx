@@ -53,8 +53,11 @@ type CartContextValue = {
   ) => void;
   removeItem: (lineOrProductId: string) => void;
   updateQuantity: (lineOrProductId: string, quantity: number) => void;
+  stepQuantity: (lineOrProductId: string, delta: number) => void;
   clearCart: () => void;
   dismissToast: () => void;
+  /** Resolves once in-flight quantity edits have reached Shopify. */
+  prepareCheckout: () => Promise<string | null>;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -101,6 +104,68 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cartError, setCartError] = useState<string | null>(null);
   const [toast, setToast] = useState<CartToast | null>(null);
   const cartRevision = useRef(0);
+  const lineJobs = useRef(
+    new Map<string, { desired: number; inflight: boolean }>()
+  );
+  const syncWaiters = useRef<Array<() => void>>([]);
+  const checkoutUrlRef = useRef<string | null>(null);
+  checkoutUrlRef.current = checkoutUrl;
+
+  const settleSync = useCallback(() => {
+    if (lineJobs.current.size > 0) return;
+    const waiters = syncWaiters.current.splice(0);
+    for (const wait of waiters) wait();
+  }, []);
+
+  const flushLineRef = useRef<(lineId: string, id: string) => void>(() => {});
+  flushLineRef.current = (lineId, id) => {
+    const job = lineJobs.current.get(lineId);
+    if (!job || job.inflight) return;
+    const quantity = job.desired;
+    job.inflight = true;
+    cartRevision.current += 1;
+    const revision = cartRevision.current;
+
+    void (async () => {
+      try {
+        setCartError(null);
+        const cart =
+          quantity < 1
+            ? await postCart({ action: "remove", cartId: id, lineId }, locale)
+            : await postCart(
+                { action: "update", cartId: id, lineId, quantity },
+                locale
+              );
+        const current = lineJobs.current.get(lineId);
+        if (!current) {
+          settleSync();
+          return;
+        }
+        current.inflight = false;
+        if (current.desired !== quantity) {
+          flushLineRef.current(lineId, id);
+          return;
+        }
+        lineJobs.current.delete(lineId);
+        if (revision === cartRevision.current) {
+          applyRemoteCart(cart);
+        }
+        settleSync();
+      } catch (e) {
+        lineJobs.current.delete(lineId);
+        setCartError(e instanceof Error ? e.message : "Greška");
+        try {
+          const fresh = await fetchCart(id, locale);
+          if (fresh && revision === cartRevision.current) {
+            applyRemoteCart(fresh);
+          }
+        } catch {
+          /* cartError already set */
+        }
+        settleSync();
+      }
+    })();
+  };
 
   const dismissToast = useCallback(() => setToast(null), []);
 
@@ -284,35 +349,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
     ]
   );
 
-  const removeItem = useCallback(
-    (lineOrProductId: string) => {
-      if (!shopifyCart) {
-        setItems((prev) => prev.filter((i) => i.product.id !== lineOrProductId));
-        return;
-      }
-
+  const stepQuantity = useCallback(
+    (lineOrProductId: string, delta: number) => {
       const item = findItem(lineOrProductId);
-      if (!item?.lineId || !cartId) return;
-
-      (async () => {
-        try {
-          setCartError(null);
-          const cart = await postCart(
-            {
-              action: "remove",
-              cartId,
-              lineId: item.lineId,
-            },
-            locale
-          );
-          applyRemoteCart(cart);
-        } catch (e) {
-          setCartError(e instanceof Error ? e.message : "Greška");
-        }
-      })();
+      const pending = item?.lineId
+        ? lineJobs.current.get(item.lineId)?.desired
+        : undefined;
+      const base = pending ?? item?.quantity ?? 0;
+      updateQuantityRef.current(lineOrProductId, base + delta);
     },
-    [shopifyCart, cartId, findItem, applyRemoteCart, locale]
+    [findItem]
   );
+
+  const updateQuantityRef = useRef<
+    (lineOrProductId: string, quantity: number) => void
+  >(() => {});
 
   const updateQuantity = useCallback(
     (lineOrProductId: string, quantity: number) => {
@@ -334,26 +385,55 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const item = findItem(lineOrProductId);
       if (!item?.lineId || !cartId) return;
 
-      (async () => {
-        try {
-          setCartError(null);
-          const cart = await postCart(
-            {
-              action: "update",
-              cartId,
-              lineId: item.lineId,
-              quantity,
-            },
-            locale
-          );
-          applyRemoteCart(cart);
-        } catch (e) {
-          setCartError(e instanceof Error ? e.message : "Greška");
-        }
-      })();
+      const lineId = item.lineId;
+      const price = item.product.price;
+      const previousQty =
+        lineJobs.current.get(lineId)?.desired ?? item.quantity;
+
+      setItems((prev) =>
+        quantity < 1
+          ? prev.filter((i) => i.lineId !== lineId)
+          : prev.map((i) => (i.lineId === lineId ? { ...i, quantity } : i))
+      );
+      setSubtotal((prev) =>
+        quantity < 1
+          ? Math.max(0, prev - price * previousQty)
+          : prev - price * previousQty + price * quantity
+      );
+
+      const job = lineJobs.current.get(lineId) ?? {
+        desired: quantity,
+        inflight: false,
+      };
+      job.desired = quantity;
+      lineJobs.current.set(lineId, job);
+      flushLineRef.current(lineId, cartId);
     },
-    [shopifyCart, cartId, findItem, applyRemoteCart, locale]
+    [shopifyCart, cartId, findItem]
   );
+  updateQuantityRef.current = updateQuantity;
+
+  const removeItem = useCallback(
+    (lineOrProductId: string) => {
+      if (!shopifyCart) {
+        setItems((prev) =>
+          prev.filter((i) => i.product.id !== lineOrProductId)
+        );
+        return;
+      }
+      updateQuantity(lineOrProductId, 0);
+    },
+    [shopifyCart, updateQuantity]
+  );
+
+  const prepareCheckout = useCallback(() => {
+    if (lineJobs.current.size === 0) {
+      return Promise.resolve(checkoutUrlRef.current);
+    }
+    return new Promise<string | null>((resolve) => {
+      syncWaiters.current.push(() => resolve(checkoutUrlRef.current));
+    });
+  }, []);
 
   const clearCart = useCallback(() => {
     if (!shopifyCart) {
@@ -361,10 +441,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return;
     }
     localStorage.removeItem(CART_ID_KEY);
+    lineJobs.current.clear();
+    cartRevision.current += 1;
     setItems([]);
     setCartId(null);
     setCheckoutUrl(null);
     setSubtotal(0);
+    const waiters = syncWaiters.current.splice(0);
+    for (const wait of waiters) wait();
   }, [shopifyCart]);
 
   useEffect(() => {
@@ -397,8 +481,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       addItem,
       removeItem,
       updateQuantity,
+      stepQuantity,
       clearCart,
       dismissToast,
+      prepareCheckout,
     }),
     [
       items,
@@ -413,8 +499,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       addItem,
       removeItem,
       updateQuantity,
+      stepQuantity,
       clearCart,
       dismissToast,
+      prepareCheckout,
     ]
   );
 

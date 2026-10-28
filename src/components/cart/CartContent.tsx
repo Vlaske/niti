@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2 } from "lucide-react";
@@ -57,15 +58,17 @@ export function CartContent() {
   const {
     items,
     subtotal,
-    updateQuantity,
+    stepQuantity,
     removeItem,
     clearCart,
     checkoutUrl,
     isShopifyCart,
     cartLoading,
     cartError,
+    prepareCheckout,
   } = useCart();
   const { t, locale } = useLanguage();
+  const [checkingOut, setCheckingOut] = useState(false);
 
   const lineKey = (item: (typeof items)[0]) =>
     item.lineId ?? item.product.id;
@@ -89,9 +92,23 @@ export function CartContent() {
 
   const checkoutButton = () =>
     isShopifyCart && checkoutUrl ? (
-      <a href={checkoutUrl} className={checkoutClass}>
+      <button
+        type="button"
+        className={checkoutClass}
+        disabled={checkingOut}
+        onClick={() => {
+          setCheckingOut(true);
+          void prepareCheckout().then((url) => {
+            if (url) {
+              window.location.assign(url);
+              return;
+            }
+            setCheckingOut(false);
+          });
+        }}
+      >
         {t("cart.checkout")}
-      </a>
+      </button>
     ) : (
       <Button variant="outline" className="w-full" disabled>
         {t("cart.checkout")}
@@ -144,9 +161,7 @@ export function CartContent() {
                 <div className="flex items-center gap-2 rounded-md border border-niti-line">
                   <button
                     type="button"
-                    onClick={() =>
-                      updateQuantity(lineKey(item), item.quantity - 1)
-                    }
+                    onClick={() => stepQuantity(lineKey(item), -1)}
                     className="interactive flex h-11 w-11 items-center justify-center"
                     aria-label="Smanji količinu"
                   >
@@ -157,9 +172,7 @@ export function CartContent() {
                   </span>
                   <button
                     type="button"
-                    onClick={() =>
-                      updateQuantity(lineKey(item), item.quantity + 1)
-                    }
+                    onClick={() => stepQuantity(lineKey(item), 1)}
                     className="interactive flex h-11 w-11 items-center justify-center"
                     aria-label="Povećaj količinu"
                   >
