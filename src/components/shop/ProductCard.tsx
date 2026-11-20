@@ -139,7 +139,9 @@ export function ProductCard({
     product.colors ??
     [];
 
-  const [activeColor, setActiveColor] = useState(cardColors[0]?.name);
+  const [activeColor, setActiveColor] = useState<string | undefined>(
+    cardColors[0]?.name
+  );
   const displayImage = imageForColor(product, activeColor);
 
   const drawerSelections = useMemo(() => {
@@ -150,7 +152,8 @@ export function ProductCard({
   useEffect(() => {
     setActiveColor(
       product.options?.find((o) => o.type === "color")?.values[0]?.value ??
-        product.colors?.[0]?.name
+        product.colors?.[0]?.name ??
+        undefined
     );
   }, [product]);
 
