@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
 import { useRecentlyViewed } from "@/context/RecentlyViewedContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePromo } from "@/context/PromoContext";
+import { getDiscount } from "@/lib/pricing";
 import { formatPrice } from "@/lib/utils";
 import { productImageSrc } from "@/lib/product-image";
 
@@ -51,6 +53,37 @@ function CartLinks({ prominent = false }: { prominent?: boolean }) {
   );
 }
 
+function CartLinePrice({
+  price,
+  compareAtPrice,
+  locale,
+  promoActive,
+}: {
+  price: number;
+  compareAtPrice?: number;
+  locale: "sr" | "en";
+  promoActive: boolean;
+}) {
+  const offer = promoActive ? getDiscount(price, compareAtPrice) : null;
+  return (
+    <p className="mt-2 flex flex-wrap items-baseline gap-x-2 text-sm font-medium">
+      <span className={offer ? "tabular-nums text-niti-sale" : "tabular-nums"}>
+        {formatPrice(price, locale)}
+      </span>
+      {offer ? (
+        <span className="text-xs font-normal tabular-nums text-niti-muted line-through">
+          {formatPrice(offer.compareAt, locale)}
+        </span>
+      ) : null}
+      {offer && offer.percent >= 1 ? (
+        <span className="text-xs font-medium tabular-nums text-niti-sale">
+          −{offer.percent}%
+        </span>
+      ) : null}
+    </p>
+  );
+}
+
 const checkoutClass =
   "interactive flex min-h-12 w-full items-center justify-center rounded-md bg-niti-charcoal px-6 py-3 text-sm font-medium text-white shadow-sm transition-all hover:bg-niti-charcoal/90 hover:shadow-md";
 
@@ -68,7 +101,14 @@ export function CartContent() {
     prepareCheckout,
   } = useCart();
   const { t, locale } = useLanguage();
+  const promoActive = usePromo();
   const [checkingOut, setCheckingOut] = useState(false);
+  const savings = promoActive
+    ? items.reduce((sum, item) => {
+        const offer = getDiscount(item.product.price, item.product.compareAtPrice);
+        return sum + (offer ? offer.savings * item.quantity : 0);
+      }, 0)
+    : 0;
 
   const lineKey = (item: (typeof items)[0]) =>
     item.lineId ?? item.product.id;
@@ -154,9 +194,12 @@ export function CartContent() {
                   {t("product.color")}: {item.selectedColor}
                 </p>
               )}
-              <p className="mt-2 text-sm font-medium">
-                {formatPrice(item.product.price, locale)}
-              </p>
+              <CartLinePrice
+                price={item.product.price}
+                compareAtPrice={item.product.compareAtPrice}
+                locale={locale}
+                promoActive={promoActive}
+              />
               <div className="mt-auto flex items-center justify-between pt-4">
                 <div className="flex items-center gap-2 rounded-md border border-niti-line">
                   <button
@@ -202,6 +245,14 @@ export function CartContent() {
             <span className="text-niti-muted">{t("nav.subtotal")}</span>
             <span>{formatPrice(subtotal, locale)}</span>
           </div>
+          {savings > 0 ? (
+            <div className="flex justify-between">
+              <span className="text-niti-muted">{t("product.save")}</span>
+              <span className="tabular-nums text-niti-sale">
+                {formatPrice(savings, locale)}
+              </span>
+            </div>
+          ) : null}
           {/* Dostava se računa pri plaćanju — vrati kad trošak bude potvrđen
           <div className="flex justify-between">
             <span className="text-niti-muted">{t("cart.shipping")}</span>

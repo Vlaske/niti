@@ -11,6 +11,7 @@ import {
 import { NewsletterForm } from "@/components/layout/NewsletterForm";
 import { CATEGORY_GROUPS, getGroupHref } from "@/config/store-categories";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePromoNav } from "@/context/PromoContext";
 import { useNewsletterImage } from "@/context/SiteImagesContext";
 import { valueProps } from "@/lib/data/collections";
 
@@ -60,6 +61,7 @@ function FooterColumn({
 
 export function Footer() {
   const { t } = useLanguage();
+  const hasSale = usePromoNav();
   const newsletterImage = useNewsletterImage();
 
   return (
@@ -180,6 +182,16 @@ export function Footer() {
                   {t("nav.allProducts")}
                 </Link>
               </li>
+              {hasSale ? (
+                <li>
+                  <Link
+                    href="/shop?snizeno=1"
+                    className="interactive text-white/90 hover:text-white"
+                  >
+                    {t("nav.sale")}
+                  </Link>
+                </li>
+              ) : null}
             </ul>
           </FooterColumn>
 

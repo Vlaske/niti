@@ -302,6 +302,10 @@ export const CART_FRAGMENT = `
               amount
               currencyCode
             }
+            compareAtPrice {
+              amount
+              currencyCode
+            }
             product {
               id
               handle

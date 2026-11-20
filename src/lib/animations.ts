@@ -18,7 +18,6 @@ export function prefersReducedMotion() {
     window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 }
-
 /** Kill all GSAP scroll animations — call on route change */
 export function killAllScrollAnimations() {
   if (typeof window === "undefined") return;

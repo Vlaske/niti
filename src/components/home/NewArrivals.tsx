@@ -17,6 +17,8 @@ import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
 
 const MOBILE_VISIBLE = 6;
+const DESKTOP_VISIBLE = 4;
+const DESKTOP_GAP = 32; // gap-8
 
 type NewArrivalsProps = {
   products?: Product[];
@@ -28,8 +30,10 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
   const [filter, setFilter] = useState("all");
   const [offset, setOffset] = useState(0);
   const [roomOpen, setRoomOpen] = useState(false);
+  const [cardWidth, setCardWidth] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const roomRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   const filters = useMemo(() => {
     const base = [{ id: "all", label: t("shop.filters.all") }];
@@ -46,14 +50,39 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
   }, [filter, source]);
 
   const mobileSlice = filtered.slice(0, MOBILE_VISIBLE);
-  const visibleDesktop = 4;
-  const maxOffset = Math.max(0, filtered.length - visibleDesktop);
+  const maxOffset = Math.max(0, filtered.length - DESKTOP_VISIBLE);
+  const step = cardWidth + DESKTOP_GAP;
 
   const setRoomFilter = (id: string) => {
     setFilter(id);
     setOffset(0);
     setRoomOpen(false);
   };
+
+  useEffect(() => {
+    setOffset(0);
+  }, [filter, filtered.length]);
+
+  useEffect(() => {
+    setOffset((o) => Math.min(o, maxOffset));
+  }, [maxOffset]);
+
+  useEffect(() => {
+    const el = viewportRef.current;
+    if (!el) return;
+
+    const measure = () => {
+      const width =
+        (el.clientWidth - DESKTOP_GAP * (DESKTOP_VISIBLE - 1)) /
+        DESKTOP_VISIBLE;
+      setCardWidth(Math.max(0, width));
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!roomOpen) return;
@@ -183,23 +212,36 @@ export function NewArrivals({ products: productList }: NewArrivalsProps) {
               ))}
             </div>
 
-            <div className="relative mt-10 hidden overflow-hidden md:block">
-              <div
-                className="flex gap-8 transition-transform duration-700 ease-out"
-                style={{
-                  transform: `translateX(-${offset * (100 / visibleDesktop)}%)`,
-                }}
-              >
-                {filtered.map((product) => (
-                  <div
-                    key={product.id}
-                    className="w-[calc(25%-24px)] shrink-0"
-                  >
-                    <ProductCard product={product} />
-                  </div>
-                ))}
+            <div className="relative mt-10 hidden md:block">
+              <div ref={viewportRef} className="overflow-hidden pb-1.5">
+                <div
+                  className="flex transition-transform duration-700 ease-out"
+                  style={{
+                    gap: DESKTOP_GAP,
+                    transform:
+                      step > 0
+                        ? `translateX(-${offset * step}px)`
+                        : undefined,
+                  }}
+                >
+                  {filtered.map((product) => (
+                    <div
+                      key={product.id}
+                      className="flex shrink-0 flex-col"
+                      style={{
+                        width: cardWidth > 0 ? cardWidth : undefined,
+                        flexBasis:
+                          cardWidth > 0
+                            ? undefined
+                            : `calc((100% - ${(DESKTOP_VISIBLE - 1) * DESKTOP_GAP}px) / ${DESKTOP_VISIBLE})`,
+                      }}
+                    >
+                      <ProductCard product={product} />
+                    </div>
+                  ))}
+                </div>
               </div>
-              {filtered.length > visibleDesktop && (
+              {filtered.length > DESKTOP_VISIBLE && (
                 <div className="mt-10 flex justify-center">
                   <CarouselControls
                     onPrev={() => setOffset((o) => Math.max(0, o - 1))}

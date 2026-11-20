@@ -63,6 +63,7 @@ Početna  /
 | Section | Job | What the user does |
 |---------|-----|-------------------|
 | Hero | Mood + brand | Watch, then shop or browse |
+| Sniženo | Real discounts, only while the edit is on. Sits above Novo u ponudi | Tap a product, or “Sva sniženja” |
 | Novo u ponudi | What’s new | Filter by **room**, tap a product |
 | Tekstil za svaki prostor | Main map of the store | Tap a **room** |
 | Istaknuti komfor | Editorial pause | Continue into the bedroom |

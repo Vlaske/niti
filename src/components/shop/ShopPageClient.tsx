@@ -15,12 +15,18 @@ import {
 } from "@/config/store-categories";
 import { products as mockProducts } from "@/lib/data/products";
 import { sortByFeatured } from "@/lib/catalog/ranking";
+import { compareDiscounts, getDiscount } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types";
 
 const PAGE_SIZE_OPTIONS = [12, 24, 48] as const;
 
-type SortKey = "featured" | "newest" | "price-asc" | "price-desc";
+type SortKey =
+  | "featured"
+  | "discount"
+  | "newest"
+  | "price-asc"
+  | "price-desc";
 type GridDensity = "large" | "medium" | "small";
 
 type ShopPageClientProps = {
@@ -37,6 +43,8 @@ type ShopPageClientProps = {
    * Ako nije setovan, refine se ne prikazuje.
    */
   refineCategorySlug?: string;
+  /** Only products with a real compare-at price. */
+  saleOnly?: boolean;
 };
 
 const GRID_CLASS: Record<GridDensity, string> = {
@@ -117,12 +125,15 @@ export function ShopPageClient({
   hideHeader = false,
   hideFilters = false,
   refineCategorySlug,
+  saleOnly = false,
 }: ShopPageClientProps) {
   const { t } = useLanguage();
   const navCategories = useNavCategories();
   const [filter, setFilter] = useState(initialFilter);
   const [tagFilter, setTagFilter] = useState("all");
-  const [sort, setSort] = useState<SortKey>("featured");
+  const [sort, setSort] = useState<SortKey>(
+    saleOnly ? "discount" : "featured"
+  );
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(24);
   const [density, setDensity] = useState<GridDensity>("medium");
@@ -168,6 +179,10 @@ export function ShopPageClient({
         ? [...source]
         : source.filter((p) => productMatchesCategory(p, filter));
 
+    if (saleOnly) {
+      list = list.filter((p) => getDiscount(p.price, p.compareAtPrice));
+    }
+
     if (tagFilter !== "all") {
       list = list.filter((p) => p.tags?.includes(tagFilter));
     }
@@ -182,11 +197,28 @@ export function ShopPageClient({
       case "newest":
         list.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
         break;
+      case "discount":
+        list.sort((a, b) => {
+          const left = getDiscount(a.price, a.compareAtPrice);
+          const right = getDiscount(b.price, b.compareAtPrice);
+          if (!left || !right) return 0;
+          return compareDiscounts(left, right);
+        });
+        break;
       default:
-        list = sortByFeatured(list);
+        if (saleOnly) {
+          list.sort((a, b) => {
+            const left = getDiscount(a.price, a.compareAtPrice);
+            const right = getDiscount(b.price, b.compareAtPrice);
+            if (!left || !right) return 0;
+            return compareDiscounts(left, right);
+          });
+        } else {
+          list = sortByFeatured(list);
+        }
     }
     return list;
-  }, [filter, tagFilter, sort, source]);
+  }, [filter, tagFilter, sort, source, saleOnly]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const safePage = Math.min(page, totalPages);
@@ -197,7 +229,7 @@ export function ShopPageClient({
 
   useEffect(() => {
     setPage(1);
-  }, [filter, tagFilter, sort, pageSize, initialFilter]);
+  }, [filter, tagFilter, sort, pageSize, initialFilter, saleOnly]);
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
@@ -301,7 +333,11 @@ export function ShopPageClient({
               onChange={(e) => setSort(e.target.value as SortKey)}
               className="interactive min-h-9 min-w-0 flex-1 rounded-md border border-niti-line bg-white px-2.5 py-2 text-sm sm:flex-none sm:px-3"
             >
-              <option value="featured">{t("shop.sortFeatured")}</option>
+              {saleOnly ? (
+                <option value="discount">{t("shop.sortDiscount")}</option>
+              ) : (
+                <option value="featured">{t("shop.sortFeatured")}</option>
+              )}
               <option value="newest">{t("shop.sortNewest")}</option>
               <option value="price-asc">{t("shop.sortPriceAsc")}</option>
               <option value="price-desc">{t("shop.sortPriceDesc")}</option>
@@ -342,12 +378,15 @@ export function ShopPageClient({
             key={product.id}
             product={product}
             variant={density === "small" ? "compact" : "grid"}
+            preferPercentBadge={saleOnly}
           />
         ))}
       </div>
 
       {filtered.length === 0 && (
-        <p className="py-16 text-center text-niti-muted">{t("shop.empty")}</p>
+        <p className="py-16 text-center text-niti-muted">
+          {saleOnly ? t("shop.emptySale") : t("shop.empty")}
+        </p>
       )}
 
       {totalPages > 1 && (

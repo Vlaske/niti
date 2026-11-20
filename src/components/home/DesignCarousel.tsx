@@ -6,9 +6,36 @@ import { useCallback, useEffect, useRef } from "react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { CarouselControls } from "@/components/ui/CarouselControls";
 import { formatPrice } from "@/lib/utils";
+import { getDiscount } from "@/lib/pricing";
 import { useScrollReveal } from "@/lib/animations";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePromo } from "@/context/PromoContext";
 import type { DesignShowcaseItem } from "@/lib/catalog/design-showcase";
+
+function ShowcasePrice({ item }: { item: DesignShowcaseItem }) {
+  const { locale } = useLanguage();
+  const promoActive = usePromo();
+  const offer = getDiscount(item.price, item.compareAtPrice);
+  const showPercent = Boolean(promoActive && offer && offer.percent >= 1);
+
+  return (
+    <div className="mt-0.5 flex flex-wrap items-baseline gap-x-2 text-sm">
+      {offer ? (
+        <span className="text-niti-muted line-through">
+          {formatPrice(offer.compareAt, locale)}
+        </span>
+      ) : null}
+      <span className={offer ? "font-medium text-niti-sale" : "text-niti-charcoal"}>
+        {formatPrice(item.price, locale)}
+      </span>
+      {showPercent && offer ? (
+        <span className="text-xs font-medium tabular-nums text-niti-sale">
+          −{offer.percent}%
+        </span>
+      ) : null}
+    </div>
+  );
+}
 
 function ShowcaseMedia({ item }: { item: DesignShowcaseItem }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -51,7 +78,7 @@ type DesignCarouselProps = {
 };
 
 export function DesignCarousel({ items }: DesignCarouselProps) {
-  const { t, locale } = useLanguage();
+  const { t } = useLanguage();
   const ref = useRef<HTMLElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -100,22 +127,7 @@ export function DesignCarousel({ items }: DesignCarouselProps) {
                   <p className="line-clamp-2 text-sm font-semibold text-niti-charcoal">
                     {item.title}
                   </p>
-                  <div className="mt-0.5 flex flex-wrap gap-x-2 text-sm">
-                    {item.compareAtPrice && (
-                      <span className="text-niti-muted line-through">
-                        {formatPrice(item.compareAtPrice, locale)}
-                      </span>
-                    )}
-                    <span
-                      className={
-                        item.compareAtPrice
-                          ? "font-medium text-niti-sale"
-                          : "text-niti-charcoal"
-                      }
-                    >
-                      {formatPrice(item.price, locale)}
-                    </span>
-                  </div>
+                  <ShowcasePrice item={item} />
                 </div>
               </Link>
             </article>
@@ -145,22 +157,7 @@ export function DesignCarousel({ items }: DesignCarouselProps) {
                   <p className="truncate text-sm font-semibold text-niti-charcoal">
                     {item.title}
                   </p>
-                  <div className="mt-0.5 flex gap-2 text-sm">
-                    {item.compareAtPrice && (
-                      <span className="text-niti-muted line-through">
-                        {formatPrice(item.compareAtPrice, locale)}
-                      </span>
-                    )}
-                    <span
-                      className={
-                        item.compareAtPrice
-                          ? "font-medium text-niti-sale"
-                          : "text-niti-charcoal"
-                      }
-                    >
-                      {formatPrice(item.price, locale)}
-                    </span>
-                  </div>
+                  <ShowcasePrice item={item} />
                 </div>
               </Link>
             </article>

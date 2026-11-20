@@ -6,6 +6,7 @@ import {
   getStoreCategoryBySlug,
 } from "@/config/store-categories";
 import { getAllProducts } from "@/lib/catalog";
+import { getPromoEdit } from "@/lib/promo";
 
 export const revalidate = 60;
 
@@ -23,7 +24,15 @@ export async function GET(req: NextRequest) {
   }
 
   const needle = normalize(q);
-  const products = await getAllProducts();
+  const [products, promo] = await Promise.all([
+    getAllProducts(),
+    getPromoEdit(),
+  ]);
+  const previewCompare = promo.preview
+    ? new Map(
+        promo.products.map((product) => [product.handle, product.compareAtPrice])
+      )
+    : null;
 
   const matchedProducts = products
     .filter((p) => {
@@ -38,6 +47,7 @@ export async function GET(req: NextRequest) {
       handle: p.handle,
       title: p.title,
       price: p.price,
+      compareAtPrice: previewCompare?.get(p.handle) ?? p.compareAtPrice ?? null,
       image: p.image,
       category: p.category,
       categoryTitle: getStoreCategoryBySlug(p.category)?.title ?? p.category,

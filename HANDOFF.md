@@ -1,8 +1,19 @@
 # NITI. Store — Session Hand-off Document
 
 **Project path:** `C:\Users\Luka-PC\niti-store`  
-**Last verified:** Production build passes (`npm run build`)  
+**Last verified:** 20 Nov 2026 — production sale system (carousel, menu, Shopify compare-at). Older sections may still describe earlier mock-only work; Storefront is wired in `src/lib/shopify/`.  
 **Purpose of this doc:** Continue development in a new chat without losing context.
+
+### Sale edit (20 Nov 2026)
+
+Charcoal homepage **Izdvojeno na sniženju** under the hero. Real compare-at only. Snap carousel up to 12; desktop arrows when &gt;4. **Sva sniženja** → `/shop?snizeno=1` (sort by steepest discount).
+
+- **Ops guide:** `SALE_EDIT.md` (Shopify + config + env).
+- **Band / −% badges off:** `enabled: false` or `NITI_PROMO_ENABLED=false` (restart). Menu **Sniženo** can still show if real discounts exist.
+- **Force band on:** `NITI_PROMO_ENABLED=true` (ignores `endsOn`).
+- **Curate:** collection `akcija`, or `handles`. Else any in-stock compare-at &gt; price.
+- **Menu:** Percent icon + **Akcija** tag (like Novo). Mobile category groups start closed.
+- **Local preview:** `previewWhenEmpty` samples in development only.
 
 ---
 
@@ -306,6 +317,7 @@ npm run build   # verify before deploy
 | Translate products | `products.ts` or Shopify fields |
 | Hero video | `collections.ts` heroSlides, `public/videos/`, `config/hero.ts` |
 | Enable marquee | `app/page.tsx`, `MarqueeBanner.tsx` |
+| Sale edit on/off | `src/config/promo.ts`, env `NITI_PROMO_ENABLED` |
 | Nav tweaks | `Header.tsx`, `NavMegaMenu.tsx` |
 
 ---

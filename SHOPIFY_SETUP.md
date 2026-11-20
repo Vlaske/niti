@@ -132,6 +132,16 @@ Varijante boje: opcija **Color** ili **Boja** — front mapira na swatche i `var
 
 Tagovi `new` / `novo` → bedž „Novo“.
 
+### Sniženje
+
+Pun vodič: **`SALE_EDIT.md`**.
+
+1. Na varijanti upiši **Compare at price** — prethodnu cenu koja je stvarno važila. Front ne izmišlja precrtanu cenu. Procenat se računa nadole (19,6% → 19%).
+2. **Artikal na sniženju** = Compare-at &gt; Price. To puni meni **Sniženo** i `/shop?snizeno=1` čim postoji bar jedan takav komad.
+3. **Početna charcoal sekcija + −% bedževi:** `src/config/promo.ts` (`enabled`) ili `NITI_PROMO_ENABLED`. `false` skida sekciju i procentne bedževe; meni može ostati dok ima stvarnih popusta.
+4. Opciono: kolekcija handle `akcija` za kuriranu selekciju. Ako kolekcija ima proizvode a nijedan nema compare-at, sekcija ostaje prazna (nema tihog fallback-a).
+5. `endsOn` (`YYYY-MM-DD`, Beograd) — countdown do kraja tog dana, zatim automatski gasi početnu sekciju.
+
 ---
 
 ## Valuta (RSD)

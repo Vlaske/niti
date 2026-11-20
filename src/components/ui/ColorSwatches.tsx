@@ -20,24 +20,29 @@ export function ColorSwatches({
   size = "sm",
   maxVisible = 6,
 }: ColorSwatchesProps) {
-  const dim = size === "sm" ? "h-3.5 w-3.5" : "h-5 w-5";
+  const dim = size === "sm" ? "h-4 w-4" : "h-5 w-5";
   const visible = colors.slice(0, maxVisible);
   const extra = Math.max(0, colors.length - visible.length);
 
   return (
-    <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
+    // pl/py give the selected ring room so it never clips on card edges
+    <div className="flex flex-nowrap items-center gap-2 overflow-visible py-1 pl-1">
       {visible.map((c, i) => (
         <button
           key={`${c.name}-${c.variantId ?? i}`}
           type="button"
           title={c.name}
-          onClick={() => onSelect?.(c.name)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onSelect?.(c.name);
+          }}
           className={cn(
             dim,
-            "interactive shrink-0 rounded-full border border-niti-charcoal/15 transition-transform hover:scale-110",
+            "interactive relative shrink-0 rounded-full border transition-transform hover:scale-105",
             selected === c.name
-              ? "ring-1 ring-niti-charcoal ring-offset-1"
-              : "ring-0"
+              ? "border-niti-charcoal shadow-[0_0_0_1.5px_var(--niti-cream),0_0_0_2.5px_var(--niti-charcoal)]"
+              : "border-niti-charcoal/20"
           )}
           style={guessColorSwatchStyle(c.name)}
           aria-label={`Color ${c.name}`}

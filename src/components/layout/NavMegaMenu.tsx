@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Percent, Sparkles } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { gsap } from "gsap";
 import { getGroupedNavCategories } from "@/config/store-categories";
 import { useNavCategories } from "@/context/CategoriesContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePromoNav } from "@/context/PromoContext";
 import { cn } from "@/lib/utils";
 
 type NavMegaMenuProps = {
@@ -16,6 +17,7 @@ type NavMegaMenuProps = {
 
 export function NavMegaMenu({ open, onClose }: NavMegaMenuProps) {
   const { t } = useLanguage();
+  const hasSale = usePromoNav();
   const enriched = useNavCategories();
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -85,6 +87,20 @@ export function NavMegaMenu({ open, onClose }: NavMegaMenuProps) {
               {t("nav.new")}
             </span>
           </Link>
+          {hasSale ? (
+            <Link
+              href="/shop?snizeno=1"
+              data-mega-item
+              onClick={onClose}
+              className="interactive flex items-center gap-2 text-sm font-medium text-niti-muted transition-colors hover:text-niti-charcoal"
+            >
+              <Percent className="h-4 w-4 text-niti-sale" strokeWidth={1.75} />
+              {t("nav.sale")}
+              <span className="bg-niti-sale px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-niti-cream">
+                {t("nav.saleBadge")}
+              </span>
+            </Link>
+          ) : null}
         </div>
 
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">

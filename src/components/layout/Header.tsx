@@ -6,6 +6,7 @@ import {
   ChevronDown,
   Globe,
   Menu,
+  Percent,
   Search,
   ShoppingBag,
   Sparkles,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePromoNav } from "@/context/PromoContext";
 import { NavMegaMenu } from "@/components/layout/NavMegaMenu";
 import { SearchOverlay } from "@/components/layout/SearchOverlay";
 import { useNavCategories } from "@/context/CategoriesContext";
@@ -26,14 +28,13 @@ type HeaderProps = {
 export function Header({ variant = "solid" }: HeaderProps) {
   const { itemCount, subtotal } = useCart();
   const { t, locale, setLocale } = useLanguage();
+  const hasSale = usePromoNav();
   const navCategories = useNavCategories();
   const [menuOpen, setMenuOpen] = useState(false);
   const [megaOpen, setMegaOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(
-    "spavaca-soba"
-  );
+  const [openMobileGroup, setOpenMobileGroup] = useState<string | null>(null);
 
   const groupedMobile = getGroupedNavCategories().map(({ group, categories }) => ({
     group,
@@ -229,6 +230,19 @@ export function Header({ variant = "solid" }: HeaderProps) {
                 {t("nav.new")}
               </span>
             </Link>
+            {hasSale ? (
+              <Link
+                href="/shop?snizeno=1"
+                onClick={() => setMenuOpen(false)}
+                className="interactive flex items-center gap-2 border-b border-niti-line py-4 text-base font-medium"
+              >
+                <Percent className="h-4 w-4 text-niti-sale" strokeWidth={1.75} />
+                {t("nav.sale")}
+                <span className="bg-niti-sale px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-niti-cream">
+                  {t("nav.saleBadge")}
+                </span>
+              </Link>
+            ) : null}
             <p className="pt-6 text-xs font-semibold uppercase tracking-widest text-niti-muted">
               {t("nav.browseCategories")}
             </p>

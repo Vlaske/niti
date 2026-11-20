@@ -4,6 +4,7 @@ import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { HeroMediaPreload } from "@/components/home/HeroMediaPreload";
 import { HomeLoaderProvider } from "@/context/HomeLoaderContext";
 import { NewArrivals } from "@/components/home/NewArrivals";
+import { SaleEdit } from "@/components/home/SaleEdit";
 import { CollectionsGrid } from "@/components/home/CollectionsGrid";
 import { DesignCarousel } from "@/components/home/DesignCarousel";
 import { FeaturedHero } from "@/components/home/FeaturedHero";
@@ -14,14 +15,16 @@ import { getDesignShowcaseItems } from "@/lib/catalog/design-showcase";
 import { heroSlides } from "@/config/hero-slides";
 import { FAQ_SECTION_IMAGE } from "@/config/placeholders";
 import { CATEGORY_GROUPS } from "@/config/store-categories";
+import { getPromoEdit } from "@/lib/promo";
 import { preferSiteImage, resolveHeroSlides } from "@/lib/site-images";
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [newArrivals, designShowcase] = await Promise.all([
+  const [newArrivals, designShowcase, promo] = await Promise.all([
     getNewArrivalsProducts(),
     getDesignShowcaseItems(),
+    getPromoEdit(),
   ]);
   const slides = resolveHeroSlides(heroSlides);
   const roomImages = Object.fromEntries(
@@ -36,6 +39,9 @@ export default async function HomePage() {
       <Header variant="transparent" />
       <main className="min-w-0 overflow-x-clip">
         <HeroCarousel slides={slides} />
+        {promo.active && promo.products.length > 0 ? (
+          <SaleEdit products={promo.products} endsOn={promo.endsOn} />
+        ) : null}
         <NewArrivals products={newArrivals} />
         <CollectionsGrid images={roomImages} />
         <FeaturedHero

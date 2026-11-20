@@ -14,6 +14,7 @@ export function toListingProduct(product: Product): Product {
     categories: product.categories,
     collection: product.collection,
     image: product.image,
+    colorImages: product.colorImages,
     colors: product.colors,
     options: product.options,
     variants: product.variants,

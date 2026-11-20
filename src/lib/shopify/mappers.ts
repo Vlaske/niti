@@ -614,6 +614,7 @@ type ShopifyCartLine = {
     title: string;
     image?: { url: string } | null;
     price: ShopifyMoney;
+    compareAtPrice?: ShopifyMoney | null;
     product: {
       id: string;
       handle: string;
@@ -650,6 +651,9 @@ export function mapCartLines(cart: ShopifyCartPayload): CartItem[] {
       brand: "NITI.",
       description: "",
       price: parseMoneyAmount(m.price),
+      compareAtPrice: m.compareAtPrice
+        ? parseMoneyAmount(m.compareAtPrice)
+        : undefined,
       category: "accessories",
       image: productImageSrc(m.image?.url ?? m.product.featuredImage?.url),
       variantId: m.id,

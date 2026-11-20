@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePromo } from "@/context/PromoContext";
+import { getDiscount } from "@/lib/pricing";
 import { formatPrice } from "@/lib/utils";
 
 type SearchProduct = {
@@ -12,6 +14,7 @@ type SearchProduct = {
   handle: string;
   title: string;
   price: number;
+  compareAtPrice?: number | null;
   image: string;
   categoryTitle: string;
 };
@@ -29,6 +32,43 @@ type SearchResults = {
   rooms: SearchHit[];
 };
 
+function SearchPrice({
+  price,
+  compareAtPrice,
+  locale,
+  promoActive,
+}: {
+  price: number;
+  compareAtPrice?: number | null;
+  locale: "sr" | "en";
+  promoActive: boolean;
+}) {
+  const offer = promoActive ? getDiscount(price, compareAtPrice) : null;
+  if (!offer) {
+    return (
+      <span className="shrink-0 text-sm text-niti-charcoal">
+        {formatPrice(price, locale)}
+      </span>
+    );
+  }
+
+  return (
+    <span className="shrink-0 text-right text-sm">
+      <span className="block font-medium tabular-nums text-niti-sale">
+        {formatPrice(price, locale)}
+      </span>
+      <span className="block text-[11px] tabular-nums text-niti-muted line-through">
+        {formatPrice(offer.compareAt, locale)}
+      </span>
+      {offer.percent >= 1 ? (
+        <span className="block text-[10px] font-medium tabular-nums text-niti-sale">
+          −{offer.percent}%
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 type SearchOverlayProps = {
   open: boolean;
   onClose: () => void;
@@ -36,6 +76,7 @@ type SearchOverlayProps = {
 
 export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const { t, locale } = useLanguage();
+  const promoActive = usePromo();
   const inputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -230,9 +271,12 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                           {p.categoryTitle}
                         </p>
                       </div>
-                      <span className="shrink-0 text-sm text-niti-charcoal">
-                        {formatPrice(p.price, locale)}
-                      </span>
+                      <SearchPrice
+                        price={p.price}
+                        compareAtPrice={p.compareAtPrice}
+                        locale={locale}
+                        promoActive={promoActive}
+                      />
                     </Link>
                   </li>
                 ))}

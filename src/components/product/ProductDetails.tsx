@@ -6,12 +6,14 @@ import { gsap } from "gsap";
 import { Button } from "@/components/ui/Button";
 import { useCart } from "@/context/CartContext";
 import { useLanguage } from "@/context/LanguageContext";
+import { usePromo } from "@/context/PromoContext";
 import {
   findVariantBySelections,
   productRequiresOptionSelection,
   selectionsAfterOptionChange,
 } from "@/lib/shopify/variants";
 import { prefersReducedMotion } from "@/lib/animations";
+import { getDiscount } from "@/lib/pricing";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/types";
 import { ProductOptionPicker } from "./ProductOptionPicker";
@@ -29,6 +31,7 @@ export function ProductDetails({
 }: ProductDetailsProps) {
   const { addItem } = useCart();
   const { t, locale } = useLanguage();
+  const promoActive = usePromo();
   const addBtnRef = useRef<HTMLSpanElement>(null);
   const needsOptions = productRequiresOptionSelection(product);
   const [optionErrors, setOptionErrors] = useState<Record<string, boolean>>(
@@ -101,10 +104,8 @@ export function ProductDetails({
     }
   };
 
-  const savings =
-    displayCompare && displayCompare > displayPrice
-      ? displayCompare - displayPrice
-      : null;
+  const offer = getDiscount(displayPrice, displayCompare);
+  const showPercent = Boolean(promoActive && offer && offer.percent >= 1);
 
   return (
     <div>
@@ -118,24 +119,36 @@ export function ProductDetails({
       <div className="mt-4 flex flex-wrap items-end gap-x-3 gap-y-1 md:mt-5">
         <span
           className={
-            savings
+            offer
               ? "text-2xl font-medium tracking-tight text-niti-sale sm:text-[1.75rem]"
               : "text-2xl font-medium tracking-tight text-niti-sage-deep sm:text-[1.75rem]"
           }
         >
           {formatPrice(displayPrice, locale)}
         </span>
-        {savings && (
-          <>
-            <span className="pb-0.5 text-sm text-niti-muted line-through md:text-base">
-              {formatPrice(displayCompare!, locale)}
-            </span>
-            <span className="pb-1 text-xs font-medium uppercase tracking-wider text-niti-sale">
-              −{formatPrice(savings, locale)}
-            </span>
-          </>
-        )}
+        {offer ? (
+          <span className="pb-0.5 text-sm text-niti-muted line-through md:text-base">
+            {formatPrice(offer.compareAt, locale)}
+          </span>
+        ) : null}
       </div>
+      {offer ? (
+        <div className="mt-3 inline-flex max-w-full flex-wrap items-center gap-2.5 rounded-md border border-niti-sale/25 bg-niti-sale/[0.08] px-2.5 py-2">
+          {showPercent ? (
+            <span className="bg-niti-sale px-2 py-1 text-[12px] font-semibold tabular-nums leading-none text-niti-cream">
+              −{offer.percent}%
+            </span>
+          ) : null}
+          <span className="text-sm leading-none">
+            <span className="font-medium uppercase tracking-[0.12em] text-niti-sale/80">
+              {t("product.save")}
+            </span>
+            <span className="ml-2 text-[15px] font-semibold tabular-nums tracking-tight text-niti-sale">
+              {formatPrice(offer.savings, locale)}
+            </span>
+          </span>
+        </div>
+      ) : null}
 
       {(activeVariant?.sku || activeVariant?.barcode) && (
         <dl className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-[13px] font-normal text-niti-muted/80">

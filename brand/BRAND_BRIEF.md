@@ -50,6 +50,9 @@ Asseti u ovom folderu: `logo/`, `brand-kit.html`, `og-template.svg`.
 - ❌ „NE PROPUSTI!!! MEGA SALE 🔥🔥🔥“
 - ❌ „Disruptive sleep innovation platform.“
 
+### Sniženje
+Kad postoji stvarna niža cena: mirna rečenica, prethodna cena, današnja cena, procenat zaokružen nadole. Rok samo ako je stvaran. Tajmer samo uz taj datum, do kraja dana; bez lažnog otkucavanja, nestašice i uskličnika. Isključuje se iz `src/config/promo.ts` ili `NITI_PROMO_ENABLED=false`.
+
 ---
 
 ## 3. Logo

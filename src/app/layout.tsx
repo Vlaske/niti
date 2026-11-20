@@ -3,6 +3,7 @@ import { Outfit, Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { FloatingActions } from "@/components/layout/FloatingActions";
 import { getEnrichedNavCategories } from "@/lib/catalog";
+import { getPromoEdit } from "@/lib/promo";
 import { preferSiteImage } from "@/lib/site-images";
 import "./globals.css";
 
@@ -74,6 +75,7 @@ export default async function RootLayout({
     "home/newsletter",
     "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&q=80"
   );
+  const promo = await getPromoEdit();
 
   return (
     <html
@@ -89,6 +91,8 @@ export default async function RootLayout({
         <AppProviders
           navCategories={navCategories}
           newsletterImage={newsletterImage}
+          promoActive={promo.active}
+          promoHasSale={promo.hasSale}
         >
           {children}
           <FloatingActions />
