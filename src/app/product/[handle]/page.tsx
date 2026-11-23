@@ -1,8 +1,22 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/layout/PageShell";
 import { ProductPageView } from "@/components/product/ProductPageView";
-import { getProductByHandle, getProductHandles, getRelatedProducts } from "@/lib/catalog";
+import { JsonLd } from "@/components/seo/JsonLd";
+import {
+  getProductByHandle,
+  getProductHandles,
+  getRelatedProducts,
+} from "@/lib/catalog";
 import { getPromoEdit } from "@/lib/promo";
+import {
+  breadcrumbJsonLd,
+  buildPageMetadata,
+  productJsonLd,
+  stripHtml,
+  truncateMeta,
+} from "@/lib/seo";
+import { getStoreCategoryBySlug } from "@/config/store-categories";
 import type { Product } from "@/types";
 
 type Props = {
@@ -16,13 +30,28 @@ export async function generateStaticParams() {
   return handles.map((handle) => ({ handle }));
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle } = await params;
   const product = await getProductByHandle(handle);
-  return {
-    title: product?.title ?? "Proizvod",
-    description: product?.description,
-  };
+  if (!product) {
+    return buildPageMetadata({
+      title: "Proizvod",
+      path: `/product/${handle}`,
+      noIndex: true,
+    });
+  }
+
+  const description = truncateMeta(
+    stripHtml(product.descriptionHtml || product.description) ||
+      `${product.title} — premium tekstil NITI.`
+  );
+
+  return buildPageMetadata({
+    title: product.title,
+    description,
+    path: `/product/${product.handle}`,
+    image: product.image,
+  });
 }
 
 export default async function ProductPage({ params }: Props) {
@@ -37,9 +66,23 @@ export default async function ProductPage({ params }: Props) {
     : undefined;
   const view = sample ? withPreviewPrices(product, sample) : product;
   const related = await getRelatedProducts(product);
+  const category = getStoreCategoryBySlug(product.category);
 
   return (
     <PageShell mainClassName="pt-[var(--header-offset)]">
+      <JsonLd
+        data={[
+          productJsonLd(view),
+          breadcrumbJsonLd([
+            { name: "Početna", path: "/" },
+            { name: "Prodavnica", path: "/shop" },
+            ...(category
+              ? [{ name: category.title, path: `/shop/${category.slug}` }]
+              : []),
+            { name: product.title, path: `/product/${product.handle}` },
+          ]),
+        ]}
+      />
       <div className="mx-auto w-full max-w-[1440px] px-4 pb-20 md:px-8 lg:px-12">
         <ProductPageView product={view} related={related} />
       </div>

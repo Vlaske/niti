@@ -37,6 +37,18 @@ export function isShopifyCatalogActive(): boolean {
   return lastCatalogSource === "shopify";
 }
 
+/** Never serve mock products in production — even if Shopify env is missing. */
+function allowMockCatalog() {
+  return process.env.NODE_ENV !== "production";
+}
+
+function rethrowInProduction(error: unknown, label: string): never {
+  console.error(`[catalog] ${label}:`, error);
+  throw error instanceof Error
+    ? error
+    : new Error(`[catalog] ${label}`);
+}
+
 export { getEnrichedNavCategories } from "@/lib/catalog/categories";
 
 export const getAllProducts = cache(async function getAllProducts() {
@@ -46,8 +58,12 @@ export const getAllProducts = cache(async function getAllProducts() {
       lastCatalogSource = "shopify";
       return products;
     } catch (e) {
+      if (!allowMockCatalog()) rethrowInProduction(e, "Shopify fetch failed");
       console.error("[catalog] Shopify fetch failed, using mock:", e);
     }
+  }
+  if (!allowMockCatalog()) {
+    throw new Error("[catalog] Shopify is required in production");
   }
   lastCatalogSource = "mock";
   return mockProducts;
@@ -62,8 +78,11 @@ export const getProductByHandle = cache(async function getProductByHandle(handle
       return null;
     } catch (e) {
       console.error("[catalog] Shopify product fetch failed:", e);
+      // Production: never invent a mock PDP — show not-found instead.
+      if (!allowMockCatalog()) return null;
     }
   }
+  if (!allowMockCatalog()) return null;
   lastCatalogSource = "mock";
   return getMockProductByHandle(handle) ?? null;
 });
@@ -98,15 +117,19 @@ export async function getRelatedProducts(product: Product, limit = 4) {
     }
   }
 
-  const all = await getAllProducts();
-  return pick(
-    all.filter((p) => {
-      if (product.category && product.category !== "all") {
-        return productMatchesCategory(p, product.category);
-      }
-      return Boolean(product.collection) && p.collection === product.collection;
-    })
-  );
+  try {
+    const all = await getAllProducts();
+    return pick(
+      all.filter((p) => {
+        if (product.category && product.category !== "all") {
+          return productMatchesCategory(p, product.category);
+        }
+        return Boolean(product.collection) && p.collection === product.collection;
+      })
+    );
+  } catch {
+    return [];
+  }
 }
 
 export async function getProductsByCategory(categorySlug: string) {
@@ -116,8 +139,14 @@ export async function getProductsByCategory(categorySlug: string) {
       lastCatalogSource = "shopify";
       return list;
     } catch (e) {
+      if (!allowMockCatalog()) {
+        rethrowInProduction(e, "Shopify collection fetch failed");
+      }
       console.error("[catalog] Shopify collection fetch failed:", e);
     }
+  }
+  if (!allowMockCatalog()) {
+    throw new Error("[catalog] Shopify is required in production");
   }
   lastCatalogSource = "mock";
   return getMockProductsByCategory(categorySlug);
@@ -130,10 +159,16 @@ export async function getProductsByGroup(groupId: CategoryGroupId) {
       lastCatalogSource = "shopify";
       return grouped;
     } catch (e) {
+      if (!allowMockCatalog()) {
+        rethrowInProduction(e, "Shopify group fetch failed");
+      }
       console.error("[catalog] Shopify group fetch failed:", e);
     }
   }
 
+  if (!allowMockCatalog()) {
+    throw new Error("[catalog] Shopify is required in production");
+  }
   lastCatalogSource = "mock";
   return mockProducts.filter((p) => productMatchesCategory(p, groupId));
 }
@@ -145,8 +180,14 @@ export async function getProductHandles(): Promise<string[]> {
       lastCatalogSource = "shopify";
       return handles;
     } catch (e) {
+      if (!allowMockCatalog()) {
+        rethrowInProduction(e, "Shopify handles fetch failed");
+      }
       console.error("[catalog] Shopify handles fetch failed:", e);
     }
+  }
+  if (!allowMockCatalog()) {
+    throw new Error("[catalog] Shopify is required in production");
   }
   lastCatalogSource = "mock";
   return mockProducts.map((p) => p.handle);

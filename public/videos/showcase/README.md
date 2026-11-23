@@ -21,8 +21,10 @@ Uredi `src/config/design-showcase.ts`:
   description: "Tekst preko videa…",
   mediaType: "video",
   mediaSrc: "/videos/showcase/posteljina-lifestyle.mp4",
-  poster: "https://…", // slika dok se video učitava
+  poster: "/videos/showcase/posteljina-lifestyle.jpg", // first frame of the MP4
 }
 ```
+
+Same name as the `.mp4`, extension `.jpg`. Extract with ffmpeg so play feels seamless.
 
 `productHandle` mora odgovarati proizvodu u Shopify-u — kartica ispod automatski pokazuje pravi naziv, cenu i sliku.

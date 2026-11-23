@@ -135,7 +135,7 @@ export function ProductDetails({
       {offer ? (
         <div className="mt-3 inline-flex max-w-full flex-wrap items-center gap-2.5 rounded-md border border-niti-sale/25 bg-niti-sale/[0.08] px-2.5 py-2">
           {showPercent ? (
-            <span className="bg-niti-sale px-2 py-1 text-[12px] font-semibold tabular-nums leading-none text-niti-cream">
+            <span className="bg-niti-sale px-2 py-1 text-[12px] font-semibold tabular-nums leading-none text-white">
               −{offer.percent}%
             </span>
           ) : null}

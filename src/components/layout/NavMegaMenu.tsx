@@ -96,7 +96,7 @@ export function NavMegaMenu({ open, onClose }: NavMegaMenuProps) {
             >
               <Percent className="h-4 w-4 text-niti-sale" strokeWidth={1.75} />
               {t("nav.sale")}
-              <span className="bg-niti-sale px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-niti-cream">
+              <span className="bg-niti-sale px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
                 {t("nav.saleBadge")}
               </span>
             </Link>

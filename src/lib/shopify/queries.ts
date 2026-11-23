@@ -232,6 +232,22 @@ export const PRODUCTS_QUERY = `
   }
 `;
 
+/** Handles-only — for sitemap / generateStaticParams (avoids full catalog payload). */
+export const PRODUCT_HANDLES_QUERY = `
+  query ProductHandles($first: Int!, $after: String) {
+    products(first: $first, after: $after, sortKey: UPDATED_AT, reverse: true) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        handle
+        updatedAt
+      }
+    }
+  }
+`;
+
 export const PRODUCT_BY_HANDLE_QUERY = `
   ${PRODUCT_CARD_FRAGMENT}
   query ProductByHandle($handle: String!) {

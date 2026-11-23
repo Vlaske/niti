@@ -10,7 +10,14 @@ Stavi `.mp4` fajlove ovde. Preporuka: H.264, max ~15 MB, 1920×1080 ili 1080×19
 ```ts
 mediaType: "video",
 mediaSrc: "/videos/posteljina-hero.mp4",
-poster: "https://...", // cover slika dok se učitava
+poster: "/videos/posteljina-hero.jpg", // first frame of the MP4 (same pixels as t=0)
+```
+
+Extract a first-frame JPG (so load feels seamless, not a different photo):
+
+```bash
+# needs ffmpeg on PATH, or: npx --yes ffmpeg-static
+ffmpeg -y -ss 0 -i public/videos/posteljina-hero.mp4 -frames:v 1 -update 1 -q:v 2 public/videos/posteljina-hero.jpg
 ```
 
 3. U `src/config/hero.ts` postavi:

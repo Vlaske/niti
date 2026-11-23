@@ -2,10 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { CarouselControls } from "@/components/ui/CarouselControls";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, cn } from "@/lib/utils";
 import { getDiscount } from "@/lib/pricing";
 import { useScrollReveal } from "@/lib/animations";
 import { useLanguage } from "@/context/LanguageContext";
@@ -39,26 +39,84 @@ function ShowcasePrice({ item }: { item: DesignShowcaseItem }) {
 
 function ShowcaseMedia({ item }: { item: DesignShowcaseItem }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [preferStill, setPreferStill] = useState(false);
+  const poster = item.poster || item.mediaSrc;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setPreferStill(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el || item.mediaType !== "video") return;
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(Boolean(entry?.isIntersecting)),
+      { rootMargin: "120px", threshold: 0.15 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [item.mediaType]);
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || item.mediaType !== "video") return;
-    video.play().catch(() => {});
-  }, [item.mediaSrc, item.mediaType]);
+    if (!video || item.mediaType !== "video" || preferStill) return;
+
+    if (!inView) {
+      video.pause();
+      return;
+    }
+
+    const onFrame = () => {
+      setVideoReady(true);
+      video.play().catch(() => {});
+    };
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      onFrame();
+    } else {
+      video.addEventListener("loadeddata", onFrame, { once: true });
+    }
+
+    return () => video.removeEventListener("loadeddata", onFrame);
+  }, [inView, item.mediaSrc, item.mediaType, preferStill]);
 
   if (item.mediaType === "video") {
     return (
-      <video
-        ref={videoRef}
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-        autoPlay
-        muted
-        loop
-        playsInline
-        poster={item.poster}
-      >
-        <source src={item.mediaSrc} type="video/mp4" />
-      </video>
+      <div ref={frameRef} className="absolute inset-0">
+        <Image
+          src={poster}
+          alt=""
+          fill
+          sizes="320px"
+          className={cn(
+            "object-cover transition-[opacity,transform] duration-200 ease-out group-hover:scale-105",
+            videoReady && !preferStill ? "opacity-0" : "opacity-100"
+          )}
+        />
+        {!preferStill ? (
+          <video
+            ref={videoRef}
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover transition-[opacity,transform] duration-200 ease-out group-hover:scale-105",
+              videoReady ? "opacity-100" : "opacity-0"
+            )}
+            muted
+            loop
+            playsInline
+            preload="none"
+            aria-hidden={!videoReady}
+          >
+            {inView ? <source src={item.mediaSrc} type="video/mp4" /> : null}
+          </video>
+        ) : null}
+      </div>
     );
   }
 
@@ -114,7 +172,6 @@ export function DesignCarousel({ items }: DesignCarouselProps) {
           )}
         </div>
 
-        {/* Mobile: 2-up grid so cards aren’t one giant sideways scroll */}
         <div className="mt-6 grid grid-cols-2 gap-3 md:hidden">
           {items.slice(0, 4).map((item) => (
             <article key={item.id} data-reveal>

@@ -111,7 +111,9 @@ export function CartContent() {
     : 0;
 
   const lineKey = (item: (typeof items)[0]) =>
-    item.lineId ?? item.product.id;
+    item.lineId ??
+    item.product.variantId ??
+    `${item.product.id}:${item.selectedColor ?? ""}`;
 
   if (cartLoading && items.length === 0) {
     return (
@@ -189,11 +191,19 @@ export function CartContent() {
               >
                 {item.product.title}
               </Link>
-              {item.selectedColor && (
+              {item.selectedOptions && item.selectedOptions.length > 0 ? (
+                <ul className="mt-1 space-y-0.5 text-sm text-niti-muted">
+                  {item.selectedOptions.map((opt) => (
+                    <li key={`${opt.name}-${opt.value}`}>
+                      {opt.name}: {opt.value}
+                    </li>
+                  ))}
+                </ul>
+              ) : item.selectedColor ? (
                 <p className="mt-1 text-sm text-niti-muted">
                   {t("product.color")}: {item.selectedColor}
                 </p>
-              )}
+              ) : null}
               <CartLinePrice
                 price={item.product.price}
                 compareAtPrice={item.product.compareAtPrice}

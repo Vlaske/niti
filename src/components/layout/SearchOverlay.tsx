@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { usePromo } from "@/context/PromoContext";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { getDiscount } from "@/lib/pricing";
 import { formatPrice } from "@/lib/utils";
 
@@ -77,7 +79,9 @@ type SearchOverlayProps = {
 export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   const { t, locale } = useLanguage();
   const promoActive = usePromo();
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<SearchResults>({
@@ -86,6 +90,14 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
     rooms: [],
   });
   const titleId = useId();
+  useFocusTrap(dialogRef, open);
+
+  const openFullResults = useCallback(() => {
+    const q = query.trim();
+    if (!q) return;
+    onClose();
+    router.push(`/search?q=${encodeURIComponent(q)}`);
+  }, [query, onClose, router]);
 
   useEffect(() => {
     if (!open) return;
@@ -156,7 +168,13 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[60]" role="dialog" aria-modal aria-labelledby={titleId}>
+    <div
+      ref={dialogRef}
+      className="fixed inset-0 z-[60]"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+    >
       <button
         type="button"
         className="absolute inset-0 bg-niti-charcoal/45 backdrop-blur-[2px]"
@@ -174,6 +192,12 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                openFullResults();
+              }
+            }}
             placeholder={t("search.placeholder")}
             className="min-w-0 flex-1 bg-transparent py-2 text-base text-niti-charcoal outline-none placeholder:text-niti-muted"
             autoComplete="off"
@@ -281,6 +305,13 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                   </li>
                 ))}
               </ul>
+              <Link
+                href={`/search?q=${encodeURIComponent(query.trim())}`}
+                onClick={handleClose}
+                className="interactive mt-4 inline-flex text-sm font-medium text-niti-charcoal underline underline-offset-4"
+              >
+                {t("search.viewAll")}
+              </Link>
             </section>
           )}
         </div>

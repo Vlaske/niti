@@ -16,6 +16,7 @@ import {
   isPatternOptionName,
   selectionsAfterOptionChange,
 } from "@/lib/shopify/variants";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { productImageSrc } from "@/lib/product-image";
 import { getDiscount } from "@/lib/pricing";
 import { cn, formatPrice } from "@/lib/utils";
@@ -202,8 +203,10 @@ export function QuickBuyDrawer({
   const initialRef = useRef(initialSelections);
   initialRef.current = initialSelections;
   const panelRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setMounted(true), []);
+  useFocusTrap(dialogRef, open && mounted);
 
   useEffect(() => {
     if (!open) {
@@ -294,7 +297,13 @@ export function QuickBuyDrawer({
   if (!mounted || !open) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[70]" role="dialog" aria-modal="true">
+    <div
+      ref={dialogRef}
+      className="fixed inset-0 z-[70]"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t("product.quickBuy")}
+    >
       <button
         type="button"
         aria-label={t("product.closeQuickBuy")}
@@ -381,7 +390,7 @@ export function QuickBuyDrawer({
                   </span>
                 ) : null}
                 {showPercent && offer ? (
-                  <span className="bg-niti-sale px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-niti-cream">
+                  <span className="bg-niti-sale px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-white">
                     −{offer.percent}%
                   </span>
                 ) : null}

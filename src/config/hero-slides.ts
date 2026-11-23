@@ -14,8 +14,8 @@ export const heroSlides: HeroSlide[] = [
     productTag: "Premium tekstil - NITI.",
     description:
       "Posteljina, čaršavi i slojevi za miran san - tekstil biran za komfor i nežne tonove.",
-    image:
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=85",
+    // First frame of the MP4 — same pixels as video t=0, so play feels seamless.
+    image: "/videos/bedding-video-hero.jpg",
     ctaPrimary: {
       label: "Pogledaj Spavaću sobu",
       href: "/shop/spavaca-soba",
@@ -23,8 +23,7 @@ export const heroSlides: HeroSlide[] = [
     ctaSecondary: { label: "shop", href: "/shop" },
     mediaType: "video",
     mediaSrc: "/videos/bedding-video-hero.mp4",
-    poster:
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1920&q=85",
+    poster: "/videos/bedding-video-hero.jpg",
   },
   {
     id: "2",

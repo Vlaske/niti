@@ -2,8 +2,14 @@ import type { Metadata } from "next";
 import { Outfit, Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import { AppProviders } from "@/components/providers/AppProviders";
 import { FloatingActions } from "@/components/layout/FloatingActions";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { getEnrichedNavCategories } from "@/lib/catalog";
 import { getPromoEdit } from "@/lib/promo";
+import {
+  getSiteUrl,
+  organizationJsonLd,
+  websiteJsonLd,
+} from "@/lib/seo";
 import { preferSiteImage } from "@/lib/site-images";
 import "./globals.css";
 
@@ -36,16 +42,21 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-      "https://niti.home"
-  ),
+  metadataBase: new URL(getSiteUrl()),
   title: {
-    default: "NITI. - Premium tekstil za dom",
+    default: "NITI. — Premium tekstil za dom",
     template: "%s | NITI.",
   },
   description:
-    "Kućni tekstil za spavaću sobu, kupatilo i kuhinju - posteljine, peškiri, stolnjaci i više. NITI.",
+    "Kućni tekstil za spavaću sobu, kupatilo i kuhinju — posteljine, peškiri, stolnjaci i više. Dostava širom Srbije. NITI.",
+  keywords: [
+    "tekstil",
+    "posteljina",
+    "peškiri",
+    "kućni tekstil",
+    "NITI",
+    "Srbija",
+  ],
   icons: {
     icon: [
       { url: "/brand/niti-favicon.svg", type: "image/svg+xml" },
@@ -54,11 +65,31 @@ export const metadata: Metadata = {
     apple: [{ url: "/brand/niti-apple.png", sizes: "180x180" }],
   },
   openGraph: {
-    title: "NITI.",
-    description: "Premium tekstil za dom u nežnim pastelnim tonovima.",
+    title: "NITI. — Premium tekstil za dom",
+    description:
+      "Kućni tekstil u nežnim tonovima — posteljine, peškiri, stolnjaci i više.",
     type: "website",
     siteName: "NITI.",
-    images: [{ url: "/brand/og-template.svg", width: 1200, height: 630 }],
+    locale: "sr_RS",
+    url: getSiteUrl(),
+    images: [
+      {
+        url: "/brand/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: "NITI. HOME — online prodavnica kućnog tekstila",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NITI. — Premium tekstil za dom",
+    description:
+      "Kućni tekstil u nežnim tonovima — posteljine, peškiri, stolnjaci i više.",
+    images: ["/brand/og-default.jpg"],
+  },
+  alternates: {
+    canonical: getSiteUrl(),
   },
 };
 
@@ -67,7 +98,23 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const navCategories = (await getEnrichedNavCategories()).map((category) => ({
+  // Parallelize — root layout blocks every navigation until both finish.
+  // Promo must fail soft: a thrown error here takes down every page.
+  const [navRaw, promo] = await Promise.all([
+    getEnrichedNavCategories(),
+    getPromoEdit().catch((e) => {
+      console.error("[layout] promo failed:", e);
+      return {
+        active: false,
+        endsOn: null,
+        products: [],
+        allProducts: [],
+        preview: false,
+        hasSale: false,
+      };
+    }),
+  ]);
+  const navCategories = navRaw.map((category) => ({
     ...category,
     image: preferSiteImage(`categories/${category.slug}`, category.image),
   }));
@@ -75,7 +122,6 @@ export default async function RootLayout({
     "home/newsletter",
     "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&q=80"
   );
-  const promo = await getPromoEdit();
 
   return (
     <html
@@ -94,6 +140,7 @@ export default async function RootLayout({
           promoActive={promo.active}
           promoHasSale={promo.hasSale}
         >
+          <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
           {children}
           <FloatingActions />
         </AppProviders>

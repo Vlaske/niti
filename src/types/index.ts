@@ -122,6 +122,8 @@ export type CartItem = {
   product: Product;
   quantity: number;
   selectedColor?: string;
+  /** All chosen options (Boja, Dimenzija, …) for cart display */
+  selectedOptions?: { name: string; value: string }[];
   /** Shopify cart line GID */
   lineId?: string;
 };

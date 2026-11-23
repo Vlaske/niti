@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { CartProvider } from "@/context/CartContext";
 import { CategoriesProvider } from "@/context/CategoriesContext";
 import { LanguageProvider } from "@/context/LanguageContext";
@@ -8,6 +8,7 @@ import { PromoProvider } from "@/context/PromoContext";
 import { RecentlyViewedProvider } from "@/context/RecentlyViewedContext";
 import { NewsletterImageProvider } from "@/context/SiteImagesContext";
 import { CartToast } from "@/components/ui/CartToast";
+import { NavigationProgress } from "@/components/ui/NavigationProgress";
 import { RouteAnimationReset } from "@/components/providers/RouteAnimationReset";
 import type { Category } from "@/types";
 
@@ -32,6 +33,9 @@ export function AppProviders({
             <CartProvider>
               <RecentlyViewedProvider>
                 <RouteAnimationReset />
+                <Suspense fallback={null}>
+                  <NavigationProgress />
+                </Suspense>
                 {children}
                 <CartToast />
               </RecentlyViewedProvider>

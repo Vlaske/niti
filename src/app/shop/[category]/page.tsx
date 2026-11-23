@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CategoryPageLayout } from "@/components/shop/CategoryPageLayout";
 import { GroupPageLayout } from "@/components/shop/GroupPageLayout";
@@ -12,6 +13,7 @@ import {
 } from "@/config/store-categories";
 import { getProductsByCategory, getProductsByGroup } from "@/lib/catalog";
 import { toListingProduct } from "@/lib/catalog/listing";
+import { buildPageMetadata, truncateMeta } from "@/lib/seo";
 import { fetchCollectionMeta } from "@/lib/shopify/collections";
 import { preferSiteImage } from "@/lib/site-images";
 import type { Category } from "@/types";
@@ -29,14 +31,34 @@ export async function generateStaticParams() {
   return getShopRouteSlugs().map((category) => ({ category }));
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
   if (isCategoryGroupId(category)) {
     const group = getGroupById(category);
-    return { title: group?.title ?? "Prostor" };
+    return buildPageMetadata({
+      title: group?.title ?? "Prostor",
+      description: truncateMeta(
+        group?.description ||
+          `Tekstil za ${group?.title ?? "dom"} — NITI. premium kućni tekstil.`
+      ),
+      path: `/shop/${category}`,
+      image: group?.image,
+    });
   }
   const cat = getStoreCategoryBySlug(category);
-  return { title: cat?.title ?? "Kategorija" };
+  const shopifyMeta = cat
+    ? await fetchCollectionMeta(cat.collectionHandle).catch(() => null)
+    : null;
+  const description =
+    shopifyMeta?.description?.trim() ||
+    cat?.description ||
+    `${cat?.title ?? "Kategorija"} — tekstil NITI.`;
+  return buildPageMetadata({
+    title: shopifyMeta?.title?.trim() || cat?.title || "Kategorija",
+    description: truncateMeta(description),
+    path: `/shop/${category}`,
+    image: shopifyMeta?.imageUrl || cat?.image,
+  });
 }
 
 export default async function CategoryPage({ params }: Props) {

@@ -64,6 +64,7 @@ export const translations = {
       empty: "Nema rezultata. Probajte drugi pojam ili pregledajte prodavnicu.",
       products: "Proizvodi",
       close: "Zatvori pretragu",
+      viewAll: "Prikaži sve rezultate",
     },
     shop: {
       title: "Sva ponuda",
@@ -85,6 +86,10 @@ export const translations = {
       pagination: "Stranice",
       prevPage: "Prethodna",
       nextPage: "Sledeća",
+      pageOf: "Strana",
+      pageOfTotal: "od",
+      goToPage: "Idi na stranu",
+      goToPageSubmit: "Idi",
       filters: {
         all: "Sve",
         bedsheets: "Posteljina",
@@ -261,6 +266,7 @@ export const translations = {
       empty: "No results. Try another term or browse the shop.",
       products: "Products",
       close: "Close search",
+      viewAll: "View all results",
     },
     shop: {
       title: "Shop all",
@@ -282,6 +288,10 @@ export const translations = {
       pagination: "Pagination",
       prevPage: "Previous",
       nextPage: "Next",
+      pageOf: "Page",
+      pageOfTotal: "of",
+      goToPage: "Go to page",
+      goToPageSubmit: "Go",
       filters: {
         all: "All",
         bedsheets: "Bedsheets",

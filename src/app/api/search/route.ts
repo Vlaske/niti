@@ -37,11 +37,19 @@ export async function GET(req: NextRequest) {
   const matchedProducts = products
     .filter((p) => {
       const hay = normalize(
-        [p.title, p.brand, p.category, p.description, p.handle].join(" ")
+        [
+          p.title,
+          p.brand,
+          p.category,
+          p.description,
+          p.handle,
+          ...(p.tags ?? []),
+          getStoreCategoryBySlug(p.category)?.title ?? "",
+        ].join(" ")
       );
       return hay.includes(needle);
     })
-    .slice(0, 8)
+    .slice(0, 12)
     .map((p) => ({
       id: p.id,
       handle: p.handle,

@@ -137,6 +137,7 @@ export function ShopPageClient({
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(24);
   const [density, setDensity] = useState<GridDensity>("medium");
+  const [pageInput, setPageInput] = useState("");
   const gridRef = useRef<HTMLDivElement>(null);
   const source = productList ?? mockProducts;
 
@@ -229,11 +230,16 @@ export function ShopPageClient({
 
   useEffect(() => {
     setPage(1);
+    setPageInput("1");
   }, [filter, tagFilter, sort, pageSize, initialFilter, saleOnly]);
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages);
   }, [page, totalPages]);
+
+  useEffect(() => {
+    setPageInput(String(safePage));
+  }, [safePage]);
 
   useEffect(() => {
     if (!gridRef.current) return;
@@ -252,9 +258,23 @@ export function ShopPageClient({
   }, [filter, tagFilter, sort, safePage, density, pageSize]);
 
   const goToPage = (next: number) => {
-    setPage(Math.min(totalPages, Math.max(1, next)));
+    const clamped = Math.min(totalPages, Math.max(1, next));
+    setPage(clamped);
+    setPageInput(String(clamped));
     gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  const submitPageJump = () => {
+    const n = Number.parseInt(pageInput, 10);
+    if (!Number.isFinite(n)) {
+      setPageInput(String(safePage));
+      return;
+    }
+    goToPage(n);
+  };
+
+  const progressPct =
+    filtered.length === 0 ? 0 : Math.min(100, (showingTo / filtered.length) * 100);
 
   return (
     <div>
@@ -389,56 +409,123 @@ export function ShopPageClient({
         </p>
       )}
 
-      {totalPages > 1 && (
+      {filtered.length > 0 && (
         <nav
-          className="mt-12 flex flex-wrap items-center justify-center gap-2"
+          className="mt-12 border-y border-niti-line py-5"
           aria-label={t("shop.pagination")}
         >
-          <button
-            type="button"
-            onClick={() => goToPage(safePage - 1)}
-            disabled={safePage <= 1}
-            className="interactive inline-flex h-10 items-center gap-1 rounded-md border border-niti-line bg-white px-3 text-sm text-niti-charcoal disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("shop.prevPage")}
-          </button>
-
-          {pageWindow(safePage, totalPages).map((item, idx) =>
-            item === "…" ? (
-              <span
-                key={`ellipsis-${idx}`}
-                className="px-1 text-sm text-niti-muted"
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+            {/* Range + progress */}
+            <div className="min-w-0 lg:w-[200px] lg:shrink-0">
+              <p className="text-sm tabular-nums tracking-tight">
+                <span className="font-semibold text-niti-charcoal">
+                  {showingFrom}–{showingTo}
+                </span>
+                <span className="text-niti-muted">
+                  {" "}
+                  / {filtered.length} {t("shop.products")}
+                </span>
+              </p>
+              <div
+                className="mt-2.5 h-px w-full bg-niti-line"
+                role="presentation"
               >
-                …
-              </span>
-            ) : (
-              <button
-                key={item}
-                type="button"
-                onClick={() => goToPage(item)}
-                aria-current={item === safePage ? "page" : undefined}
-                className={cn(
-                  "interactive flex h-10 min-w-10 items-center justify-center rounded-md border px-2.5 text-sm font-medium",
-                  item === safePage
-                    ? "border-niti-charcoal bg-niti-charcoal text-white"
-                    : "border-niti-line bg-white text-niti-charcoal hover:border-niti-charcoal/30"
+                <div
+                  className="h-px bg-niti-charcoal transition-[width] duration-300 ease-out"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Page numbers */}
+            {totalPages > 1 ? (
+              <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => goToPage(safePage - 1)}
+                  disabled={safePage <= 1}
+                  className="interactive flex h-9 w-9 items-center justify-center text-niti-charcoal disabled:cursor-not-allowed disabled:opacity-30"
+                  aria-label={t("shop.prevPage")}
+                >
+                  <ChevronLeft className="h-4 w-4" strokeWidth={1.5} />
+                </button>
+
+                {pageWindow(safePage, totalPages).map((item, idx) =>
+                  item === "…" ? (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="px-1 text-sm text-niti-muted"
+                      aria-hidden
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => goToPage(item)}
+                      aria-current={item === safePage ? "page" : undefined}
+                      className={cn(
+                        "interactive flex h-9 min-w-9 items-center justify-center px-2 text-sm tabular-nums transition-colors",
+                        item === safePage
+                          ? "bg-niti-charcoal font-medium text-white"
+                          : "text-niti-muted hover:text-niti-charcoal"
+                      )}
+                    >
+                      {item}
+                    </button>
+                  )
                 )}
-              >
-                {item}
-              </button>
-            )
-          )}
 
-          <button
-            type="button"
-            onClick={() => goToPage(safePage + 1)}
-            disabled={safePage >= totalPages}
-            className="interactive inline-flex h-10 items-center gap-1 rounded-md border border-niti-line bg-white px-3 text-sm text-niti-charcoal disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            {t("shop.nextPage")}
-            <ChevronRight className="h-4 w-4" />
-          </button>
+                <button
+                  type="button"
+                  onClick={() => goToPage(safePage + 1)}
+                  disabled={safePage >= totalPages}
+                  className="interactive flex h-9 w-9 items-center justify-center text-niti-charcoal disabled:cursor-not-allowed disabled:opacity-30"
+                  aria-label={t("shop.nextPage")}
+                >
+                  <ChevronRight className="h-4 w-4" strokeWidth={1.5} />
+                </button>
+              </div>
+            ) : (
+              <div className="hidden lg:block" />
+            )}
+
+            {/* Jump to page */}
+            {totalPages > 1 ? (
+              <form
+                className="flex items-center justify-center gap-2 lg:w-[200px] lg:shrink-0 lg:justify-end"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  submitPageJump();
+                }}
+              >
+                <label
+                  htmlFor="shop-goto-page"
+                  className="text-sm text-niti-muted"
+                >
+                  {t("shop.pageOf")}
+                </label>
+                <input
+                  id="shop-goto-page"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={pageInput}
+                  onChange={(e) =>
+                    setPageInput(e.target.value.replace(/[^\d]/g, ""))
+                  }
+                  onBlur={submitPageJump}
+                  onFocus={(e) => e.target.select()}
+                  aria-label={t("shop.goToPage")}
+                  className="w-10 border-0 border-b border-niti-charcoal bg-transparent pb-0.5 text-center text-sm font-medium tabular-nums text-niti-charcoal outline-none focus:border-niti-charcoal"
+                />
+                <span className="text-sm tabular-nums text-niti-muted">
+                  / {totalPages}
+                </span>
+              </form>
+            ) : null}
+          </div>
         </nav>
       )}
     </div>

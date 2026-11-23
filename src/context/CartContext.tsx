@@ -237,7 +237,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (lineOrProductId: string) =>
       items.find(
         (i) =>
-          i.lineId === lineOrProductId || i.product.id === lineOrProductId
+          i.lineId === lineOrProductId ||
+          i.product.variantId === lineOrProductId ||
+          i.product.id === lineOrProductId
       ),
     [items]
   );
@@ -250,22 +252,67 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (
       product: Product,
       quantity: number,
-      selectedColor?: string
+      extras?: {
+        variantId?: string;
+        selectedColor?: string;
+        selections?: Record<string, string>;
+      }
     ): CartItem[] => {
+      const variantId =
+        extras?.variantId ??
+        (extras?.selections
+          ? getVariantIdFromSelections(product, extras.selections)
+          : getVariantIdForColor(product, extras?.selectedColor)) ??
+        product.variantId;
+      const variant = product.variants?.find((v) => v.id === variantId);
+      const selectedColor =
+        extras?.selectedColor ??
+        extras?.selections?.[
+          Object.keys(extras.selections ?? {}).find((k) =>
+            /^(color|colour|boja)$/i.test(k)
+          ) ?? ""
+        ];
+      const selectedOptions =
+        extras?.selections && Object.keys(extras.selections).length > 0
+          ? Object.entries(extras.selections).map(([name, value]) => ({
+              name,
+              value,
+            }))
+          : selectedColor
+            ? [{ name: "Boja", value: selectedColor }]
+            : undefined;
+
+      const lineProduct: Product = {
+        ...product,
+        variantId,
+        price: variant?.price ?? product.price,
+        compareAtPrice: variant?.compareAtPrice ?? product.compareAtPrice,
+        image: variant?.image || product.image,
+      };
+
       let nextItems: CartItem[] = [];
       setItems((prev) => {
-        const existing = prev.find(
-          (i) =>
-            i.product.id === product.id && i.selectedColor === selectedColor
-        );
+        const sameLine = (i: CartItem) =>
+          variantId
+            ? i.product.variantId === variantId
+            : i.product.id === product.id &&
+              i.selectedColor === selectedColor;
+        const existing = prev.find(sameLine);
         nextItems = existing
           ? prev.map((i) =>
-              i.product.id === product.id &&
-              i.selectedColor === selectedColor
+              sameLine(i)
                 ? { ...i, quantity: i.quantity + quantity }
                 : i
             )
-          : [...prev, { product, quantity, selectedColor }];
+          : [
+              ...prev,
+              {
+                product: lineProduct,
+                quantity,
+                selectedColor,
+                selectedOptions,
+              },
+            ];
         return nextItems;
       });
       setSubtotal(
@@ -286,10 +333,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         selections?: Record<string, string>;
       }
     ) => {
-      const selectedColor = extras?.selectedColor;
-
       if (!shopifyCart) {
-        applyOptimisticAdd(product, quantity, selectedColor);
+        applyOptimisticAdd(product, quantity, extras);
         setToast({ product, variant: "success", visible: true });
         return;
       }
@@ -298,7 +343,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const previousSubtotal = subtotal;
       cartRevision.current += 1;
       const revision = cartRevision.current;
-      applyOptimisticAdd(product, quantity, selectedColor);
+      // Optimistic UI: cart + toast update immediately; Shopify syncs in background.
+      applyOptimisticAdd(product, quantity, extras);
+      setToast({ product, variant: "success", visible: true });
 
       (async () => {
         try {
@@ -307,10 +354,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
             extras?.variantId ??
             (extras?.selections
               ? getVariantIdFromSelections(product, extras.selections)
-              : getVariantIdForColor(product, selectedColor));
+              : getVariantIdForColor(product, extras?.selectedColor));
           if (!variantId) {
             throw new Error(
-              "Proizvod nema Shopify varijantu (dodaj iz /shop ili proveri mock podatke)."
+              "Nije moguće dodati proizvod u korpu. Osvežite stranicu i pokušajte ponovo."
             );
           }
           const id = cartId ?? (await ensureCartId());
@@ -325,7 +372,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
           );
           if (revision !== cartRevision.current) return;
           applyRemoteCart(cart);
-          setToast({ product, variant: "success", visible: true });
         } catch (e) {
           if (revision !== cartRevision.current) return;
           setItems(previousItems);
@@ -368,16 +414,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const updateQuantity = useCallback(
     (lineOrProductId: string, quantity: number) => {
       if (!shopifyCart) {
+        const matches = (i: CartItem) =>
+          i.lineId === lineOrProductId ||
+          i.product.variantId === lineOrProductId ||
+          i.product.id === lineOrProductId;
         if (quantity < 1) {
-          setItems((prev) =>
-            prev.filter((i) => i.product.id !== lineOrProductId)
-          );
+          setItems((prev) => prev.filter((i) => !matches(i)));
           return;
         }
         setItems((prev) =>
-          prev.map((i) =>
-            i.product.id === lineOrProductId ? { ...i, quantity } : i
-          )
+          prev.map((i) => (matches(i) ? { ...i, quantity } : i))
         );
         return;
       }
@@ -417,7 +463,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (lineOrProductId: string) => {
       if (!shopifyCart) {
         setItems((prev) =>
-          prev.filter((i) => i.product.id !== lineOrProductId)
+          prev.filter(
+            (i) =>
+              i.lineId !== lineOrProductId &&
+              i.product.variantId !== lineOrProductId &&
+              i.product.id !== lineOrProductId
+          )
         );
         return;
       }

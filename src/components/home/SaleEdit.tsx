@@ -161,7 +161,7 @@ function SaleCard({ product, best }: { product: Product; best: boolean }) {
         />
         <div className="absolute left-2.5 top-2.5 flex max-w-[calc(100%-1.25rem)] items-center gap-1.5">
           {offer && offer.percent >= 1 ? (
-            <span className="bg-niti-sale px-2 py-1.5 text-[12px] font-semibold tabular-nums leading-none tracking-tight text-niti-cream shadow-sm shadow-black/15 sm:text-[13px]">
+            <span className="bg-niti-sale px-2 py-1.5 text-[12px] font-semibold tabular-nums leading-none tracking-tight text-white shadow-sm shadow-black/15 sm:text-[13px]">
               −{offer.percent}%
             </span>
           ) : null}

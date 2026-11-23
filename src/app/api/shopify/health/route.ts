@@ -1,24 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getStorefrontAuthStrategies } from "@/lib/shopify/auth";
-import {
-  getActiveAuthStrategyId,
-  shopifyFetch,
-} from "@/lib/shopify/client";
+import { shopifyFetch } from "@/lib/shopify/client";
 import {
   getShopifyTokenMode,
   shopifyServerConfigured,
-  shopifyStoreDomain,
 } from "@/lib/shopify/config";
 import { SHOP_NAME_QUERY } from "@/lib/shopify/queries";
 
+/**
+ * Lightweight Shopify connectivity check.
+ * In production require ?key=HEALTH_CHECK_SECRET (or omit secret → 404).
+ */
 export async function GET(request: NextRequest) {
+  const secret = process.env.HEALTH_CHECK_SECRET?.trim();
+  if (process.env.NODE_ENV === "production") {
+    if (!secret || request.nextUrl.searchParams.get("key") !== secret) {
+      return new NextResponse(null, { status: 404 });
+    }
+  }
+
   if (!shopifyServerConfigured) {
     return NextResponse.json(
       {
         ok: false,
         configured: false,
-        message:
-          "Nedostaju SHOPIFY_STORE_DOMAIN i token. Vidi SHOPIFY_SETUP.md.",
+        message: "Shopify nije konfigurisan.",
       },
       { status: 503 }
     );
@@ -26,52 +31,21 @@ export async function GET(request: NextRequest) {
 
   try {
     const data = await shopifyFetch<{
-      shop: { name: string; primaryDomain?: { url: string } };
+      shop: { name: string };
     }>(SHOP_NAME_QUERY, undefined, { revalidate: false });
-
-    let cartOk: boolean | null = null;
-    let cartHint: string | undefined;
-
-    if (request.nextUrl.searchParams.get("testCart") === "1") {
-      try {
-        const { createCart } = await import("@/lib/shopify/cart");
-        const cart = await createCart();
-        cartOk = Boolean(cart.checkoutUrl);
-      } catch (e) {
-        cartOk = false;
-        cartHint =
-          e instanceof Error
-            ? e.message
-            : "Dodaj unauthenticated_write_checkouts u Headless dozvole.";
-      }
-    }
 
     return NextResponse.json({
       ok: true,
       configured: true,
       shopName: data.shop.name,
-      domain: shopifyStoreDomain,
       tokenMode: getShopifyTokenMode(),
-      authStrategies: getStorefrontAuthStrategies().map((s) => s.id),
-      activeAuth: getActiveAuthStrategyId(),
-      primaryDomain: data.shop.primaryDomain?.url ?? null,
-      ...(request.nextUrl.searchParams.has("testCart")
-        ? { cartOk, cartHint }
-        : {}),
     });
-  } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Nepoznata greška";
+  } catch (e) {
     return NextResponse.json(
       {
         ok: false,
         configured: true,
-        domain: shopifyStoreDomain,
-        tokenMode: getShopifyTokenMode(),
-        authStrategies: getStorefrontAuthStrategies().map((s) => s.id),
-        message,
-        hint:
-          "Za Headless: SHOPIFY_STOREFRONT_PUBLIC_TOKEN = javni (hex), SHOPIFY_STOREFRONT_PRIVATE_TOKEN = shpss_ privatni. shpat_ u private polju često daje 401.",
+        message: e instanceof Error ? e.message : "Shopify greška",
       },
       { status: 502 }
     );

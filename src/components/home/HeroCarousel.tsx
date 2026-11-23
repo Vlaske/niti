@@ -33,6 +33,8 @@ function HeroMedia({
   const { type, src, poster } = getSlideMedia(slide);
   const videoRef = useRef<HTMLVideoElement>(null);
   const readySent = useRef(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [preferStill, setPreferStill] = useState(false);
 
   const notifyReady = useCallback(() => {
     if (readySent.current) return;
@@ -42,40 +44,72 @@ function HeroMedia({
 
   useEffect(() => {
     readySent.current = false;
+    setVideoReady(false);
   }, [src, type]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setPreferStill(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
     const v = videoRef.current;
-    if (!v || type !== "video") return;
+    if (!v || type !== "video" || preferStill) return;
 
-    const handleReady = () => notifyReady();
+    // Reveal as soon as frame 0 is painted (matches the JPG still), then play.
+    // With a true first-frame poster this reads as “video starts”, not a photo swap.
+    const onFrame = () => {
+      setVideoReady(true);
+      notifyReady();
+      v.play().catch(() => {});
+    };
 
-    if (v.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-      handleReady();
+    if (v.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      onFrame();
     } else {
-      v.addEventListener("canplay", handleReady, { once: true });
+      v.addEventListener("loadeddata", onFrame, { once: true });
     }
 
-    v.play().catch(() => {});
-
-    return () => v.removeEventListener("canplay", handleReady);
-  }, [src, type, notifyReady]);
+    return () => v.removeEventListener("loadeddata", onFrame);
+  }, [src, type, preferStill, notifyReady]);
 
   if (type === "video") {
     return (
-      <video
-        ref={videoRef}
-        key={src}
-        className="h-full w-full object-cover"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        poster={poster}
-      >
-        <source src={src} type="video/mp4" />
-      </video>
+      <div className="relative h-full w-full bg-niti-sand">
+        <Image
+          src={poster}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className={cn(
+            "object-cover transition-opacity duration-200 ease-out",
+            videoReady && !preferStill ? "opacity-0" : "opacity-100"
+          )}
+          onLoad={preferStill ? notifyReady : undefined}
+        />
+        {!preferStill ? (
+          <video
+            ref={videoRef}
+            key={src}
+            className={cn(
+              "absolute inset-0 h-full w-full object-cover transition-opacity duration-200 ease-out",
+              videoReady ? "opacity-100" : "opacity-0"
+            )}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden={!videoReady}
+          >
+            <source src={src} type="video/mp4" />
+          </video>
+        ) : null}
+      </div>
     );
   }
 

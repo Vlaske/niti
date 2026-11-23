@@ -1,9 +1,13 @@
-import { productMatchesCategory } from "@/config/store-categories";
+import {
+  getCollectionHandlesForSlug,
+  productMatchesCategory,
+} from "@/config/store-categories";
 import { shopifyFetch } from "@/lib/shopify/client";
 import { mapShopifyProduct, type ShopifyProductNode } from "@/lib/shopify/mappers";
 import {
   COLLECTION_PRODUCTS_QUERY,
   PRODUCT_BY_HANDLE_QUERY,
+  PRODUCT_HANDLES_QUERY,
   PRODUCT_RECOMMENDATIONS_QUERY,
   PRODUCTS_QUERY,
 } from "@/lib/shopify/queries";
@@ -11,6 +15,7 @@ import type { Product } from "@/types";
 
 const PAGE_SIZE = 100;
 const MAX_PRODUCTS = 3000;
+const HANDLES_PAGE = 250;
 
 type ProductsResponse = {
   products: {
@@ -62,20 +67,76 @@ export async function fetchShopifyProductByHandle(
 }
 
 /**
- * Always filter from the full mapped catalog.
- * Collection-handle fetches miss products that Shopify placed in the wrong
- * collection, while our title/tag heuristics still classify them correctly.
+ * Prefer Shopify collection fetches (fast) for category/group pages.
+ * Fall back to full-catalog filter only when collections return nothing —
+ * misplaced products still show via that path.
  */
 export async function fetchShopifyProductsByCategory(
   categorySlug: string
 ): Promise<Product[]> {
+  const handles = getCollectionHandlesForSlug(categorySlug);
+  const lists = await Promise.all(
+    handles.map((handle) =>
+      fetchShopifyCollectionProducts(handle, 250).catch(() => [] as Product[])
+    )
+  );
+
+  const byId = new Map<string, Product>();
+  for (const list of lists) {
+    for (const product of list) byId.set(product.id, product);
+  }
+
+  const fromCollections = [...byId.values()].filter((p) =>
+    productMatchesCategory(p, categorySlug)
+  );
+
+  if (fromCollections.length > 0) return fromCollections;
+
   const all = await fetchShopifyProducts();
   return all.filter((p) => productMatchesCategory(p, categorySlug));
 }
 
+export type ShopifyProductHandleRow = {
+  handle: string;
+  updatedAt?: string;
+};
+
 export async function fetchShopifyProductHandles(): Promise<string[]> {
-  const products = await fetchShopifyProducts();
-  return products.map((p) => p.handle);
+  const rows = await fetchShopifyProductHandleRows();
+  return rows.map((r) => r.handle);
+}
+
+type HandlesResponse = {
+  products: {
+    pageInfo: { hasNextPage: boolean; endCursor: string | null };
+    nodes: { handle: string; updatedAt?: string }[];
+  };
+};
+
+/** Lean handles list for sitemap / static params — not the full catalog. */
+export async function fetchShopifyProductHandleRows(): Promise<
+  ShopifyProductHandleRow[]
+> {
+  const rows: ShopifyProductHandleRow[] = [];
+  let after: string | null = null;
+  let hasNext = true;
+
+  while (hasNext) {
+    const data: HandlesResponse = await shopifyFetch<HandlesResponse>(
+      PRODUCT_HANDLES_QUERY,
+      { first: HANDLES_PAGE, after },
+      { revalidate: 300 }
+    );
+
+    for (const n of data.products.nodes) {
+      rows.push({ handle: n.handle, updatedAt: n.updatedAt });
+    }
+    hasNext = data.products.pageInfo.hasNextPage;
+    after = data.products.pageInfo.endCursor;
+    if (rows.length >= MAX_PRODUCTS) break;
+  }
+
+  return rows;
 }
 
 type CollectionProductsResponse = {

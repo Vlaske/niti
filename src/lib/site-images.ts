@@ -28,6 +28,11 @@ export function resolveHeroSlides(slides: HeroSlide[]): HeroSlide[] {
   return slides.map((slide) => {
     const file = HERO_FILES[slide.id];
     if (!file) return slide;
+    // Video slides keep their first-frame still — a different site photo
+    // would snap when the MP4 starts (even with a soft fade).
+    if (slide.mediaType === "video") {
+      return slide;
+    }
     const image = preferSiteImage(file, slide.image);
     return {
       ...slide,
@@ -44,6 +49,8 @@ const SHOWCASE_FILES: Record<string, string> = {
 };
 
 export function resolveShowcasePoster(id: string, fallback: string): string {
+  // Prefer an extracted first-frame still next to the MP4 over a site override.
+  if (fallback.startsWith("/videos/")) return fallback;
   const file = SHOWCASE_FILES[id];
   return file ? preferSiteImage(file, fallback) : fallback;
 }

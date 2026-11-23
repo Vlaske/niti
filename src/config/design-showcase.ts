@@ -6,7 +6,7 @@
  * 2. Video: stavi .mp4 u `public/videos/showcase/`, zatim:
  *    mediaType: "video",
  *    mediaSrc: "/videos/showcase/ime-fajla.mp4",
- *    poster: "…", // cover dok se učitava
+ *    poster: "/videos/showcase/ime-fajla.jpg", // first frame of the MP4 (same name)
  * 3. Samo slika: izostavi mediaType ili stavi "image" + mediaSrc (URL ili putanja)
  *
  * Kartica ispod videa automatski povlači naziv, cenu i sliku iz Shopify-a.
@@ -28,30 +28,27 @@ export type DesignShowcaseEntry = {
 export const designShowcaseEntries: DesignShowcaseEntry[] = [
   {
     id: "1",
-    productHandle: "pamucni-carsav-sa-lastisem",
+    productHandle: "cebe-prekrivac-spring-a7",
     description:
       "Mekani slojevi i pastelnih tonova - posteljina koja poziva na odmor.",
     mediaType: "video",
     mediaSrc: "/videos/showcase/prekrivac-live.mp4",
-    poster:
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=85",
+    poster: "/videos/showcase/prekrivac-live.jpg",
   },
   {
     id: "2",
-    productHandle: "jastuk-premium",
+    productHandle: "jastuk-soft-fiber-nova",
     description: "Savršena podrška i mekana tkanina - detalj koji čini razliku.",
     mediaType: "video",
     mediaSrc: "/videos/showcase/jastuk-live-1.mp4",
-    poster:
-      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&q=85",
+    poster: "/videos/showcase/jastuk-live-1.jpg",
   },
   {
     id: "3",
-    productHandle: "luksuzni-pamucni-peskir-niti",
+    productHandle: "plazni-peskir-mambo",
     description: "Osećaj kao kod kuće - peškiri koji voli vaša koža.",
     mediaType: "video",
     mediaSrc: "/videos/showcase/peskir-plaza-live.mp4",
-    poster:
-      "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=800&q=85",
+    poster: "/videos/showcase/peskir-plaza-live.jpg",
   },
 ];

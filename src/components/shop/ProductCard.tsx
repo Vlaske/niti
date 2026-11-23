@@ -234,7 +234,7 @@ export function ProductCard({
                   </span>
                 ) : null}
                 {offer ? (
-                  <span className="bg-niti-sale px-2 py-1 text-[10px] font-semibold tabular-nums leading-none text-niti-cream">
+                  <span className="bg-niti-sale px-2 py-1 text-[10px] font-semibold tabular-nums leading-none text-white">
                     −
                     {showPercent
                       ? `${offer.percent}%`

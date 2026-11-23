@@ -16,12 +16,13 @@ type ButtonProps = {
 const variants: Record<ButtonVariant, string> = {
   primary:
     "bg-white text-niti-charcoal hover:bg-niti-cream shadow-sm",
+  // sage-dark + white failed WCAG; deep sage keeps brand tint with readable contrast
   secondary:
-    "bg-niti-sage-dark text-white shadow-sm hover:bg-niti-sage-deep active:scale-[0.98] active:bg-niti-charcoal",
+    "bg-niti-sage-deep text-white shadow-sm hover:bg-niti-charcoal active:scale-[0.98]",
   ghost:
     "border border-white/80 text-white bg-transparent hover:bg-white/10",
   outline:
-    "border border-niti-charcoal/20 text-niti-charcoal bg-transparent hover:border-niti-charcoal/40",
+    "border border-niti-charcoal/40 text-niti-charcoal bg-transparent hover:border-niti-charcoal hover:bg-niti-sand/40",
   dark:
     "bg-niti-charcoal text-white hover:bg-niti-footer",
 };

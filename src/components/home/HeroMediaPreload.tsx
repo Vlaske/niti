@@ -1,26 +1,18 @@
 import type { HeroSlide } from "@/types";
 
-/** Preload hero medija u <head> radi bržeg prvog prikaza */
+/**
+ * Preload only the hero still (poster/image).
+ * Do not preload the MP4 as fetch — the <video> element loads it itself;
+ * a separate fetch preload often doubles bandwidth and does not prevent poster snap.
+ */
 export function HeroMediaPreload({ slides }: { slides: HeroSlide[] }) {
   const slide = slides[0];
   if (!slide) return null;
   const mediaType = slide.mediaType ?? "image";
-  const poster = slide.poster ?? slide.image;
-  const videoSrc =
-    mediaType === "video" ? (slide.mediaSrc ?? slide.image) : null;
+  const poster =
+    mediaType === "video"
+      ? (slide.poster ?? slide.image)
+      : (slide.mediaSrc ?? slide.image);
 
-  return (
-    <>
-      <link rel="preload" href={poster} as="image" />
-      {videoSrc && (
-        <link
-          rel="preload"
-          href={videoSrc}
-          as="fetch"
-          type="video/mp4"
-          crossOrigin="anonymous"
-        />
-      )}
-    </>
-  );
+  return <link rel="preload" href={poster} as="image" />;
 }

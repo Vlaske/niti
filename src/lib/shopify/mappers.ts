@@ -640,9 +640,10 @@ export type ShopifyCartPayload = {
 export function mapCartLines(cart: ShopifyCartPayload): CartItem[] {
   return cart.lines.nodes.map((line) => {
     const m = line.merchandise;
-    const colorOpt = m.selectedOptions.find(
-      (o) => o.name.toLowerCase() === "color" || o.name.toLowerCase() === "boja"
+    const selectedOptions = m.selectedOptions.filter(
+      (o) => o.value && o.value !== "Default Title"
     );
+    const colorOpt = selectedOptions.find((o) => isColorOptionName(o.name));
 
     const product: Product = {
       id: m.product.id,
@@ -663,6 +664,7 @@ export function mapCartLines(cart: ShopifyCartPayload): CartItem[] {
       product,
       quantity: line.quantity,
       selectedColor: colorOpt?.value,
+      selectedOptions,
       lineId: line.id,
     };
   });
