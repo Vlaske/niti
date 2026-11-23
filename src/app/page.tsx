@@ -6,12 +6,12 @@ import { HomeLoaderProvider } from "@/context/HomeLoaderContext";
 import { NewArrivals } from "@/components/home/NewArrivals";
 import { SaleEdit } from "@/components/home/SaleEdit";
 import { CollectionsGrid } from "@/components/home/CollectionsGrid";
-import { DesignCarousel } from "@/components/home/DesignCarousel";
 import { FeaturedHero } from "@/components/home/FeaturedHero";
+// import { DesignCarousel } from "@/components/home/DesignCarousel";
 // import { MarqueeBanner } from "@/components/home/MarqueeBanner";
 import { FaqSection } from "@/components/home/FaqSection";
 import { getNewArrivalsProducts } from "@/lib/catalog";
-import { getDesignShowcaseItems } from "@/lib/catalog/design-showcase";
+// import { getDesignShowcaseItems } from "@/lib/catalog/design-showcase";
 import { heroSlides } from "@/config/hero-slides";
 import { FAQ_SECTION_IMAGE } from "@/config/placeholders";
 import { CATEGORY_GROUPS } from "@/config/store-categories";
@@ -21,11 +21,12 @@ import { preferSiteImage, resolveHeroSlides } from "@/lib/site-images";
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const [newArrivals, designShowcase, promo] = await Promise.all([
+  const [newArrivals, promo] = await Promise.all([
     getNewArrivalsProducts(),
-    getDesignShowcaseItems(),
     getPromoEdit(),
   ]);
+  // Design showcase — privremeno isključeno (vrati fetch + <DesignCarousel /> kad zatreba)
+  // const designShowcase = await getDesignShowcaseItems();
   const slides = resolveHeroSlides(heroSlides);
   const roomImages = Object.fromEntries(
     CATEGORY_GROUPS.map((room) => [
@@ -51,7 +52,9 @@ export default async function HomePage() {
           )}
           ctaHref="/shop/spavaca-soba"
         />
+        {/* Gde dizajn oživljava — privremeno isključeno
         <DesignCarousel items={designShowcase} />
+        */}
         {/* Pomerajuća traka — privremeno isključeno
         <MarqueeBanner />
         */}
