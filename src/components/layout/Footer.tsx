@@ -91,15 +91,7 @@ export function Footer() {
         />
         <div className="absolute inset-0 bg-niti-charcoal/55" />
         <div className={`${FOOTER_INSET} relative flex justify-center py-14 md:py-20`}>
-          <div className="flex w-full max-w-xl flex-col items-center text-center text-white">
-            <h2 className="mb-2 font-serif text-xl font-medium md:mb-3 md:text-3xl">
-              {t("footer.newsletter")}
-            </h2>
-            <p className="mb-6 text-xs text-white/85 md:mb-8 md:text-base">
-              {t("footer.newsletterSub")}
-            </p>
-            <NewsletterForm />
-          </div>
+          <NewsletterForm />
         </div>
       </section>
 

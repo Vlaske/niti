@@ -190,8 +190,9 @@ export const translations = {
       email: "Email",
       subscribe: "Prijavi se",
       subscribing: "Prijava…",
-      newsletterThanksTitle: "Hvala što ste se prijavili",
-      newsletterThanks: "Uspešno ste prijavljeni na naš newsletter.",
+      newsletterThanksTitle: "Hvala vam na prijavi!",
+      newsletterThanks:
+        "Vaša prijava na newsletter je uspešna. Uskoro vam stižu novosti o našim kolekcijama, savetima i specijalnim ponudama.",
       newsletterInvalid: "Unesite ispravnu email adresu.",
       newsletterError:
         "Prijava trenutno nije uspela. Pišite nam na info@nitihome.rs.",
@@ -393,8 +394,9 @@ export const translations = {
       email: "Email",
       subscribe: "Subscribe",
       subscribing: "Subscribing…",
-      newsletterThanksTitle: "Thank you for subscribing",
-      newsletterThanks: "You have successfully joined our newsletter.",
+      newsletterThanksTitle: "Thank you for subscribing!",
+      newsletterThanks:
+        "Your newsletter signup was successful. You’ll soon get news on our collections, tips, and special offers.",
       newsletterInvalid: "Enter a valid email address.",
       newsletterError:
         "Signup didn’t go through. Email us at info@nitihome.rs.",
