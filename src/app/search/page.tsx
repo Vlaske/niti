@@ -107,7 +107,7 @@ export default async function SearchPage({ searchParams }: Props) {
             {q
               ? matched.length > 0
                 ? `${matched.length} proizvoda`
-                : "Nema proizvoda za ovaj upit — pokušajte drugačiji pojam ili pregledajte prostor."
+                : "Nema proizvoda za ovaj upit - pokušajte drugačiji pojam ili pregledajte prostor."
               : "Koristite pretragu u zaglavlju ili unesite pojam u URL (?q=…)."}
           </p>
         </section>

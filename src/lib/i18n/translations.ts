@@ -38,7 +38,7 @@ export const translations = {
       saleEyebrow: "Sezonska selekcija",
       saleTitle: "Izdvojeno na sniženju",
       saleLead:
-        "Isti kvalitet tkanja i izrade — posebne cene na izabranim komadima.",
+        "Isti kvalitet tkanja i izrade - posebne cene na izabranim komadima.",
       saleUntil: "Važi do",
       saleUpTo: "Ušteda do",
       saleBest: "Najveći popust",
@@ -190,7 +190,8 @@ export const translations = {
       email: "Email",
       subscribe: "Prijavi se",
       subscribing: "Prijava…",
-      newsletterThanks: "Hvala. Bićete u toku sa kolekcijama i negom tekstila.",
+      newsletterThanksTitle: "Hvala što ste se prijavili",
+      newsletterThanks: "Uspešno ste prijavljeni na naš newsletter.",
       newsletterInvalid: "Unesite ispravnu email adresu.",
       newsletterError:
         "Prijava trenutno nije uspela. Pišite nam na info@nitihome.rs.",
@@ -240,7 +241,7 @@ export const translations = {
       saleEyebrow: "Seasonal edit",
       saleTitle: "Set aside, reduced",
       saleLead:
-        "The same cloth and making — a special price on chosen pieces.",
+        "The same cloth and making - a special price on chosen pieces.",
       saleUntil: "Until",
       saleUpTo: "Save up to",
       saleBest: "Largest cut",
@@ -392,7 +393,8 @@ export const translations = {
       email: "Email",
       subscribe: "Subscribe",
       subscribing: "Subscribing…",
-      newsletterThanks: "Thank you. You’ll hear about collections and textile care.",
+      newsletterThanksTitle: "Thank you for subscribing",
+      newsletterThanks: "You have successfully joined our newsletter.",
       newsletterInvalid: "Enter a valid email address.",
       newsletterError:
         "Signup didn’t go through. Email us at info@nitihome.rs.",

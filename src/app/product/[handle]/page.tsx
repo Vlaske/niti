@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const description = truncateMeta(
     stripHtml(product.descriptionHtml || product.description) ||
-      `${product.title} — premium tekstil NITI.`
+      `${product.title} - premium tekstil NITI.`
   );
 
   return buildPageMetadata({

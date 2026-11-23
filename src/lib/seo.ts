@@ -48,7 +48,7 @@ export function buildPageMetadata(input: {
 }): Metadata {
   const description = truncateMeta(
     input.description ||
-      "Kućni tekstil za spavaću sobu, kupatilo i kuhinju — posteljine, peškiri, stolnjaci i više. NITI."
+      "Kućni tekstil za spavaću sobu, kupatilo i kuhinju - posteljine, peškiri, stolnjaci i više. NITI."
   );
   const image = input.image?.trim() || DEFAULT_OG;
   const url = absoluteUrl(input.path);

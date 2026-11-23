@@ -44,11 +44,11 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: "NITI. — Premium tekstil za dom",
+    default: "NITI. - Premium tekstil za dom",
     template: "%s | NITI.",
   },
   description:
-    "Kućni tekstil za spavaću sobu, kupatilo i kuhinju — posteljine, peškiri, stolnjaci i više. Dostava širom Srbije. NITI.",
+    "Kućni tekstil za spavaću sobu, kupatilo i kuhinju - posteljine, peškiri, stolnjaci i više. Dostava širom Srbije. NITI.",
   keywords: [
     "tekstil",
     "posteljina",
@@ -65,9 +65,9 @@ export const metadata: Metadata = {
     apple: [{ url: "/brand/niti-apple.png", sizes: "180x180" }],
   },
   openGraph: {
-    title: "NITI. — Premium tekstil za dom",
+    title: "NITI. - Premium tekstil za dom",
     description:
-      "Kućni tekstil u nežnim tonovima — posteljine, peškiri, stolnjaci i više.",
+      "Kućni tekstil u nežnim tonovima - posteljine, peškiri, stolnjaci i više.",
     type: "website",
     siteName: "NITI.",
     locale: "sr_RS",
@@ -77,15 +77,15 @@ export const metadata: Metadata = {
         url: "/brand/og-default.jpg",
         width: 1200,
         height: 630,
-        alt: "NITI. HOME — online prodavnica kućnog tekstila",
+        alt: "NITI. HOME - online prodavnica kućnog tekstila",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NITI. — Premium tekstil za dom",
+    title: "NITI. - Premium tekstil za dom",
     description:
-      "Kućni tekstil u nežnim tonovima — posteljine, peškiri, stolnjaci i više.",
+      "Kućni tekstil u nežnim tonovima - posteljine, peškiri, stolnjaci i više.",
     images: ["/brand/og-default.jpg"],
   },
   alternates: {

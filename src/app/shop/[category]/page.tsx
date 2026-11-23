@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: group?.title ?? "Prostor",
       description: truncateMeta(
         group?.description ||
-          `Tekstil za ${group?.title ?? "dom"} — NITI. premium kućni tekstil.`
+          `Tekstil za ${group?.title ?? "dom"} - NITI. premium kućni tekstil.`
       ),
       path: `/shop/${category}`,
       image: group?.image,
@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description =
     shopifyMeta?.description?.trim() ||
     cat?.description ||
-    `${cat?.title ?? "Kategorija"} — tekstil NITI.`;
+    `${cat?.title ?? "Kategorija"} - tekstil NITI.`;
   return buildPageMetadata({
     title: shopifyMeta?.title?.trim() || cat?.title || "Kategorija",
     description: truncateMeta(description),

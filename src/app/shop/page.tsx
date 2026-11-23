@@ -27,14 +27,14 @@ export async function generateMetadata({
     return buildPageMetadata({
       title: "Sniženo",
       description:
-        "Artikli na sniženju — današnja cena niža od prethodne. Posteljine, peškiri i tekstil za dom. NITI.",
+        "Artikli na sniženju - današnja cena niža od prethodne. Posteljine, peškiri i tekstil za dom. NITI.",
       path: "/shop?snizeno=1",
     });
   }
   return buildPageMetadata({
     title: "Prodavnica",
     description:
-      "Cela ponuda NITI. — posteljine, peškiri, stolnjaci, dečiji i hotelski program. Filtrirajte po prostoru i sortirajte po ceni.",
+      "Cela ponuda NITI. - posteljine, peškiri, stolnjaci, dečiji i hotelski program. Filtrirajte po prostoru i sortirajte po ceni.",
     path: "/shop",
   });
 }
@@ -61,7 +61,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
             </h1>
             {saleOnly ? (
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-niti-muted md:text-base">
-                Komadi čija je današnja cena niža od prethodne — najveći popust
+                Komadi čija je današnja cena niža od prethodne - najveći popust
                 prvi.{" "}
                 <Link
                   href="/shop"
