@@ -129,7 +129,7 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: "NITI.",
     url: getSiteUrl(),
-    logo: absoluteUrl("/brand/niti-apple.png"),
+    logo: absoluteUrl("/brand/niti-icon-512.png"),
     email: "info@nitihome.rs",
     address: {
       "@type": "PostalAddress",
@@ -144,14 +144,13 @@ export function websiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "NITI.",
+    alternateName: ["NITI HOME", "nitihome.rs"],
     url: getSiteUrl(),
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${getSiteUrl()}/search?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
+    inLanguage: "sr-RS",
+    publisher: {
+      "@type": "Organization",
+      name: "NITI.",
+      url: getSiteUrl(),
     },
   };
 }
